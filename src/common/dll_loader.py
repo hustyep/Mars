@@ -2,9 +2,15 @@ import ctypes
 from ctypes import *
 import time
 from src.common import config
+from src.common.usb import USB
 
 class DllLoader:
-    dll = None
+
+    @staticmethod
+    def load():
+        config.dllTool = DllLoader()
+        config.usb = USB()
+        config.usb.load()
     
     def __init__(self):
         self.dll = cdll.LoadLibrary('./MarsDLL.dll')

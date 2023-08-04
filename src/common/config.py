@@ -13,7 +13,7 @@ RESOURCES_DIR = 'resources'
 player_pos = (0, 0)
 
 # Describes whether the main bot loop is currently running or not
-enabled = False
+enabled: bool = False
 
 # If there is another player in the map, Auto Maple will purposely make random human-like mistakes
 stage_fright = False
@@ -21,6 +21,17 @@ stage_fright = False
 # Represents the current shortest path that the bot is taking
 path = []
 
+################################
+#       Notifier Config        #
+################################
+# 填写真实的发邮件服务器用户名、密码
+mail_user = 'mars_maple@163.com'
+mail_password = 'KQJKXCWSVPGOWPEW'
+# 实际发给的收件人
+mail_to_addrs = '326143583@qq.com'
+
+telegram_apiToken = '6683915847:AAH1iOECS1y394jkvDCD2YhHLxIDIAmGGac'
+telegram_chat_id = '805381440'
 
 #############################
 #       Shared Modules      #

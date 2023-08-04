@@ -2,16 +2,12 @@
 import cv2
 import numpy as np
 import win32gui
-import win32ui
-import win32con
 import time
 import threading
 import ctypes
 import mss
 import mss.windows
-
-from src.common import config
-from src.common import utils
+from src.common import config, utils
 
 user32 = ctypes.windll.user32
 user32.SetProcessDPIAware()
@@ -60,7 +56,7 @@ class Capture:
         self.ready = False
         self.calibrated = False
         self.thread = threading.Thread(target=self._main)
-        self.thread.daemon = False
+        self.thread.daemon = True
 
     def start(self):
         """Starts this Capture's thread."""
@@ -81,6 +77,8 @@ class Capture:
             with mss.mss() as self.sct:
                 while True:
                     if not self.calibrated:
+                        if not self.ready:
+                            self.ready = True
                         break
 
                     self.locatePlayer()

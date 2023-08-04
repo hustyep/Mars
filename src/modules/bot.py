@@ -2,14 +2,16 @@
 
 import threading
 import time
+import git
 import cv2
-import inspect
-import importlib
-import traceback
 from os.path import splitext, basename
-from src.common import config, utils, detection
-from src.common.interfaces import Configurable
+from src.common import config, utils
+from src.detection import detection
+from src.routine.routine import Routine
 from src.command_book.command_book import CommandBook
+from src.routine.components import Point
+from src.common.vkeys import press, click
+from src.common.interfaces import Configurable
 
 
 # The rune's buff icon
@@ -32,8 +34,7 @@ class Bot(Configurable):
 
         self.rune_active = False
         self.rune_pos = (0, 0)
-        # Location of the Point closest to rune
-        self.rune_closest_pos = (0, 0)
+        self.rune_closest_pos = (0, 0)      # Location of the Point closest to rune
         self.submodules = []
         self.command_book = None            # CommandBook instance
         # self.module_name = None
@@ -44,7 +45,7 @@ class Bot(Configurable):
         #           components.Move, components.Adjust, components.Buff):
         #     self.command_book[c.__name__.lower()] = c
 
-        # config.routine = Routine()
+        config.routine = Routine()
 
         self.ready = False
         self.thread = threading.Thread(target=self._main)
@@ -69,17 +70,34 @@ class Bot(Configurable):
         # model = detection.load_model()
         # print('\n[~] Initialized detection algorithm')
 
-        self.load_commands('./resources/command_books/shadower.py')
         self.ready = True
         config.listener.enabled = True
         last_fed = time.time()
         while True:
-            if config.enabled:
+            if config.enabled and len(config.routine) > 0:
                 # Buff and feed pets
-                time.sleep(5)
-                
+                self.command_book.buff.main()
+                pet_settings = config.gui.settings.pets
+                auto_feed = pet_settings.auto_feed.get()
+                num_pets = pet_settings.num_pets.get()
+                now = time.time()
+                if auto_feed and now - last_fed > 1200 / num_pets:
+                    press(self.config['Feed pet'], 1)
+                    last_fed = now
+
+                # Highlight the current Point
+                config.gui.view.routine.select(config.routine.index)
+                config.gui.view.details.display_info(config.routine.index)
+
+                # Execute next Point in the routine
+                element = config.routine[config.routine.index]
+                if self.rune_active and isinstance(element, Point) \
+                        and element.location == self.rune_closest_pos:
+                    self._solve_rune(model)
+                element.execute()
+                config.routine.step()
             else:
-                time.sleep(10)
+                time.sleep(0.01)
 
     @utils.run_if_enabled
     def _solve_rune(self, model):
@@ -89,11 +107,47 @@ class Bot(Configurable):
         :param sct:     The mss instance object with which to take screenshots.
         :return:        None
         """
-        pass
+
+        move = self.command_book['move']
+        move(*self.rune_pos).execute()
+        adjust = self.command_book['adjust']
+        adjust(*self.rune_pos).execute()
+        time.sleep(0.2)
+        press(self.config['Interact'], 1, down_time=0.2)        # Inherited from Configurable
+
+        print('\nSolving rune:')
+        inferences = []
+        for _ in range(15):
+            frame = config.capture.frame
+            solution = detection.merge_detection(model, frame)
+            if solution:
+                print(', '.join(solution))
+                if solution in inferences:
+                    print('Solution found, entering result')
+                    for arrow in solution:
+                        press(arrow, 1, down_time=0.1)
+                    time.sleep(1)
+                    for _ in range(3):
+                        time.sleep(0.3)
+                        frame = config.capture.frame
+                        rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :],
+                                                      RUNE_BUFF_TEMPLATE,
+                                                      threshold=0.9)
+                        if rune_buff:
+                            rune_buff_pos = min(rune_buff, key=lambda p: p[0])
+                            target = (
+                                round(rune_buff_pos[0] + config.capture.window['left']),
+                                round(rune_buff_pos[1] + config.capture.window['top'])
+                            )
+                            click(target, button='right')
+                    self.rune_active = False
+                    break
+                elif len(solution) == 4:
+                    inferences.append(solution)
 
     def load_commands(self, file):
         try:
             self.command_book = CommandBook(file)
-            # config.gui.settings.update_class_bindings()
+            config.gui.settings.update_class_bindings()
         except ValueError:
-            pass
+            pass    # TODO: UI warning popup, say check cmd for errors

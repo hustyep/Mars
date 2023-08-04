@@ -10,7 +10,7 @@ class Skill(ABC):
         self.precast = None
         self.backswing = 500
 
-    def canUse(self, next_t=0):
+    def canUse(self, next_t: float = 0) -> bool:
         if self.cooldown is None:
             return True
 
