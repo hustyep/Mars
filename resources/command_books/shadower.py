@@ -10,31 +10,32 @@ from src.common.vkeys import press, key_down, key_up
 # List of key mappings
 class Key:
     # Movement
-    JUMP = 'space' 
-    FLASH_JUMP = 'space' 
-    SHADOW_ASSAULT = 't' 
+    JUMP = 's'
+    FLASH_JUMP = 's' 
+    SHADOW_ASSAULT = 'g' 
 
     # Buffs
-    SHADOW_PARTNER = '1' 
-    MAPLE_WARRIOR = '2' 
-    EPIC_ADVENTURE = '3'
-    SPEED_INFUSION = '8'
-    HOLY_SYMBOL = '4'
-    SHARP_EYE = '5'
-    COMBAT_ORDERS = '6'
-    ADVANCED_BLESSING = '7'
+    MAPLE_WARRIOR = '1' 
+    EPIC_ADVENTURE = '2'
+    SHADOW_PARTNER = '3' 
+
+    # SPEED_INFUSION = '8'
+    # HOLY_SYMBOL = '4'
+    # SHARP_EYE = '5'
+    # COMBAT_ORDERS = '6'
+    # ADVANCED_BLESSING = '7'
 
     # Skills
-    CRUEL_STAB = 'q' 
-    MESO_EXPLOSION = 'w' 
-    SUDDEN_RAID = 'e'
-    DARK_FLARE = 's' 
-    SHADOW_VEIL = 'a' 
-    ARACHNID = 'f4' 
-    ERDA_SHOWER = 'f5' 
-    TRICKBLADE = 'd'
-    SLASH_SHADOW_FORMATION = 'v'
-    SONIC_BLOW = 'b'
+    CRUEL_STAB = 'f' 
+    MESO_EXPLOSION = 'd' 
+    SUDDEN_RAID = 'r'
+    DARK_FLARE = 'w' 
+    SHADOW_VEIL = 'x' 
+    # ARACHNID = 'f4' 
+    ERDA_SHOWER = '`' 
+    TRICKBLADE = 'a'
+    SLASH_SHADOW_FORMATION = 'c'
+    SONIC_BLOW = 'z'
 
 
 #########################
@@ -43,7 +44,7 @@ class Key:
 def step(direction, target):
     """
     Performs one movement step in the given DIRECTION towards TARGET.
-    Should not press any arrow keys, as those are handled by Auto Maple.
+    Should not press any arrow keys, as those are handled by Mars.
     """
 
     num_presses = 2
@@ -58,7 +59,11 @@ def step(direction, target):
         elif direction == 'up':
             press(Key.JUMP, 1)
     press(Key.FLASH_JUMP, num_presses)
-
+    if direction == "left" or direction == "right":
+        CruelStabRandomDirection().execute()
+        time.sleep(0.05)
+        MesoExplosion().execute()
+        time.sleep(0.30)
 
 class Adjust(Command):
     """Fine-tunes player position using small movements."""
@@ -122,26 +127,29 @@ class Buff(Command):
         self.decent_buff_time = 0
 
     def main(self):
-        buffs = [Key.SPEED_INFUSION, Key.HOLY_SYMBOL, Key.SHARP_EYE, Key.COMBAT_ORDERS, Key.ADVANCED_BLESSING]
+        # buffs = [Key.SPEED_INFUSION, Key.HOLY_SYMBOL, Key.SHARP_EYE, Key.COMBAT_ORDERS, Key.ADVANCED_BLESSING]
         now = time.time()
 
         if self.cd120_buff_time == 0 or now - self.cd120_buff_time > 120:
-	        press(Key.EPIC_ADVENTURE, 2)
-	        self.cd120_buff_time = now
+            press(Key.EPIC_ADVENTURE, 2)
+            self.cd120_buff_time = now
+            time.sleep(1)
         if self.cd180_buff_time == 0 or now - self.cd180_buff_time > 180:
-	        self.cd180_buff_time = now
+            self.cd180_buff_time = now
         if self.cd200_buff_time == 0 or now - self.cd200_buff_time > 200:
-	        press(Key.SHADOW_PARTNER, 2)
-	        self.cd200_buff_time = now
+            press(Key.SHADOW_PARTNER, 2)
+            self.cd200_buff_time = now
+            time.sleep(1)
         if self.cd240_buff_time == 0 or now - self.cd240_buff_time > 240:
-	        self.cd240_buff_time = now
+            self.cd240_buff_time = now
         if self.cd900_buff_time == 0 or now - self.cd900_buff_time > 900:
-	        press(Key.MAPLE_WARRIOR, 2)
-	        self.cd900_buff_time = now
-        if self.decent_buff_time == 0 or now - self.decent_buff_time > settings.buff_cooldown:
-	        for key in buffs:
-		        press(key, 3, up_time=0.3)
-	        self.decent_buff_time = now		
+            press(Key.MAPLE_WARRIOR, 2)
+            self.cd900_buff_time = now
+            time.sleep(1)
+        # if self.decent_buff_time == 0 or now - self.decent_buff_time > settings.buff_cooldown:
+        #     for key in buffs:
+        #         press(key, 3, up_time=0.3)
+        #     self.decent_buff_time = now		
 
 			
 class FlashJump(Command):

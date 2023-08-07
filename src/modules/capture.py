@@ -67,7 +67,7 @@ class Capture:
     def _main(self):
         """Constantly monitors the player's position and in-game events."""
 
-        self.start_auto_calibrate()
+        # self.start_auto_calibrate()
 
         mss.windows.CAPTUREBLT = 0
         while True:
@@ -85,13 +85,13 @@ class Capture:
 
                     if not self.ready:
                         self.ready = True
-                    time.sleep(1)
+                    time.sleep(0.001)
         
     def start_auto_calibrate(self):
         # auto recalibrate
         self.calibrated = False
 
-        timer = threading.Timer(5, self.start_auto_calibrate)
+        timer = threading.Timer(10, self.start_auto_calibrate)
         timer.start()
 
     def recalibrate(self):
@@ -149,7 +149,7 @@ class Capture:
         player = utils.multi_match(
             minimap, PLAYER_TEMPLATE, threshold=0.8)
         if player:
-            config.player_pos = player[0]
+            config.player_pos = utils.convert_to_relative(player[0], minimap)
         else:
             # print("cant locate player")
             pass
@@ -157,8 +157,8 @@ class Capture:
         # Package display information to be polled by GUI
         self.minimap = {
             'minimap': minimap,
-            # 'rune_active': config.bot.rune_active,
-            # 'rune_pos': config.bot.rune_pos,
+            'rune_active': config.bot.rune_active,
+            'rune_pos': config.bot.rune_pos,
             'path': config.path,
             'player_pos': config.player_pos
         }

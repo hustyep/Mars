@@ -1,0 +1,15 @@
+
+@, label=Bottom mobbing
+*, x=0.85, y=0.2, frequency=1, skip=False, adjust=False
+    MesoExplosion
+*, x=0.621, y=0.2, frequency=1, skip=False, adjust=False
+    MesoExplosion
+*, x=0.399, y=0.2, frequency=1, skip=False, adjust=False
+    MesoExplosion
+*, x=0.16, y=0.2, frequency=1, skip=False, adjust=False
+    MesoExplosion
+    Wait, duration=1
+*, x=0.399, y=0.2, frequency=1, skip=False, adjust=False
+    MesoExplosion
+*, x=0.621, y=0.2, frequency=1, skip=False, adjust=False
+    MesoExplosion

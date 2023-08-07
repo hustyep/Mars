@@ -98,9 +98,9 @@ class CommandBook(Configurable):
         if required_found and (step_found or movement_found):
             self.buff = new_cb['buff']()
             components.step = new_step
-            # config.gui.menu.file.enable_routine_state()
-            # config.gui.view.status.set_cb(basename(file))
-            # config.routine.clear()
+            config.gui.menu.file.enable_routine_state()
+            config.gui.view.status.set_cb(basename(file))
+            config.routine.clear()
             print(f" ~  Successfully loaded command book '{self.name}'")
             return new_cb, module
         else:

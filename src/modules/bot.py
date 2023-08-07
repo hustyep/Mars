@@ -2,11 +2,10 @@
 
 import threading
 import time
-import git
 import cv2
 from os.path import splitext, basename
 from src.common import config, utils
-from src.detection import detection
+from src.detection import rune
 from src.routine.routine import Routine
 from src.command_book.command_book import CommandBook
 from src.routine.components import Point
@@ -22,8 +21,8 @@ class Bot(Configurable):
     """A class that interprets and executes user-defined routines."""
 
     DEFAULT_CONFIG = {
-        'Interact': 'y',
-        'Feed pet': '9'
+        'Interact': 'space',
+        'Feed pet': 'L'
     }
 
     def __init__(self):
@@ -37,13 +36,6 @@ class Bot(Configurable):
         self.rune_closest_pos = (0, 0)      # Location of the Point closest to rune
         self.submodules = []
         self.command_book = None            # CommandBook instance
-        # self.module_name = None
-        # self.buff = components.Buff()
-
-        # self.command_book = {}
-        # for c in (components.Wait, components.Walk, components.Fall,
-        #           components.Move, components.Adjust, components.Buff):
-        #     self.command_book[c.__name__.lower()] = c
 
         config.routine = Routine()
 
@@ -60,19 +52,20 @@ class Bot(Configurable):
         print('\n[~] Started main bot loop')
         self.thread.start()
 
+    # def loadModel(self):
+    #     print('\n[~] Initializing detection algorithm:\n')
+    #     self.model = detection.load_model()
+    #     print('\n[~] Initialized detection algorithm')
+
     def _main(self):
         """
         The main body of Bot that executes the user's routine.
         :return:    None
         """
 
-        # print('\n[~] Initializing detection algorithm:\n')
-        # model = detection.load_model()
-        # print('\n[~] Initialized detection algorithm')
-
         self.ready = True
         config.listener.enabled = True
-        last_fed = time.time()
+        last_fed = 0
         while True:
             if config.enabled and len(config.routine) > 0:
                 # Buff and feed pets
@@ -81,7 +74,7 @@ class Bot(Configurable):
                 auto_feed = pet_settings.auto_feed.get()
                 num_pets = pet_settings.num_pets.get()
                 now = time.time()
-                if auto_feed and now - last_fed > 1200 / num_pets:
+                if auto_feed and now - last_fed > 600 / num_pets:
                     press(self.config['Feed pet'], 1)
                     last_fed = now
 
@@ -93,17 +86,16 @@ class Bot(Configurable):
                 element = config.routine[config.routine.index]
                 if self.rune_active and isinstance(element, Point) \
                         and element.location == self.rune_closest_pos:
-                    self._solve_rune(model)
+                    self._solve_rune()
                 element.execute()
                 config.routine.step()
             else:
                 time.sleep(0.01)
 
     @utils.run_if_enabled
-    def _solve_rune(self, model):
+    def _solve_rune(self):
         """
         Moves to the position of the rune and solves the arrow-key puzzle.
-        :param model:   The TensorFlow model to classify with.
         :param sct:     The mss instance object with which to take screenshots.
         :return:        None
         """
@@ -114,13 +106,15 @@ class Bot(Configurable):
         adjust(*self.rune_pos).execute()
         time.sleep(0.2)
         press(self.config['Interact'], 1, down_time=0.2)        # Inherited from Configurable
+        time.sleep(0.2)
+        utils.save_screenshot(config.capture.frame)
 
         print('\nSolving rune:')
         inferences = []
-        for _ in range(15):
+        for _ in range(12):
             frame = config.capture.frame
-            solution = detection.merge_detection(model, frame)
-            if solution:
+            solution = rune.show_magic(frame)
+            if solution is not None:
                 print(', '.join(solution))
                 if solution in inferences:
                     print('Solution found, entering result')
@@ -139,7 +133,12 @@ class Bot(Configurable):
                                 round(rune_buff_pos[0] + config.capture.window['left']),
                                 round(rune_buff_pos[1] + config.capture.window['top'])
                             )
+                            click(target, button='left')
+                            time.sleep(0.05)
                             click(target, button='right')
+                            time.sleep(0.05)
+                            click(target, button='right')
+
                     self.rune_active = False
                     break
                 elif len(solution) == 4:

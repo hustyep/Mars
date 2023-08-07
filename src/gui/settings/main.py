@@ -1,4 +1,4 @@
-"""Displays Auto Maple's current settings and allows the user to edit them."""
+"""Displays Mars's current settings and allows the user to edit them."""
 
 import tkinter as tk
 from src.gui.interfaces import KeyBindings
@@ -16,7 +16,7 @@ class Settings(Tab):
 
         self.column1 = Frame(self)
         self.column1.grid(row=0, column=1, sticky=tk.N, padx=10, pady=10)
-        self.controls = KeyBindings(self.column1, 'Auto Maple Controls', config.listener)
+        self.controls = KeyBindings(self.column1, 'Mars Controls', config.listener)
         self.controls.pack(side=tk.TOP, fill='x', expand=True)
         self.common_bindings = KeyBindings(self.column1, 'In-game Keybindings', config.bot)
         self.common_bindings.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))

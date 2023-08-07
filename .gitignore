@@ -163,3 +163,7 @@ assets/models/
 .idea/
 .settings/
 *.iml
+screenshot
+resources/layouts/*
+resources/keybindings/*
+.settings/*

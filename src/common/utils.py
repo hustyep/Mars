@@ -90,7 +90,7 @@ def single_match(frame, template):
     result = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF)
     _, maxVal, _, top_left = cv2.minMaxLoc(result)
     if (maxVal > 0.95):
-        w, h = template.shape[::-1]
+        h, w = template.shape[::-1]
         bottom_right = (top_left[0] + w, top_left[1] + h)
         return top_left, bottom_right
     else:
@@ -121,11 +121,11 @@ def multi_match(frame, template, threshold=0.95):
         y = int(round(p[1] + template.shape[0] / 2))
         results.append((x, y))
 
-        cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
-                      p[1]+template.shape[0]), (0, 0, 225), 2)
+        # cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
+        #               p[1]+template.shape[0]), (0, 0, 225), 2)
     # cv2.imshow("result", src_copy)
     # cv2.waitKey()
-    return locations
+    return results
 
 
 def convert_to_relative(point, frame):
@@ -212,7 +212,7 @@ def print_tag(tag):
 
 
 def print_state():
-    """Prints whether Auto Maple is currently enabled or disabled."""
+    """Prints whether Mars is currently enabled or disabled."""
     print_tag('ENABLED ' if config.enabled else 'DISABLED')
 
 
@@ -308,3 +308,6 @@ def image_search(template_path):
 
 def timeStr() -> str:
     return time.strftime("%y_%m_%d_%H_%M_%S", time.localtime()) 
+
+def save_screenshot(frame):
+    cv2.imwrite(f'screenshot/screen_shot_{int(time.time() * 1000)}.png', frame)

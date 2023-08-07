@@ -112,7 +112,7 @@ class KeyBindings(LabelFrame):
             self.canvas.destroy()
             self.scrollbar.destroy()
 
-    @utils.run_if_disabled('\n[!] Cannot save key bindings while Auto Maple is enabled')
+    @utils.run_if_disabled('\n[!] Cannot save key bindings while Mars is enabled')
     def save_keybindings(self):
         utils.print_separator()
         print(f"[~] Saving key bindings to '{self.target.TARGET}':")

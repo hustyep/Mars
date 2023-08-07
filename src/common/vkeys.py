@@ -158,7 +158,7 @@ def press(key, n, down_time=0.05, up_time=0.1):
         time.sleep(up_time * (0.8 + 0.4 * random()))
 
 
-@utils.run_if_enabled
+# @utils.run_if_enabled
 def click(position, button='left'):
     """
     Simulate a mouse click with BUTTON at POSITION.
@@ -170,7 +170,7 @@ def click(position, button='left'):
     if button not in ['left', 'right']:
         print(f"'{button}' is not a valid mouse button.")
     else:
-        config.usb.mousu_abs_move(position[0], position[1])
+        config.usb.mouse_abs_move(position[0], position[1])
         if button == 'left':
             config.usb.mouse_left_click()
         else:

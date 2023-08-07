@@ -118,9 +118,9 @@ class USB:
         self.sendCMD(cmd)
         
     def mouse_relative_move(self, x, y):
-        cmd = self.buildCMD(CMD_MOUSE_MOVE, x, y)
+        cmd = self.buildCMD(CMD_MOUSE_MOVE, str(x), str(y))
         self.sendCMD(cmd)
         
     def mouse_abs_move(self, x, y):
-        cmd = self.buildCMD(CMD_MOUSE_ABS_MOVE, x, y)
+        cmd = self.buildCMD(CMD_MOUSE_ABS_MOVE, str(x), str(y))
         self.sendCMD(cmd)

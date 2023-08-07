@@ -85,7 +85,7 @@ def reset():
 
 
 # The allowed error from the destination when moving towards a Point
-move_tolerance = 0.1
+move_tolerance = 0.08
 
 # The allowed error from a specific location while adjusting to that location
 adjust_tolerance = 0.01
