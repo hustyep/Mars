@@ -166,4 +166,4 @@ assets/models/
 screenshot
 resources/layouts/*
 resources/keybindings/*
-.settings/*
+.vscode/
