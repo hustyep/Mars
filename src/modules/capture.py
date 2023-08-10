@@ -124,8 +124,8 @@ class Capture:
             tl[1] + MINIMAP_TOP_BORDER
         )
         mm_br = (
-            max(mm_tl[0] + PT_WIDTH, br[0] - MINIMAP_BOTTOM_BORDER),
-            max(mm_tl[1] + PT_HEIGHT, br[1] - MINIMAP_BOTTOM_BORDER)
+            max(mm_tl[0] + PT_WIDTH, br[0] + 5),
+            max(mm_tl[1] + PT_HEIGHT, br[1] - 25)
         )
         self.minimap_ratio = (mm_br[0] - mm_tl[0]) / (mm_br[1] - mm_tl[1])
         self.mm_tl = mm_tl
@@ -170,6 +170,23 @@ class Capture:
             print(f'\n[!] Error while taking screenshot, retrying in {delay} second'
                   + ('s' if delay != 1 else ''))
             time.sleep(delay)
+            
+    def findMinimap(self, frame):
+        tl, _ = utils.single_match(frame, MM_TL_TEMPLATE)
+        _, br = utils.single_match(frame, MM_BR_TEMPLATE)
+        if tl == -1 or br == -1:
+            # print("cant locate minimap")
+            return None
+        
+        mm_tl = (
+            tl[0] + MINIMAP_BOTTOM_BORDER,
+            tl[1] + MINIMAP_TOP_BORDER
+        )
+        mm_br = (
+            br[0] + 5,
+            br[1] - 25
+        )
+        return frame[mm_tl[1]:mm_br[1], mm_tl[0]:mm_br[0]]
 
     # def screen_shot(self, hwnd = None, picture_name = None):
     #     if hwnd is None:

@@ -1,16 +1,15 @@
 """A module for detecting and notifying the user of dangerous in-game events."""
 
-from src.common import config, utils
 import time
 import os
 import cv2
 import pygame
 import threading
 import numpy as np
-import keyboard as kb
 from src.routine.components import Point
-from src.common import mail, telegram
+from src.common import config, utils, mail, telegram_bot
 
+RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 
 # A rune's symbol on the minimap
 RUNE_RANGES = (
@@ -101,17 +100,21 @@ class Notifier:
                         else:
                             self.notifyRuneResolveFailed()
                     elif self.rune_start_time != 0:
-                        self.rune_start_time = 0
-                        threading.Timer(1, self.notifyRuneResolved).start()
+                        frame = config.capture.frame
+                        rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+                        if len(rune_buff) > 1:
+                            self.rune_start_time = 0
+                            self.notifyRuneResolved()
+                        else:
+                            self.notifyRuneResolveFailed()
                 elif now - self.rune_start_time > self.rune_alert_delay:     # Alert if rune hasn't been solved
-                    # config.bot.rune_active = False
-                    # self.notifyRuneResolveFailed()
+                    # TODO 语音提醒
                     pass
             time.sleep(0.05)
 
     def checkOtherPlayer(self, minimap):
         filtered = utils.filter_color(minimap, OTHER_RANGES)
-        others = len(utils.multi_match(filtered, OTHER_TEMPLATE, threshold=0.5))
+        others = len(utils.multi_match(filtered, OTHER_TEMPLATE, threshold=0.7))
         config.stage_fright = others > 0
         if others > self.prev_others:
             self.notifyPlayerComing(others)
@@ -127,8 +130,8 @@ class Notifier:
         text_notice = f"有人来了，当前地图人数{num}"
         print(f"[!!!!]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram.send_text(text_notice)
-            telegram.send_photo(imagePath)
+            telegram_bot.send_text(text_notice)
+            telegram_bot.send_photo(imagePath)
         elif config.mail_user is not None:
             mail.sendImage(text_notice, imagePath)
             
@@ -136,7 +139,7 @@ class Notifier:
         text_notice = f"有人走了，当前地图人数{num}"
         print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram.send_text(text_notice)
+            telegram_bot.send_text(text_notice)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
             
@@ -144,7 +147,7 @@ class Notifier:
         text_notice = "出现符文"
         print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram.send_text(text_notice)
+            telegram_bot.send_text(text_notice)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
             
@@ -156,8 +159,8 @@ class Notifier:
         text_notice = "解符文成功"
         print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram.send_text(text_notice)
-            telegram.send_photo(imagePath)
+            telegram_bot.send_text(text_notice)
+            telegram_bot.send_photo(imagePath)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
             
@@ -169,8 +172,8 @@ class Notifier:
         text_notice = f"解符文失败, 已持续{time.time() - self.rune_start_time}s"
         print(f"[!!!!!!]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram.send_text(text_notice)
-            telegram.send_photo(imagePath)
+            telegram_bot.send_text(text_notice)
+            telegram_bot.send_photo(imagePath)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
                     

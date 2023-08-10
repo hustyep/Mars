@@ -115,7 +115,7 @@ def multi_match(frame, template, threshold=0.95):
     locations = np.where(result >= threshold)
     locations = list(zip(*locations[::-1]))
     results = []
-    src_copy = frame.copy()
+    # src_copy = frame.copy()
     for p in locations:
         x = int(round(p[0] + template.shape[1] / 2))
         y = int(round(p[1] + template.shape[0] / 2))
