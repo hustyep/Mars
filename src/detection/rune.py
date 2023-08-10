@@ -12,8 +12,8 @@ mpl.rcParams['axes.unicode_minus'] = False
 
 ARROW_TL_TEMPLATE = cv2.imread('assets/rune_top_left.png', 0)
 ARROW_RANGES1 = (
-    ((1, 100, 100), (100, 255, 255)),
-    ((0, 100, 200), (180, 255, 255))
+    ((1, 100, 100), (75, 255, 255)),
+    ((0, 100, 200), (75, 255, 255))
 )
 
 ARROW_RANGES2 = (
@@ -47,7 +47,10 @@ def single_match(frame, template):
 
 def crop_arrow_area(frame):
     height, width, channels = frame.shape
-    cropped = frame[120:height//2, width//4:3*width//4]
+    if width < 1000:
+        cropped = frame[120:height//2, 100:width-100]
+    else:
+        cropped = frame[120:height//2, width//4:3*width//4]
     canned = canny(cropped)
     tl, _ = single_match(canned, ARROW_TL_TEMPLATE)
     x = tl[0] + 10

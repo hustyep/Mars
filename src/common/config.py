@@ -59,3 +59,5 @@ usb = None
 
 # Shares the tool dll
 dllTool = None  
+
+notifier = None

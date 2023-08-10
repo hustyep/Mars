@@ -48,9 +48,12 @@ class Notifier:
         self.thread.daemon = True
         
         self.prev_others = 0
+        self.rune_start_time = 0
 
         self.room_change_threshold = 0.9
-        self.rune_alert_delay = 270         # 4.5 minutes
+        self.rune_alert_delay = 90         # 3 minutes
+        
+        config.notifier = self
 
     def start(self):
         """Starts this Notifier's thread."""
@@ -60,7 +63,6 @@ class Notifier:
 
     def _main(self):
         self.ready = True
-        rune_start_time = time.time()
         while True:
             if config.enabled:
                 frame = config.capture.frame
@@ -86,7 +88,6 @@ class Notifier:
                 if not config.bot.rune_active:
                     filtered = utils.filter_color(minimap, RUNE_RANGES)
                     matches = utils.multi_match(filtered, RUNE_TEMPLATE, threshold=0.9)
-                    rune_start_time = now
                     if matches and config.routine.sequence:
                         abs_rune_pos = (matches[0][0], matches[0][1])
                         config.bot.rune_pos = utils.convert_to_relative(abs_rune_pos, minimap)
@@ -94,54 +95,101 @@ class Notifier:
                         index = np.argmin(distances)
                         config.bot.rune_closest_pos = config.routine[index].location
                         config.bot.rune_active = True
-                        self._ping('rune_appeared', volume=0.75)
-                elif now - rune_start_time > self.rune_alert_delay:     # Alert if rune hasn't been solved
-                    config.bot.rune_active = False
-                    self._alert('siren')
+                        if self.rune_start_time == 0:
+                            self.rune_start_time = now
+                            self.notifyRuneAppeared()
+                        else:
+                            self.notifyRuneResolveFailed()
+                    elif self.rune_start_time != 0:
+                        self.rune_start_time = 0
+                        threading.Timer(1, self.notifyRuneResolved).start()
+                elif now - self.rune_start_time > self.rune_alert_delay:     # Alert if rune hasn't been solved
+                    # config.bot.rune_active = False
+                    # self.notifyRuneResolveFailed()
+                    pass
             time.sleep(0.05)
 
     def checkOtherPlayer(self, minimap):
         filtered = utils.filter_color(minimap, OTHER_RANGES)
         others = len(utils.multi_match(filtered, OTHER_TEMPLATE, threshold=0.5))
         config.stage_fright = others > 0
-        if others != self.prev_others:
-            if others > self.prev_others:
-                self._ping('ding')
-            self.prev_others = others
+        if others > self.prev_others:
+            self.notifyPlayerComing(others)
+        elif others < self.prev_others:
+            self.notifyPlayerLeaved(others)
+        self.prev_others = others            
             
     def notifyPlayerComing(self, num):        
         timestamp = int(time.time())
-        imagePath = f"screenshot/newPlayer/maple_{timestamp}.png"
+        imagePath = f"screenshot/new_player/maple_{timestamp}.png"
         cv2.imwrite(imagePath, config.capture.frame)
         
+        text_notice = f"有人来了，当前地图人数{num}"
+        print(f"[!!!!]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram.send_text(f"有人来了，当前地图人数{num}")
+            telegram.send_text(text_notice)
             telegram.send_photo(imagePath)
-        if config.mail_user is not None:
-            mail.sendImage("有人来了", f"当前地图人数{num}", imagePath)
+        elif config.mail_user is not None:
+            mail.sendImage(text_notice, imagePath)
             
     def notifyPlayerLeaved(self, num):
+        text_notice = f"有人走了，当前地图人数{num}"
+        print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram.send_text(f"有人走了，当前地图人数{num}")
-        if config.mail_user is not None:
-            mail.sendText("有人走了", f"当前地图人数{num}")
+            telegram.send_text(text_notice)
+        elif config.mail_user is not None:
+            mail.sendText(text_notice)
+            
+    def notifyRuneAppeared(self):
+        text_notice = "出现符文"
+        print(f"[~]{text_notice}")
+        if config.telegram_chat_id is not None:
+            telegram.send_text(text_notice)
+        elif config.mail_user is not None:
+            mail.sendText(text_notice)
+            
+    def notifyRuneResolved(self):
+        timestamp = int(time.time())
+        imagePath = f"screenshot/rune_solved/maple_{timestamp}.png"
+        cv2.imwrite(imagePath, config.capture.frame)
+
+        text_notice = "解符文成功"
+        print(f"[~]{text_notice}")
+        if config.telegram_chat_id is not None:
+            telegram.send_text(text_notice)
+            telegram.send_photo(imagePath)
+        elif config.mail_user is not None:
+            mail.sendText(text_notice)
+            
+    def notifyRuneResolveFailed(self):
+        timestamp = int(time.time())
+        imagePath = f"screenshot/rune_failed/maple_{timestamp}.png"
+        cv2.imwrite(imagePath, config.capture.frame)
+
+        text_notice = f"解符文失败, 已持续{time.time() - self.rune_start_time}s"
+        print(f"[!!!!!!]{text_notice}")
+        if config.telegram_chat_id is not None:
+            telegram.send_text(text_notice)
+            telegram.send_photo(imagePath)
+        elif config.mail_user is not None:
+            mail.sendText(text_notice)
                     
     def _alert(self, name, volume=0.75):
         """
         Plays an alert to notify user of a dangerous event. Stops the alert
         once the key bound to 'Start/stop' is pressed.
         """
-
-        config.enabled = False
-        config.listener.enabled = False
-        self.mixer.load(get_alert_path(name))
-        self.mixer.set_volume(volume)
-        self.mixer.play(-1)
-        while not kb.is_pressed(config.listener.config['Start/stop']):
-            time.sleep(0.1)
-        self.mixer.stop()
-        time.sleep(2)
-        config.listener.enabled = True
+        pass
+        # config.enabled = False
+        # config.listener.enabled = False
+        # self.mixer.load(get_alert_path(name))
+        # self.mixer.set_volume(volume)
+        # self.mixer.play(-1)
+        # while not kb.is_pressed(config.listener.config['Start/stop']):
+        #     time.sleep(0.1)
+        # self.mixer.stop()
+        # time.sleep(2)
+        # config.listener.enabled = True
 
     def _ping(self, name, volume=0.5):
         """A quick notification for non-dangerous events."""

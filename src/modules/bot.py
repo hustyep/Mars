@@ -120,26 +120,13 @@ class Bot(Configurable):
                     print('Solution found, entering result')
                     for arrow in solution:
                         press(arrow, 1, down_time=0.1)
-                    time.sleep(1)
-                    for _ in range(3):
-                        time.sleep(0.3)
-                        frame = config.capture.frame
-                        rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :],
-                                                      RUNE_BUFF_TEMPLATE,
-                                                      threshold=0.9)
-                        if rune_buff:
-                            rune_buff_pos = min(rune_buff, key=lambda p: p[0])
-                            target = (
-                                round(rune_buff_pos[0] + config.capture.window['left']),
-                                round(rune_buff_pos[1] + config.capture.window['top'])
-                            )
-                            click(target, button='left')
-                            time.sleep(0.05)
-                            click(target, button='right')
-                            time.sleep(0.05)
-                            click(target, button='right')
-
                     self.rune_active = False
+                    time.sleep(0.1)
+                    # if self.rune_active:
+                    #     config.notifier.notifyRuneResolveFailed()
+                    # else :
+                    #     config.notifier.notifyRuneResolved()
+                            
                     break
                 elif len(solution) == 4:
                     inferences.append(solution)
@@ -150,3 +137,27 @@ class Bot(Configurable):
             config.gui.settings.update_class_bindings()
         except ValueError:
             pass    # TODO: UI warning popup, say check cmd for errors
+
+    def cancel_rune_buff(self):
+        for _ in range(3):
+            time.sleep(0.3)
+            frame = config.capture.frame
+            rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :],
+                                            RUNE_BUFF_TEMPLATE,
+                                            threshold=0.9)
+            if rune_buff:
+                rune_buff_pos = min(rune_buff, key=lambda p: p[0])
+                target = (
+                    round(rune_buff_pos[0] + config.capture.window['left']),
+                    round(rune_buff_pos[1] + config.capture.window['top'])
+                )
+                # click(target, button='left')
+                # time.sleep(0.05)
+                config.usb.mouse_relative_move(-35, 10)
+                config.usb.mouse_relative_move(2, 5)
+                time.sleep(0.05)
+                click(target, button='right')
+                time.sleep(0.03)
+                click(target, button='right')
+                time.sleep(0.03)
+                click(target, button='right')
