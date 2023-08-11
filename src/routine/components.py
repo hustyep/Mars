@@ -210,6 +210,11 @@ SYMBOLS = {
 #############################
 class Command(Component):
     id = 'Command Superclass'
+    key: str = None
+    cooldown: int = 0
+    castedTime: float = 0
+    precast: float = 0
+    backswing: float = 0.5
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -224,6 +229,28 @@ class Command(Component):
             if key != 'id':
                 result += f'\n        {key}={value}'
         return result
+    
+    def canUse(self, next_t: float = 0) -> bool:
+        if self.__class__.cooldown is None:
+            return True
+
+        cur_time = time.time()
+        if (cur_time + next_t - self.__class__.castedTime) > self.__class__.cooldown + self.__class__.backswing:
+            return True
+
+        return False
+    
+    def main(self):
+        if not self.canUse():
+            return
+        
+        if self.__class__.key is None:
+            return
+        
+        print(f"cast skill: {self.key}")
+        time.sleep(self.__class__.precast)
+        self.__class__.castedTime = time.time()
+        press(self.__class__.key, up_time=self.__class__.backswing)
 
 
 class Move(Command):
@@ -236,7 +263,9 @@ class Move(Command):
         self.prev_direction = ''
 
     def _new_direction(self, new):
-        key_down(new)
+        if new != 'up':
+            # 谨慎按上方向键
+            key_down(new)
         if self.prev_direction and self.prev_direction != new:
             key_up(self.prev_direction)
         self.prev_direction = new

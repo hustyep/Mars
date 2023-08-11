@@ -48,3 +48,22 @@ threading.Timer(3, loadDefault).start()
 
 gui = GUI()
 gui.start()
+
+
+#########################
+##         Test        ##
+#########################
+
+# import cv2
+# from src.common import utils
+# RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
+
+# frame = cv2.imread("screenshot/new_player/maple_1691600971.png")
+# minimap = capture.findMinimap(frame)
+# cv2.imshow("minimap", minimap)
+# notifier.checkOtherPlayer(minimap)
+
+# frame = cv2.imread("screenshot/rune_solved/maple_1691652398.png")
+# rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+
+# cv2.waitKey(0)

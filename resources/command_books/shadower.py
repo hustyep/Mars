@@ -31,7 +31,7 @@ class Key:
     SUDDEN_RAID = 'r'
     DARK_FLARE = 'w' 
     SHADOW_VEIL = 'x' 
-    # ARACHNID = 'f4' 
+    # ARACHNID = 'h' 
     ERDA_SHOWER = '`' 
     TRICKBLADE = 'a'
     SLASH_SHADOW_FORMATION = 'c'
@@ -58,12 +58,12 @@ def step(direction, target):
             press(Key.JUMP, 3)
         elif direction == 'up':
             press(Key.JUMP, 1)
-    press(Key.FLASH_JUMP, num_presses)
+    press(Key.FLASH_JUMP, num_presses, down_time=0.04, up_time=0.05)
     if direction == "left" or direction == "right":
         CruelStabRandomDirection().execute()
         time.sleep(0.05)
         MesoExplosion().execute()
-        time.sleep(0.30)
+        time.sleep(0.28)
 
 class Adjust(Command):
     """Fine-tunes player position using small movements."""

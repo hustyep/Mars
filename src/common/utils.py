@@ -310,4 +310,4 @@ def timeStr() -> str:
     return time.strftime("%y_%m_%d_%H_%M_%S", time.localtime()) 
 
 def save_screenshot(frame):
-    cv2.imwrite(f'screenshot/screen_shot_{int(time.time() * 1000)}.png', frame)
+    cv2.imwrite(f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}.png', frame)

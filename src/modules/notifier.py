@@ -7,7 +7,8 @@ import pygame
 import threading
 import numpy as np
 from src.routine.components import Point
-from src.common import config, utils, mail, telegram_bot
+from src.common import config, utils, mail
+from src.common.telegram_bot import TelegramBot
 
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 
@@ -52,10 +53,14 @@ class Notifier:
         self.room_change_threshold = 0.9
         self.rune_alert_delay = 90         # 3 minutes
         
+        self.telegram_bot = TelegramBot(config.telegram_apiToken, config.telegram_chat_id)
+        
         config.notifier = self
 
     def start(self):
         """Starts this Notifier's thread."""
+
+        threading.Timer(3, self.telegram_bot.run).start()
 
         print('\n[~] Started notifier')
         self.thread.start()
@@ -130,8 +135,8 @@ class Notifier:
         text_notice = f"有人来了，当前地图人数{num}"
         print(f"[!!!!]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram_bot.send_text(text_notice)
-            telegram_bot.send_photo(imagePath)
+            self.telegram_bot.send_text(text_notice)
+            self.telegram_bot.send_photo(imagePath)
         elif config.mail_user is not None:
             mail.sendImage(text_notice, imagePath)
             
@@ -139,7 +144,7 @@ class Notifier:
         text_notice = f"有人走了，当前地图人数{num}"
         print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram_bot.send_text(text_notice)
+            self.telegram_bot.send_text(text_notice)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
             
@@ -147,7 +152,7 @@ class Notifier:
         text_notice = "出现符文"
         print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram_bot.send_text(text_notice)
+            self.telegram_bot.send_text(text_notice)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
             
@@ -159,8 +164,8 @@ class Notifier:
         text_notice = "解符文成功"
         print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram_bot.send_text(text_notice)
-            telegram_bot.send_photo(imagePath)
+            self.telegram_bot.send_text(text_notice)
+            self.telegram_bot.send_photo(imagePath)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
             
@@ -172,8 +177,8 @@ class Notifier:
         text_notice = f"解符文失败, 已持续{time.time() - self.rune_start_time}s"
         print(f"[!!!!!!]{text_notice}")
         if config.telegram_chat_id is not None:
-            telegram_bot.send_text(text_notice)
-            telegram_bot.send_photo(imagePath)
+            self.telegram_bot.send_text(text_notice)
+            self.telegram_bot.send_photo(imagePath)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
                     

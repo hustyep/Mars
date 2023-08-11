@@ -52,11 +52,6 @@ class Bot(Configurable):
         print('\n[~] Started main bot loop')
         self.thread.start()
 
-    # def loadModel(self):
-    #     print('\n[~] Initializing detection algorithm:\n')
-    #     self.model = detection.load_model()
-    #     print('\n[~] Initialized detection algorithm')
-
     def _main(self):
         """
         The main body of Bot that executes the user's routine.
