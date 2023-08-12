@@ -39,12 +39,14 @@ class USB:
         # dll.netcfg(IP,9000) # IP（可用广播地址） 端口
 
         # print("dll调用测试")
-        # nRst  =  dll.test( )
+        # nRst  =  self.dll.test( )
 
         # USB版本硬件
         self.usbopen = self.dll.open_hiddev_default()
         if (self.usbopen < 0):
             print("USB硬件未连接")
+        
+        self.key_release()
 
     def unload(self):
         # USB版本硬件
