@@ -313,6 +313,6 @@ def save_screenshot(frame=None, filename=None):
     if frame is None:
         frame = config.capture.frame
     if filename is None:
-        filename = f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}.png'
-    cv2.imwrite(filename, frame)
+        filename = f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}.webp'
+    cv2.imwrite(filename, frame, [int(cv2.IMWRITE_WEBP_QUALITY), 0])
     return filename

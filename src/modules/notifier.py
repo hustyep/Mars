@@ -130,14 +130,14 @@ class Notifier:
             
     def notifyPlayerComing(self, num):        
         timestamp = int(time.time())
-        imagePath = f"screenshot/new_player/maple_{timestamp}.png"
-        cv2.imwrite(imagePath, config.capture.frame)
+        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
+        utils.save_screenshot(filename=imagePath)
         
         text_notice = f"有人来了，当前地图人数{num}"
         print(f"[!!!!]{text_notice}")
         if config.telegram_chat_id is not None:
-            self.telegram_bot.send_text(text_notice)
-            self.telegram_bot.send_photo(imagePath)
+            # self.telegram_bot.send_text(text_notice)
+            self.telegram_bot.send_photo(imagePath, text_notice)
         elif config.mail_user is not None:
             mail.sendImage(text_notice, imagePath)
             
@@ -159,27 +159,27 @@ class Notifier:
             
     def notifyRuneResolved(self):
         timestamp = int(time.time())
-        imagePath = f"screenshot/rune_solved/maple_{timestamp}.png"
-        cv2.imwrite(imagePath, config.capture.frame)
+        imagePath = f"screenshot/rune_solved/maple_{timestamp}.webp"
+        utils.save_screenshot(filename=imagePath)
 
         text_notice = "解符文成功"
         print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
-            self.telegram_bot.send_text(text_notice)
-            self.telegram_bot.send_photo(imagePath)
+            # self.telegram_bot.send_text(text_notice)
+            self.telegram_bot.send_photo(imagePath, text_notice)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
             
     def notifyRuneResolveFailed(self):
         timestamp = int(time.time())
-        imagePath = f"screenshot/rune_failed/maple_{timestamp}.png"
-        cv2.imwrite(imagePath, config.capture.frame)
-
+        imagePath = f"screenshot/rune_failed/maple_{timestamp}.webp"
+        utils.save_screenshot(filename=imagePath)
+        
         text_notice = f"解符文失败, 已持续{time.time() - self.rune_start_time}s"
         print(f"[!!!!!!]{text_notice}")
         if config.telegram_chat_id is not None:
-            self.telegram_bot.send_text(text_notice)
-            self.telegram_bot.send_photo(imagePath)
+            # self.telegram_bot.send_text(text_notice)
+            self.telegram_bot.send_photo(imagePath, text_notice)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
                     

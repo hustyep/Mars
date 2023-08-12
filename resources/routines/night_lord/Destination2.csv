@@ -1,0 +1,12 @@
+
+@, label=Summoning
+
+@, label=Bottom mobbing
+*, x=0.06, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0.28, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0.48, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0.7, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0.925, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0.7, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0.48, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0.28, y=0.478, frequency=1, skip=False, adjust=False

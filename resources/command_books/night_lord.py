@@ -121,7 +121,7 @@ class Adjust(Command):
                     else:
                         key_down('down')
                         time.sleep(0.05)
-                        press(Key.JUMP, 1, down_time=0.2, down_time=0.5)
+                        press(Key.JUMP, 1, down_time=0.2, up_time=0.5)
                         key_up('down')
                         time.sleep(0.05)
                     counter -= 1

@@ -22,7 +22,7 @@ class Minimap(LabelFrame):
         """Updates the Main page with the current minimap."""
 
         minimap = config.capture.minimap
-        if minimap:
+        if minimap and minimap['minimap'] is not None:
             rune_active = minimap['rune_active']
             rune_pos = minimap['rune_pos']
             path = minimap['path']

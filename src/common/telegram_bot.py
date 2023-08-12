@@ -67,15 +67,15 @@ class TelegramBot:
         async with self.bot:
             await self.bot.send_message(chat_id=chat_id, text=message)
             
-    def send_photo(self, filePath):
+    def send_photo(self, filePath, message: str):
         try:
-            asyncio.run(self._send_photo(filePath))
+            asyncio.run(self._send_photo(filePath, message))
         except Exception as e:
             print(e)
 
-    async def _send_photo(self, filePath: str):
+    async def _send_photo(self, filePath: str, message: str=None):
         async with self.bot:
-            await self.bot.send_photo(self.chatID, photo=open(filePath, 'rb'))
+            await self.bot.send_photo(self.chatID, photo=open(filePath, 'rb'), caption=message)
 
     async def replyText(self, update: Update, message: str):
         i = 0
@@ -88,16 +88,16 @@ class TelegramBot:
                 time.sleep(0.1)
                 await update.effective_message.reply_text(message)
 
-    async def replayPhoto(self, update: Update, photo_path: str):
+    async def replayPhoto(self, update: Update, photo_path: str, mesaage: str = None):
         i = 0
         try:
-            await update.effective_message.reply_photo(photo=open(photo_path, 'rb'), connect_timeout=30)
+            await update.effective_message.reply_photo(photo=open(photo_path, 'rb'), caption=mesaage, connect_timeout=30)
         except Exception as e:
             print(e)
             i += 1
             if i < 3:
                 time.sleep(0.1)
-                await update.effective_message.reply_photo(photo=open(photo_path, 'rb'), connect_timeout=30)
+                await update.effective_message.reply_photo(photo=open(photo_path, 'rb'), caption=mesaage, connect_timeout=30)
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         config.enabled = True
@@ -123,7 +123,7 @@ class TelegramBot:
 
     async def screenshot(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         filepath = utils.save_screenshot()
-        await self.replayPhoto(update, filepath)
+        await self.replayPhoto(update, filepath, "screenshot")
 
 
 # def send_text(message):
