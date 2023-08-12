@@ -60,7 +60,8 @@ def step(direction, target):
     if direction == 'down':
         # print(f"step_down: {d_y}")
         if d_y > settings.move_tolerance:
-            press_acc(Key.JUMP, 2, down_time=0.2,up_time=1)
+            press_acc(Key.JUMP, 1, down_time=0.05,up_time=0.05)
+            press_acc(Key.JUMP, 1, down_time=0.05,up_time=0.8)
         return
     elif direction == 'up':
         # print(f"step_up: {d_y}")
@@ -308,7 +309,7 @@ class ErdaShower(Command):
     to the current Layout if necessary.
     """
     cooldown = 120
-    backswing = 0.5
+    backswing = 0.6
 
     def __init__(self, direction=None):
         super().__init__(locals())
