@@ -33,6 +33,10 @@ MMT_WIDTH = max(MM_TL_TEMPLATE.shape[1], MM_BR_TEMPLATE.shape[1])
 PLAYER_TEMPLATE = cv2.imread('assets/player_template.png', 0)
 PT_HEIGHT, PT_WIDTH = PLAYER_TEMPLATE.shape
 
+PLAYER_TEMPLATE_L = cv2.imread('assets/player_template_l.png', 0)
+
+PLAYER_TEMPLATE_R = cv2.imread('assets/player_template_r.png', 0)
+
 
 class Capture:
 
@@ -120,7 +124,7 @@ class Capture:
 
         tl, _ = utils.single_match(self.frame, MM_TL_TEMPLATE)
         _, br = utils.single_match(self.frame, MM_BR_TEMPLATE)
-        if tl == -1 or br == -1:
+        if tl == -1 and br == -1:
             # print("cant locate minimap")
             return False
         
@@ -129,7 +133,7 @@ class Capture:
             tl[1] + MINIMAP_TOP_BORDER
         )
         mm_br = (
-            max(mm_tl[0] + PT_WIDTH, br[0] + 5),
+            max(mm_tl[0] + PT_WIDTH, br[0] + 6),
             max(mm_tl[1] + PT_HEIGHT, br[1] - 25)
         )
         self.minimap_ratio = (mm_br[0] - mm_tl[0]) / (mm_br[1] - mm_tl[1])
@@ -151,10 +155,23 @@ class Capture:
         minimap = self.frame[self.mm_tl[1]:self.mm_br[1], self.mm_tl[0]:self.mm_br[0]]
 
         # Determine the player's position
-        player = utils.multi_match(
-            minimap, PLAYER_TEMPLATE, threshold=0.8)
+        player = utils.multi_match( minimap, PLAYER_TEMPLATE, threshold=0.8)
+        if len(player) == 0:
+            player = utils.multi_match(minimap, PLAYER_TEMPLATE_R, threshold=0.8)
+            if player:
+                x = player[0][0] - 2
+                y = player[0][1]
+                player[0] = (x, y)
+        if len(player) == 0:
+            player = utils.multi_match(minimap, PLAYER_TEMPLATE_L, threshold=0.8)
+            if player:
+                x = player[0][0] + 2
+                y = player[0][1]
+                player[0] = (x, y)
+        
         if player:
-            # print(f"{player[0]}")
+            h, w, _ = minimap.shape
+            print(f"{player[0]} | {w}")
             config.player_pos = utils.convert_to_relative(player[0], minimap)
         else:
             # print("cant locate player")
