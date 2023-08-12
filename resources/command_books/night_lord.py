@@ -60,8 +60,8 @@ def step(direction, target):
     if direction == 'down':
         # print(f"step_down: {d_y}")
         if d_y > settings.move_tolerance:
-            press_acc(Key.JUMP, 1, down_time=0.05,up_time=0.05)
-            press_acc(Key.JUMP, 1, down_time=0.05,up_time=0.8)
+            press_acc(Key.JUMP, 3, down_time=0.05,up_time=0.05)
+            time.sleep(1)
         return
     elif direction == 'up':
         # print(f"step_up: {d_y}")
