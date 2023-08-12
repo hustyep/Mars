@@ -58,10 +58,10 @@ def step(direction, target):
     d_y = abs(target[1] - config.player_pos[1])
     # if d_y > settings.move_tolerance * 1.5:
     if direction == 'down':
-            # print(f"step_down: {d_y}")
-            if d_y > settings.move_tolerance:
-                press_acc(Key.JUMP, 1, down_time=0.2,up_time=0.5)
-            return
+        # print(f"step_down: {d_y}")
+        if d_y > settings.move_tolerance:
+            press_acc(Key.JUMP, 1, down_time=0.2,up_time=1)
+        return
     elif direction == 'up':
         # print(f"step_up: {d_y}")
         MoveUp(dy=d_y)
