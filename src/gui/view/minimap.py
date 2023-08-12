@@ -68,7 +68,7 @@ class Minimap(LabelFrame):
             cv2.circle(img,
                        utils.convert_to_absolute(player_pos, img),
                        3,
-                       (0, 0, 255),
+                       (255, 0, 0),
                        -1)
 
             # Display the minimap in the Canvas

@@ -1,6 +1,6 @@
 """A collection of functions and classes used across multiple modules."""
 
-import aircv as ac
+# import aircv as ac
 import time
 from PIL import ImageChops, Image
 import math
@@ -309,5 +309,10 @@ def image_search(template_path):
 def timeStr() -> str:
     return time.strftime("%y_%m_%d_%H_%M_%S", time.localtime()) 
 
-def save_screenshot(frame):
-    cv2.imwrite(f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}.png', frame)
+def save_screenshot(frame=None, filename=None):
+    if frame is None:
+        frame = config.capture.frame
+    if filename is None:
+        filename = f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}.png'
+    cv2.imwrite(filename, frame)
+    return filename

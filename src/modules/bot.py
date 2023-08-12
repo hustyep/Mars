@@ -64,7 +64,6 @@ class Bot(Configurable):
         while True:
             if config.enabled and len(config.routine) > 0:
                 # Buff and feed pets
-                self.command_book.buff.main()
                 pet_settings = config.gui.settings.pets
                 auto_feed = pet_settings.auto_feed.get()
                 num_pets = pet_settings.num_pets.get()
@@ -72,6 +71,8 @@ class Bot(Configurable):
                 if auto_feed and now - last_fed > 600 / num_pets:
                     press(self.config['Feed pet'], 1)
                     last_fed = now
+                
+                self.command_book.buff.main()
 
                 # Highlight the current Point
                 config.gui.view.routine.select(config.routine.index)
@@ -106,7 +107,7 @@ class Bot(Configurable):
 
         print('\nSolving rune:')
         inferences = []
-        for _ in range(12):
+        for _ in range(10):
             frame = config.capture.frame
             solution = rune.show_magic(frame)
             if solution is not None:
@@ -115,16 +116,12 @@ class Bot(Configurable):
                     print('Solution found, entering result')
                     for arrow in solution:
                         press(arrow, 1, down_time=0.1)
-                    self.rune_active = False
-                    time.sleep(0.1)
-                    # if self.rune_active:
-                    #     config.notifier.notifyRuneResolveFailed()
-                    # else :
-                    #     config.notifier.notifyRuneResolved()
-                            
                     break
                 elif len(solution) == 4:
                     inferences.append(solution)
+            time.sleep(0.1)
+        time.sleep(0.5)
+        self.rune_active = False
 
     def load_commands(self, file):
         try:

@@ -138,6 +138,8 @@ def key_up(key):
     else:
         config.usb.key_up(key)
 
+def releaseAll():
+    config.usb.key_release()
 
 
 @utils.run_if_enabled
@@ -153,10 +155,17 @@ def press(key, n: int=1, down_time=0.05, up_time=0.05):
 
     for _ in range(n):
         key_down(key)
-        time.sleep(down_time * (0.8 + 0.4 * random()))
+        time.sleep(down_time * (1 + 0.2 * random()))
         key_up(key)
-        time.sleep(up_time * (0.8 + 0.4 * random()))
-
+        time.sleep(up_time * (1 + 0.2 * random()))
+        
+@utils.run_if_enabled
+def press_acc(key, n: int=1, down_time=0.05, up_time=0.05):
+    for _ in range(n):
+        key_down(key)
+        time.sleep(down_time)
+        key_up(key)
+        time.sleep(up_time)
 
 # @utils.run_if_enabled
 def click(position, button='left'):

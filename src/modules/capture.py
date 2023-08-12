@@ -67,9 +67,8 @@ class Capture:
     def _main(self):
         """Constantly monitors the player's position and in-game events."""
 
-        # self.start_auto_calibrate()
-
         mss.windows.CAPTUREBLT = 0
+        self.start_auto_calibrate()
         while True:
             self.calibrated = self.recalibrate()
             time.sleep(1)
@@ -89,12 +88,11 @@ class Capture:
         
     def start_auto_calibrate(self):
         # auto recalibrate
-        self.calibrated = False
-
-        timer = threading.Timer(10, self.start_auto_calibrate)
+        timer = threading.Timer(5, self.start_auto_calibrate)
         timer.start()
+        self.recalibrate(auto=True)
 
-    def recalibrate(self):
+    def recalibrate(self, auto = False):
         # Calibrate screen capture
         hwnd = win32gui.FindWindow(None, "MapleStory")
         if (hwnd == 0):
@@ -102,14 +100,21 @@ class Capture:
             return False
 
         x1, y1, x2, y2 = win32gui.GetWindowRect(hwnd)  # 获取当前窗口大小
+        
+        if auto and self.window['left'] == x1 and \
+            self.window['top'] == y1 and \
+            self.window['width'] == x2 - x1 and \
+            self.window['height'] == y2 - y1:
+            return True
+        
         self.window['left'] = x1
         self.window['top'] = y1
         self.window['width'] = x2 - x1
         self.window['height'] = y2 - y1
 
         # Calibrate by finding the top-left and bottom-right corners of the minimap
-        with mss.mss() as self.sct:
-            self.frame = self.screenshot()
+        with mss.mss() as sct:
+            self.frame = self.screenshot(sct=sct)
         if self.frame is None:
             return False
 
@@ -149,6 +154,7 @@ class Capture:
         player = utils.multi_match(
             minimap, PLAYER_TEMPLATE, threshold=0.8)
         if player:
+            # print(f"{player[0]}")
             config.player_pos = utils.convert_to_relative(player[0], minimap)
         else:
             # print("cant locate player")
@@ -163,9 +169,11 @@ class Capture:
             'player_pos': config.player_pos
         }
 
-    def screenshot(self, delay=1):
+    def screenshot(self, delay=1, sct=None):
         try:
-            return np.array(self.sct.grab(self.window))
+            if sct is None:
+                sct = self.sct
+            return np.array(sct.grab(self.window))
         except mss.exception.ScreenShotError:
             print(f'\n[!] Error while taking screenshot, retrying in {delay} second'
                   + ('s' if delay != 1 else ''))

@@ -27,7 +27,7 @@ other_filtered = utils.filter_color(cv2.imread('assets/other_template.png'), OTH
 OTHER_TEMPLATE = cv2.cvtColor(other_filtered, cv2.COLOR_BGR2GRAY)
 
 # The Elite Boss's warning sign
-ELITE_TEMPLATE = cv2.imread('assets/elite_template.jpg', 0)
+# ELITE_TEMPLATE = cv2.imread('assets/elite_template.jpg', 0)
 
 
 def get_alert_path(name):
@@ -60,7 +60,7 @@ class Notifier:
     def start(self):
         """Starts this Notifier's thread."""
 
-        threading.Timer(3, self.telegram_bot.run).start()
+        threading.Timer(1, self.telegram_bot.run).start()
 
         print('\n[~] Started notifier')
         self.thread.start()
@@ -92,7 +92,8 @@ class Notifier:
                 if not config.bot.rune_active:
                     filtered = utils.filter_color(minimap, RUNE_RANGES)
                     matches = utils.multi_match(filtered, RUNE_TEMPLATE, threshold=0.9)
-                    if matches and config.routine.sequence:
+                    rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+                    if matches and config.routine.sequence and len(rune_buff) == 0:
                         abs_rune_pos = (matches[0][0], matches[0][1])
                         config.bot.rune_pos = utils.convert_to_relative(abs_rune_pos, minimap)
                         distances = list(map(distance_to_rune, config.routine.sequence))
@@ -105,12 +106,12 @@ class Notifier:
                         else:
                             self.notifyRuneResolveFailed()
                     elif self.rune_start_time != 0:
-                        frame = config.capture.frame
-                        rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
-                        if len(rune_buff) > 1:
+                        if len(rune_buff) >= 1 or len(matches) == 0:
                             self.rune_start_time = 0
+                            config.bot.rune_active = False
                             self.notifyRuneResolved()
                         else:
+                            config.bot.rune_active = True
                             self.notifyRuneResolveFailed()
                 elif now - self.rune_start_time > self.rune_alert_delay:     # Alert if rune hasn't been solved
                     # TODO 语音提醒

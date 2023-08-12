@@ -171,8 +171,8 @@ def show_magic(image):
             for arc_filter in arc_filters:
                 result, resolve_images = resolve_arrow(processed_img, arc_filter)
                 
-                print(f"solution: {result}")
                 if len(result) == 4:
+                    print(f"solution: {result}")
                     end = time.time()
                     print("cast :", end - begin)
                     # show_multi_images(all_process_images + process_images + resolve_images)

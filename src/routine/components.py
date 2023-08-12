@@ -3,7 +3,7 @@
 import math
 import time
 from src.common import config, utils, settings
-from src.common.vkeys import key_down, key_up, press
+from src.common.vkeys import key_down, key_up, press, releaseAll
 
 
 #################################
@@ -247,7 +247,7 @@ class Command(Component):
         if self.__class__.key is None:
             return
         
-        print(f"cast skill: {self.key}")
+        # print(f"cast skill: {self.key}")
         time.sleep(self.__class__.precast)
         self.__class__.castedTime = time.time()
         press(self.__class__.key, up_time=self.__class__.backswing)
@@ -278,6 +278,10 @@ class Move(Command):
             self.prev_direction = ''
             local_error = utils.distance(config.player_pos, point)
             global_error = utils.distance(config.player_pos, self.target)
+            
+            if global_error <= settings.move_tolerance:
+                break
+            
             while config.enabled and counter > 0 and \
                     local_error > settings.move_tolerance and \
                     global_error > settings.move_tolerance:
@@ -296,12 +300,15 @@ class Move(Command):
                         if i < len(path) - 1:
                             time.sleep(0.15)
                 else:
+                    global_d_y = self.target[1] - config.player_pos[1]
                     d_y = point[1] - config.player_pos[1]
-                    if abs(d_y) > settings.move_tolerance / math.sqrt(2):
+                    if abs(global_d_y) > settings.move_tolerance / math.sqrt(2) and \
+                        abs(d_y) > settings.move_tolerance / math.sqrt(2):
                         if d_y < 0:
                             key = 'up'
                         else:
                             key = 'down'
+                        # print(f"move down: {local_error} | {global_error}" )
                         self._new_direction(key)
                         step(key, point)
                         if settings.record_layout:
@@ -345,6 +352,7 @@ class Wait(Command):
         self.duration = float(duration)
 
     def main(self):
+        releaseAll()
         time.sleep(self.duration)
 
 
@@ -372,6 +380,7 @@ class Fall(Command):
     def __init__(self, distance=settings.move_tolerance / 2):
         super().__init__(locals())
         self.distance = float(distance)
+        print("fall")
 
     def main(self):
         start = config.player_pos

@@ -72,11 +72,13 @@ class USB:
     def key_down(self, key):
         cmd = self.buildCMD(CMD_KEYBOARD_DOWN, key)
         self.sendCMD(cmd)
+        # print(f"key_down: {key}")
         
     # 松开按键
     def key_up(self, key):
         cmd = self.buildCMD(CMD_KEYBOARD_UP, key)
         self.sendCMD(cmd)
+        # print(f"key_up: {key}")
 
     # 发送HID键盘码, 使用hex16进制字符串表示，全0表示释放所有按键
     def key_hid(self, key):

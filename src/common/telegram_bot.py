@@ -1,14 +1,15 @@
-import requests
+# import requests
 
-# from src.common import config
-import aiohttp
+# import aiohttp
+import cv2
 import asyncio
 import time
 import telegram
 import logging
-
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+
+from src.common import utils, config
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -40,6 +41,8 @@ class TelegramBot:
         self.application.add_handler(
             CommandHandler('screenshot', self.screenshot))
         self.application.add_handler(CommandHandler('info', self.info))
+        
+        self.bot = telegram.Bot(apiToken)
 
     def run(self):
         loop = asyncio.new_event_loop()
@@ -61,9 +64,9 @@ class TelegramBot:
     async def __send_text(self, message: str, chat_id=None):
         if chat_id is None:
             chat_id = self.chatID
-
-        await self.application.bot.send_message(chat_id=chat_id, text=message)
-
+        async with self.bot:
+            await self.bot.send_message(chat_id=chat_id, text=message)
+            
     def send_photo(self, filePath):
         try:
             asyncio.run(self._send_photo(filePath))
@@ -85,36 +88,42 @@ class TelegramBot:
                 time.sleep(0.1)
                 await update.effective_message.reply_text(message)
 
-    async def replayPhoto(self, update: Update, photo: open):
+    async def replayPhoto(self, update: Update, photo_path: str):
         i = 0
         try:
-            await update.effective_message.reply_photo(photo=photo)
+            await update.effective_message.reply_photo(photo=open(photo_path, 'rb'), connect_timeout=30)
         except Exception as e:
             print(e)
             i += 1
             if i < 3:
                 time.sleep(0.1)
-                await update.effective_message.reply_photo(photo=photo)
+                await update.effective_message.reply_photo(photo=open(photo_path, 'rb'), connect_timeout=30)
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        text = "start"
-        await self.replyText(update, text)
+        config.enabled = True
+        config.bot.rune_active = False
+        utils.print_state()
+        await self.info(update=update, context=context)
+        
         
     async def pause(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        text = "pause"
-        await self.replyText(update, text)
+        config.enabled = False
+        config.bot.rune_active = False
+        utils.print_state()
+        await self.info(update=update, context=context)
+
 
     async def info(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = (
-            f"bot status: {'running' if False else 'pause'}\n"
-            f"other players: {0}"
+            f"bot status: {'running' if config.enabled  else 'pause'}\n"
+            f"rune status: {config.notifier.rune_start_time if config.bot.rune_active else 'clear'}\n"
+            f"other players: {config.notifier.prev_others}"
         )
         await self.replyText(update, message)
 
     async def screenshot(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        photo = open(
-            'C:/Users/Aaron/Documents/Python/Mars/screenshot/rune_solved/maple_1691651660.png', 'rb')
-        await self.replayPhoto(update, photo)
+        filepath = utils.save_screenshot()
+        await self.replayPhoto(update, filepath)
 
 
 # def send_text(message):
@@ -135,10 +144,10 @@ class TelegramBot:
 if __name__ == "__main__":
     telegram_apiToken = '6683915847:AAH1iOECS1y394jkvDCD2YhHLxIDIAmGGac'
     telegram_chat_id = '805381440'
-    # send_photo('C:\\Users\\Aaron\\Desktop\\MapleScreen\\btmRight.png')
     # send_text_retry("Hello from Python!")
     bot = TelegramBot(telegram_apiToken, telegram_chat_id)
-    bot.run()
+    bot.send_photo('C:/Users/husty/Documents/Mars/screenshot/new_player/maple_1691724838.png')
+    # bot.run()
     # bot.send_text("123")
 
 
