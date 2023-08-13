@@ -4,6 +4,7 @@ import numpy as np
 import win32gui
 import time
 import threading
+from threading import Timer
 import ctypes
 import mss
 import mss.windows
@@ -58,9 +59,10 @@ class Capture:
         }
 
         self.lostPlayer = True
-
         self.ready = False
         self.calibrated = False
+        self.stop_timer: Timer = None
+        
         self.thread = threading.Thread(target=self._main)
         self.thread.daemon = True
 
@@ -127,7 +129,7 @@ class Capture:
         if self.frame is None:
             notice = f"[!!!]screenshot failed"
             config.notifier.send_text(notice)
-            config.bot.toggle(False)
+            self.delay_to_stop()
             return False
 
         tl, _ = utils.single_match(self.frame, MM_TL_TEMPLATE)
@@ -135,7 +137,7 @@ class Capture:
         if tl == -1 and br == -1:
             notice = f"[!!!]cant locate minimap"
             config.notifier.send_text(notice)
-            config.bot.toggle(False)
+            self.delay_to_stop()
             return False
         
         mm_tl = (
@@ -180,16 +182,19 @@ class Capture:
                 player[0] = (x, y)
         
         if player:
-            h, w, _ = minimap.shape
+            # h, w, _ = minimap.shape
             # print(f"{player[0]} | {w}")
             config.player_pos = utils.convert_to_relative(player[0], minimap)
             self.lostPlayer = False
+            if self.stop_timer:
+                self.stop_timer.cancel()
+                self.stop_timer = None
         elif config.enabled:
             notice = f"[!!!]cant locate player"
             print(notice)
             config.notifier.send_text(notice)
             self.lostPlayer = True
-            # config.bot.toggle(False)
+            self.delay_to_stop()
 
         # Package display information to be polled by GUI
         self.minimap = {
@@ -226,3 +231,10 @@ class Capture:
             br[1] - 25
         )
         return frame[mm_tl[1]:mm_br[1], mm_tl[0]:mm_br[0]]
+    
+    def delay_to_stop(self, delay = 2):
+        if self.stop_timer:
+            return
+        
+        self.stop_timer = Timer(delay, config.bot.toggle, enabled = False)
+        self.stop_timer.start()

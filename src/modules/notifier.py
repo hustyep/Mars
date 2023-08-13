@@ -51,6 +51,7 @@ class Notifier:
         self.rune_start_time = 0
 
         self.room_change_threshold = 0.9
+        self.white_room_threshold = 0.2
         self.rune_alert_delay = 90         # 3 minutes
         
         self.telegram_bot = TelegramBot(config.telegram_apiToken, config.telegram_chat_id)
@@ -72,11 +73,19 @@ class Notifier:
                 frame = config.capture.frame
                 height, width, _ = frame.shape
                 minimap = config.capture.minimap['minimap']
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
                 # Check for unexpected black screen
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 if np.count_nonzero(gray < 15) / height / width > self.room_change_threshold:
-                    self._alert('siren')
+                    config.capture.delay_to_stop()
+                    self.send_text('[!!!]black screen]')
+                    
+                # Check for white room
+                if np.count_nonzero(gray == 255) / height / width > self.white_room_threshold:
+                    config.bot.toggle(False)
+                    for i in range(10):
+                        self.send_text('[!!!!!!!!!!]white home')
+                        time.sleep(0.2)
 
                 # # Check for elite warning
                 # elite_frame = frame[height // 4:3 * height // 4, width // 4:3 * width // 4]
