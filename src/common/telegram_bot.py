@@ -114,11 +114,7 @@ class TelegramBot:
 
 
     async def info(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        message = (
-            f"bot status: {'running' if config.enabled  else 'pause'}\n"
-            f"rune status: {config.notifier.rune_start_time if config.bot.rune_active else 'clear'}\n"
-            f"other players: {config.notifier.prev_others}"
-        )
+        message = utils.bot_status()
         await self.replyText(update, message)
 
     async def screenshot(self, update: Update, context: ContextTypes.DEFAULT_TYPE):

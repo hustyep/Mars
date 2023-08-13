@@ -153,3 +153,16 @@ class Bot(Configurable):
                 click(target, button='right')
                 time.sleep(0.03)
                 click(target, button='right')
+                
+    def toggle(self, enabled: bool):
+        config.bot.rune_active = False
+        
+        if enabled:
+            config.capture.calibrated = False
+
+        config.enabled = enabled
+        utils.print_state()
+        
+        config.notifier.send_text(utils.bot_status())
+        
+        time.sleep(0.267)

@@ -58,13 +58,13 @@ def step(direction, target):
     d_y = abs(target[1] - config.player_pos[1])
     # if d_y > settings.move_tolerance * 1.5:
     if direction == 'down':
-        # print(f"step_down: {d_y}")
+        print(f"step_down: {d_y}")
         if d_y > settings.move_tolerance:
-            press_acc(Key.JUMP, 3, down_time=0.2,up_time=0.5)
+            press_acc(Key.JUMP, 3, down_time=0.1,up_time=0.1)
             # time.sleep(d_y * 10)
         return
     elif direction == 'up':
-        # print(f"step_up: {d_y}")
+        print(f"step_up: {d_y}")
         MoveUp(dy=d_y)
         return
         
@@ -117,12 +117,14 @@ class Adjust(Command):
                 d_y = self.target[1] - config.player_pos[1]
                 if abs(d_y) > settings.adjust_tolerance / math.sqrt(2):
                     if d_y < 0:
+                        print(f"adjust up {d_y}")
                         releaseAll()
                         MoveUp(d_y).execute()
                     else:
+                        print(f"adjust down {d_y}")
                         key_down('down')
                         time.sleep(0.05)
-                        press(Key.JUMP, 3, down_time=0.2, up_time=0.5)
+                        press(Key.JUMP, 2, down_time=0.2, up_time=0.3)
                         key_up('down')
                         time.sleep(0.05)
                     counter -= 1
@@ -205,8 +207,8 @@ class MoveUp(Command):
         self.dy = abs(dy)
         
     def main(self):
-        if self.dy <= 0.08:
-            ShadowLeap(True if self.dy >= 0.065 else False).execute()
+        if self.dy <= 0.125:
+            ShadowLeap(True if self.dy >= 0.11 else False).execute()
         else:
             RopeLift(self.dy).execute()
         

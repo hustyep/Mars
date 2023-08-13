@@ -27,8 +27,12 @@ class Minimap(LabelFrame):
             rune_pos = minimap['rune_pos']
             path = minimap['path']
             player_pos = minimap['player_pos']
-
-            img = cv2.cvtColor(minimap['minimap'], cv2.COLOR_BGR2RGB)
+            minimap_img = minimap['minimap']
+            
+            if not minimap_img:
+                return
+            
+            img = cv2.cvtColor(minimap_img, cv2.COLOR_BGR2RGB)
             height, width, _ = img.shape
 
             # Resize minimap to fit the Canvas

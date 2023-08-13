@@ -316,3 +316,11 @@ def save_screenshot(frame=None, filename=None):
         filename = f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}.webp'
     cv2.imwrite(filename, frame, [int(cv2.IMWRITE_WEBP_QUALITY), 0])
     return filename
+
+def bot_status() -> str:
+    message = (
+    f"bot status: {'running' if config.enabled  else 'pause'}\n"
+    f"rune status: {config.notifier.rune_start_time if config.bot.rune_active else 'clear'}\n"
+    f"other players: {config.notifier.prev_others}"
+    )
+    return message

@@ -57,6 +57,8 @@ class Capture:
             'height': 768
         }
 
+        self.lostPlayer = True
+
         self.ready = False
         self.calibrated = False
         self.thread = threading.Thread(target=self._main)
@@ -101,6 +103,8 @@ class Capture:
         hwnd = win32gui.FindWindow(None, "MapleStory")
         if (hwnd == 0):
             # print("cant find maplestory")
+            config.notifier.send_text("cant find maplestory")
+            config.bot.toggle(False)
             return False
 
         x1, y1, x2, y2 = win32gui.GetWindowRect(hwnd)  # 获取当前窗口大小
@@ -108,7 +112,8 @@ class Capture:
         if auto and self.window['left'] == x1 and \
             self.window['top'] == y1 and \
             self.window['width'] == x2 - x1 and \
-            self.window['height'] == y2 - y1:
+            self.window['height'] == y2 - y1 and \
+            self.lostPlayer == False:
             return True
         
         self.window['left'] = x1
@@ -120,12 +125,15 @@ class Capture:
         with mss.mss() as sct:
             self.frame = self.screenshot(sct=sct)
         if self.frame is None:
+            config.bot.toggle(False)
             return False
 
         tl, _ = utils.single_match(self.frame, MM_TL_TEMPLATE)
         _, br = utils.single_match(self.frame, MM_BR_TEMPLATE)
         if tl == -1 and br == -1:
             # print("cant locate minimap")
+            config.notifier.send_text("cant locate minimap")
+            config.bot.toggle(False)
             return False
         
         mm_tl = (
@@ -171,11 +179,14 @@ class Capture:
         
         if player:
             h, w, _ = minimap.shape
-            print(f"{player[0]} | {w}")
+            # print(f"{player[0]} | {w}")
             config.player_pos = utils.convert_to_relative(player[0], minimap)
-        else:
-            # print("cant locate player")
-            pass
+            self.lostPlayer = False
+        elif config.enabled:
+            print("cant locate player")
+            config.notifier.send_text("cant locate player")
+            self.lostPlayer = True
+            # config.bot.toggle(False)
 
         # Package display information to be polled by GUI
         self.minimap = {
@@ -212,38 +223,3 @@ class Capture:
             br[1] - 25
         )
         return frame[mm_tl[1]:mm_br[1], mm_tl[0]:mm_br[0]]
-
-    # def screen_shot(self, hwnd = None, picture_name = None):
-    #     if hwnd is None:
-    #         hwnd = win32gui.FindWindow(None, "MapleStory")
-    #     hwndDC = win32gui.GetWindowDC(hwnd)  # 通过应用窗口句柄获得窗口DC
-    #     x1, y1, x2, y2 = win32gui.GetWindowRect(hwnd)  # 获取当前窗口大小
-    #     mfcDC = win32ui.CreateDCFromHandle(hwndDC)  # 通过hwndDC获得mfcDC(注意主窗口用的是win32gui库，操作位图截图是用win32ui库)
-    #     cacheDC = mfcDC.CreateCompatibleDC()  # 创建兼容DC，实际在内存开辟空间（ 将位图BitBlt至屏幕缓冲区（内存），而不是将屏幕缓冲区替换成自己的位图。同时解决绘图闪烁等问题）
-    #     savebitmap = win32ui.CreateBitmap()  # 创建位图
-    #     width = x2 - x1
-    #     height = y2 - y1
-    #     savebitmap.CreateCompatibleBitmap(mfcDC, width, height)  # 设置位图的大小以及内容
-    #     cacheDC.SelectObject(savebitmap)  # 将位图放置在兼容DC，即 将位图数据放置在刚开辟的内存里
-    #     cacheDC.BitBlt((0, 0), (width, height), mfcDC, (0, 0), win32con.SRCCOPY)  # 截取位图部分，并将截图保存在剪贴板
-    #     if picture_name is not None:
-    #         savebitmap.SaveBitmapFile(cacheDC, picture_name)  # 将截图数据从剪贴板中取出，并保存为bmp图片
-    #     img_buf = savebitmap.GetBitmapBits(True)
-
-    #     img = np.frombuffer(img_buf, dtype="uint8")
-    #     img.shape = (height, width, 4)
-
-    #     cv2.imshow('shot', img)
-    #     cv2.waitKey(0)
-
-    #     # 释放内存
-    #     win32gui.DeleteObject(savebitmap.GetHandle())
-    #     cacheDC.DeleteDC()
-    #     mfcDC.DeleteDC()
-    #     win32gui.ReleaseDC(hwnd, hwndDC)
-    #     return img
-
-
-# if __name__ == '__main__':
-#     capture = Capture()
-#     img = capture.screenshot()

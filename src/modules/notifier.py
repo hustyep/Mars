@@ -140,22 +140,18 @@ class Notifier:
             self.telegram_bot.send_photo(imagePath, text_notice)
         elif config.mail_user is not None:
             mail.sendImage(text_notice, imagePath)
+        
             
     def notifyPlayerLeaved(self, num):
         text_notice = f"有人走了，当前地图人数{num}"
         print(f"[~]{text_notice}")
-        if config.telegram_chat_id is not None:
-            self.telegram_bot.send_text(text_notice)
-        elif config.mail_user is not None:
-            mail.sendText(text_notice)
+        self.send_text(text_notice)
+
             
     def notifyRuneAppeared(self):
         text_notice = "出现符文"
         print(f"[~]{text_notice}")
-        if config.telegram_chat_id is not None:
-            self.telegram_bot.send_text(text_notice)
-        elif config.mail_user is not None:
-            mail.sendText(text_notice)
+        self.send_text(text_notice)
             
     def notifyRuneResolved(self):
         timestamp = int(time.time())
@@ -182,6 +178,12 @@ class Notifier:
             self.telegram_bot.send_photo(imagePath, text_notice)
         elif config.mail_user is not None:
             mail.sendText(text_notice)
+            
+    def send_text(self, text: str):
+        if config.telegram_chat_id is not None:
+            self.telegram_bot.send_text(text)
+        elif config.mail_user is not None:
+            mail.sendText(text)
                     
     def _alert(self, name, volume=0.75):
         """
