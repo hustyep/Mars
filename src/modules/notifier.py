@@ -143,14 +143,12 @@ class Notifier:
         
             
     def notifyPlayerLeaved(self, num):
-        text_notice = f"有人走了，当前地图人数{num}"
-        print(f"[~]{text_notice}")
+        text_notice = f"[~]有人走了，当前地图人数{num}"
         self.send_text(text_notice)
 
             
     def notifyRuneAppeared(self):
-        text_notice = "出现符文"
-        print(f"[~]{text_notice}")
+        text_notice = f"[~]出现符文"
         self.send_text(text_notice)
             
     def notifyRuneResolved(self):
@@ -158,7 +156,7 @@ class Notifier:
         imagePath = f"screenshot/rune_solved/maple_{timestamp}.webp"
         utils.save_screenshot(filename=imagePath)
 
-        text_notice = "解符文成功"
+        text_notice = f"[~]解符文成功"
         print(f"[~]{text_notice}")
         if config.telegram_chat_id is not None:
             # self.telegram_bot.send_text(text_notice)
@@ -180,6 +178,7 @@ class Notifier:
             mail.sendText(text_notice)
             
     def send_text(self, text: str):
+        print(text)
         if config.telegram_chat_id is not None:
             self.telegram_bot.send_text(text)
         elif config.mail_user is not None:

@@ -102,8 +102,8 @@ class Capture:
         # Calibrate screen capture
         hwnd = win32gui.FindWindow(None, "MapleStory")
         if (hwnd == 0):
-            # print("cant find maplestory")
-            config.notifier.send_text("cant find maplestory")
+            notice = f"[!!!]cant find maplestory"
+            config.notifier.send_text(notice)
             config.bot.toggle(False)
             return False
 
@@ -125,14 +125,16 @@ class Capture:
         with mss.mss() as sct:
             self.frame = self.screenshot(sct=sct)
         if self.frame is None:
+            notice = f"[!!!]screenshot failed"
+            config.notifier.send_text(notice)
             config.bot.toggle(False)
             return False
 
         tl, _ = utils.single_match(self.frame, MM_TL_TEMPLATE)
         _, br = utils.single_match(self.frame, MM_BR_TEMPLATE)
         if tl == -1 and br == -1:
-            # print("cant locate minimap")
-            config.notifier.send_text("cant locate minimap")
+            notice = f"[!!!]cant locate minimap"
+            config.notifier.send_text(notice)
             config.bot.toggle(False)
             return False
         
@@ -183,8 +185,9 @@ class Capture:
             config.player_pos = utils.convert_to_relative(player[0], minimap)
             self.lostPlayer = False
         elif config.enabled:
-            print("cant locate player")
-            config.notifier.send_text("cant locate player")
+            notice = f"[!!!]cant locate player"
+            print(notice)
+            config.notifier.send_text(notice)
             self.lostPlayer = True
             # config.bot.toggle(False)
 

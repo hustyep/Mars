@@ -29,11 +29,11 @@ class Minimap(LabelFrame):
             player_pos = minimap['player_pos']
             minimap_img = minimap['minimap']
             
-            if not minimap_img:
+            height, width, _ = minimap_img.shape
+            if width == 0 or height == 0:
                 return
             
             img = cv2.cvtColor(minimap_img, cv2.COLOR_BGR2RGB)
-            height, width, _ = img.shape
 
             # Resize minimap to fit the Canvas
             ratio = min(self.WIDTH / width, self.HEIGHT / height)
