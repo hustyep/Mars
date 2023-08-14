@@ -236,5 +236,5 @@ class Capture:
         if self.stop_timer:
             return
         
-        self.stop_timer = Timer(delay, config.bot.toggle, enabled = False)
+        self.stop_timer = Timer(delay, config.bot.toggle, (False, ))
         self.stop_timer.start()

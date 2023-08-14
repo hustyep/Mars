@@ -58,13 +58,13 @@ def step(direction, target):
     d_y = abs(target[1] - config.player_pos[1])
     # if d_y > settings.move_tolerance * 1.5:
     if direction == 'down':
-        print(f"step_down: {d_y}")
+        # print(f"step_down: {d_y}")
         if d_y > settings.move_tolerance:
             press_acc(Key.JUMP, 3, down_time=0.1,up_time=0.1)
             # time.sleep(d_y * 10)
         return
     elif direction == 'up':
-        print(f"step_up: {d_y}")
+        # print(f"step_up: {d_y}")
         MoveUp(dy=d_y)
         return
         
@@ -234,7 +234,7 @@ class FlashJump(Command):
 class ShadowLeap(Command):
     key = Key.SHADOW_LEAP
     precast = 0.5
-    backswing = 1.25
+    backswing = 0.75
 
     def __init__(self, jump: bool = False):
         super().__init__(locals())
@@ -265,10 +265,10 @@ class RopeLift(Command):
 
     def main(self):
         if self.dy >= 0.3:
-            press(Key.JUMP, up_time=0.06)
-        press_acc(self.__class__.key, up_time=self.dy * 12)
+            press(Key.JUMP, up_time=0.1)
+        press_acc(self.__class__.key, up_time=self.dy * 10)
         if self.dy >= 0.3:
-            time.sleep(self.dy * 10)
+            time.sleep(self.dy * 4)
         # if self.cancel is not None:
         #     time.sleep(self.cancel)
         #     press(self.__class__.key)
@@ -285,7 +285,7 @@ class DarkFlare(Command):
     no direction is specified.
     """
     cooldown = 120
-    backswing = 1
+    backswing = 0.75
 
     def __init__(self, direction=None):
         super().__init__(locals())

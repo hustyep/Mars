@@ -18,7 +18,6 @@
 *, x=0.262, y=0.157, frequency=6, skip=False, adjust=True
     Wait, duration=0.3
     DarkFlare, direction=right
-    Wait, duration=0.2
 *, x=0.262, y=0.356, frequency=6, skip=False, adjust=False
     Wait, duration=0.3
     SuddenRaid
