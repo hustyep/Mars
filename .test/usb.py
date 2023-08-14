@@ -1,6 +1,5 @@
 import ctypes
 from ctypes import *
-from src.common import config
 
 # 字符串命令接口
 # https://note.youdao.com/s/Gyrcngxs
@@ -27,9 +26,6 @@ CMD_MOUSE_ABS_MOVE = "mouse:absmove"
 class USB:
     dll = None
     usbopen = False
-
-    def __init__(self):
-        config.usb = self
 
     def load(self):
         self.dll = cdll.LoadLibrary('./hiddll.dll')

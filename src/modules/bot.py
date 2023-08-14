@@ -9,9 +9,10 @@ from src.detection import rune
 from src.routine.routine import Routine
 from src.command_book.command_book import CommandBook
 from src.routine.components import Point
-from src.common.vkeys import press, click
+from src.common.vkeys import press, click, releaseAll
 from src.common.interfaces import Configurable
-
+import win32con
+import win32clipboard as wc
 
 # The rune's buff icon
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
@@ -36,6 +37,7 @@ class Bot(Configurable):
         self.rune_closest_pos = (0, 0)      # Location of the Point closest to rune
         self.submodules = []
         self.command_book = None            # CommandBook instance
+        self.stop_timer: threading.Timer = None
 
         config.routine = Routine()
 
@@ -105,6 +107,9 @@ class Bot(Configurable):
         time.sleep(0.2)
         utils.save_screenshot(config.capture.frame)
 
+        # if not rune.located_arrows(config.capture.frame):
+        #     press(self.config['Interact'], 1, down_time=0.2)
+
         print('\nSolving rune:')
         inferences = []
         for _ in range(10):
@@ -120,7 +125,9 @@ class Bot(Configurable):
                 elif len(solution) == 4:
                     inferences.append(solution)
             time.sleep(0.1)
-        time.sleep(0.5)
+        threading.Timer(2, self.notify_rune_solved).start()
+
+    def notify_rune_solved(self):
         self.rune_active = False
 
     def load_commands(self, file):
@@ -160,9 +167,62 @@ class Bot(Configurable):
         if enabled:
             config.capture.calibrated = False
 
+        if config.enabled == enabled:
+            return
+
         config.enabled = enabled
         utils.print_state()
         
-        config.notifier.send_text(utils.bot_status())
+        config.notifier.send_message(text=utils.bot_status())
+        
+        self.cancel_delay_stop()
+        releaseAll()
         
         time.sleep(0.267)
+       
+        
+    def delay_to_stop(self, delay: int = 3):
+        if self.stop_timer:
+            return
+        
+        self.stop_timer = threading.Timer(delay, self.toggle, (False, ))
+        self.stop_timer.start()
+        
+    def cancel_delay_stop(self):
+        if self.stop_timer is not None:
+            self.stop_timer.cancel()
+            self.stop_timer = None
+
+        
+    def setText(self, text):
+        wc.OpenClipboard()
+        wc.EmptyClipboard()
+        wc.SetClipboardData(win32con.CF_UNICODETEXT, text)
+        wc.CloseClipboard()
+            
+    def say(self, text):
+        self.setText(text)
+            
+        config.usb.key_press('enter')
+        time.sleep(0.1)
+        config.usb.key_down('ctrl')
+        config.usb.key_press("v")
+        config.usb.key_up('ctrl')
+        time.sleep(0.1)
+        config.usb.key_press('enter')
+        time.sleep(0.1)
+        config.usb.key_press('enter')
+        
+    def say_to_all(self, text):
+        self.toggle(False)
+        time.sleep(1)
+        self.say(text)
+        self.toggle(True)
+        
+    def go_home(self):
+        for i in range(0, 6):
+            self.toggle(False)
+            config.usb.key_press("H")
+            time.sleep(0.5)
+            config.usb.key_press("H")
+            time.sleep(5)

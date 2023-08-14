@@ -7,8 +7,8 @@ import pygame
 import threading
 import numpy as np
 from src.routine.components import Point
-from src.common import config, utils, mail
-from src.common.telegram_bot import TelegramBot
+from src.common import config, utils
+from src.common.chat_bot import ChatBot
 
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 
@@ -16,14 +16,16 @@ RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 RUNE_RANGES = (
     ((141, 148, 245), (146, 158, 255)),
 )
-rune_filtered = utils.filter_color(cv2.imread('assets/rune_template.png'), RUNE_RANGES)
+rune_filtered = utils.filter_color(
+    cv2.imread('assets/rune_template.png'), RUNE_RANGES)
 RUNE_TEMPLATE = cv2.cvtColor(rune_filtered, cv2.COLOR_BGR2GRAY)
 
 # Other players' symbols on the minimap
 OTHER_RANGES = (
     ((0, 245, 215), (10, 255, 255)),
 )
-other_filtered = utils.filter_color(cv2.imread('assets/other_template.png'), OTHER_RANGES)
+other_filtered = utils.filter_color(cv2.imread(
+    'assets/other_template.png'), OTHER_RANGES)
 OTHER_TEMPLATE = cv2.cvtColor(other_filtered, cv2.COLOR_BGR2GRAY)
 
 # The Elite Boss's warning sign
@@ -46,66 +48,57 @@ class Notifier:
         self.ready = False
         self.thread = threading.Thread(target=self._main)
         self.thread.daemon = True
-        
+
         self.prev_others = 0
+        self.prev_others_last_update = 0
+        self.other_comming_time = 0
+        self.noticed_other_long_stay = False
+        
         self.rune_start_time = 0
+        self.noticed_white_room = False
+        self.noticed_black_screen = False
 
         self.room_change_threshold = 0.9
-        self.white_room_threshold = 0.2
+        self.white_room_threshold = 0.4
         self.rune_alert_delay = 90         # 3 minutes
-        
-        self.telegram_bot = TelegramBot(config.telegram_apiToken, config.telegram_chat_id)
-        
+
+        self.chat_bot = ChatBot()
+
         config.notifier = self
 
     def start(self):
         """Starts this Notifier's thread."""
 
-        threading.Timer(1, self.telegram_bot.run).start()
+        threading.Timer(3, self.chat_bot.run).start()
 
         print('\n[~] Started notifier')
         self.thread.start()
 
     def _main(self):
         self.ready = True
-        while True:
+        while True:                        
             if config.enabled:
                 frame = config.capture.frame
-                height, width, _ = frame.shape
                 minimap = config.capture.minimap['minimap']
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-                # Check for unexpected black screen
-                if np.count_nonzero(gray < 15) / height / width > self.room_change_threshold:
-                    config.capture.delay_to_stop()
-                    self.send_text('[!!!]black screen]')
-                    
-                # Check for white room
-                if np.count_nonzero(gray == 255) / height / width > self.white_room_threshold:
-                    config.bot.toggle(False)
-                    for i in range(10):
-                        self.send_text('[!!!!!!!!!!]white home')
-                        time.sleep(0.2)
-
-                # # Check for elite warning
-                # elite_frame = frame[height // 4:3 * height // 4, width // 4:3 * width // 4]
-                # elite = utils.multi_match(elite_frame, ELITE_TEMPLATE, threshold=0.9)
-                # if len(elite) > 0:
-                #     self._alert('siren')
-
-                # Check for other players entering the map
+                self.exceptionCheck(frame)
+                
                 self.checkOtherPlayer(minimap)
 
                 # Check for rune
                 now = time.time()
                 if not config.bot.rune_active:
                     filtered = utils.filter_color(minimap, RUNE_RANGES)
-                    matches = utils.multi_match(filtered, RUNE_TEMPLATE, threshold=0.9)
-                    rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+                    matches = utils.multi_match(
+                        filtered, RUNE_TEMPLATE, threshold=0.9)
+                    rune_buff = utils.multi_match(
+                        frame[:frame.shape[0] // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
                     if matches and config.routine.sequence and len(rune_buff) == 0:
                         abs_rune_pos = (matches[0][0], matches[0][1])
-                        config.bot.rune_pos = utils.convert_to_relative(abs_rune_pos, minimap)
-                        distances = list(map(distance_to_rune, config.routine.sequence))
+                        config.bot.rune_pos = utils.convert_to_relative(
+                            abs_rune_pos, minimap)
+                        distances = list(
+                            map(distance_to_rune, config.routine.sequence))
                         index = np.argmin(distances)
                         config.bot.rune_closest_pos = config.routine[index].location
                         config.bot.rune_active = True
@@ -115,7 +108,7 @@ class Notifier:
                         else:
                             self.notifyRuneResolveFailed()
                     elif self.rune_start_time != 0:
-                        if len(rune_buff) >= 1 or len(matches) == 0:
+                        if len(rune_buff) > 1:
                             self.rune_start_time = 0
                             config.bot.rune_active = False
                             self.notifyRuneResolved()
@@ -123,43 +116,103 @@ class Notifier:
                             config.bot.rune_active = True
                             self.notifyRuneResolveFailed()
                 elif now - self.rune_start_time > self.rune_alert_delay:     # Alert if rune hasn't been solved
-                    # TODO 语音提醒
-                    pass
+                    self.notifyRuneError()
             time.sleep(0.05)
+
+    def exceptionCheck(self, frame):
+        if frame is None:
+            return 
+        height, width, _ = frame.shape
+        if width < 400 and height < 400:
+            return
+        
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Check for unexpected black screen
+        if np.count_nonzero(gray < 15) / height / width > self.room_change_threshold:
+            if not self.noticed_black_screen:
+                config.bot.delay_to_stop(5)
+                self.send_message('[!!!]black screen]')
+                self.noticed_black_screen = True
+        else:
+            self.noticed_black_screen = False            
+
+        # Check for white room
+        white_radio = np.count_nonzero(gray == 255) / height / width
+        if white_radio >= self.white_room_threshold and config.capture.lost_player_time > 0:
+            if not self.noticed_white_room:
+                self.noticed_white_room = True  
+                config.bot.toggle(False)
+                self.chat_bot.voice_call()
+                for i in range(3):
+                    self.send_message('[!!!!!!!!!!]white home')
+                    time.sleep(0.2)
+        else:
+            self.noticed_white_room = False
+            
+        # # Check for elite warning
+        # elite_frame = frame[height // 4:3 * height // 4, width // 4:3 * width // 4]
+        # elite = utils.multi_match(elite_frame, ELITE_TEMPLATE, threshold=0.9)
+        # if len(elite) > 0:
+        #     self._alert('siren')
+
+        # Check for other players entering the map
 
     def checkOtherPlayer(self, minimap):
         filtered = utils.filter_color(minimap, OTHER_RANGES)
-        others = len(utils.multi_match(filtered, OTHER_TEMPLATE, threshold=0.7))
+        others = len(utils.multi_match(
+            filtered, OTHER_TEMPLATE, threshold=0.7))
         config.stage_fright = others > 0
-        if others > self.prev_others:
-            self.notifyPlayerComing(others)
-        elif others < self.prev_others:
-            self.notifyPlayerLeaved(others)
-        self.prev_others = others            
+        now = time.time()
+        if others > 0 and self.other_comming_time > 0 and now - self.other_comming_time >= 30:
+            self.othersLongStayWarnning()
+        if others != self.prev_others and now - self.prev_others_last_update > 2: 
+            if others > self.prev_others:
+                self.notifyOtherComing(others)
+                if self.prev_others == 0:
+                    self.other_comming_time = now
+            elif others < self.prev_others:
+                self.notifyOtherLeaved(others)
+                if others == 0:
+                    self.other_comming_time = 0
+                    self.noticed_other_long_stay = False
+            self.prev_others = others
+            self.prev_others_last_update = now
+
+
+    def othersLongStayWarnning(self, num):
+        
+        if time.time() - self.other_comming_time >= 60:
+            config.bot.go_home()
+        elif self.noticed_other_long_stay == False:
+            self.noticed_other_long_stay = True
+            config.bot.say_to_all('bro?')
             
-    def notifyPlayerComing(self, num):        
+            timestamp = int(time.time())
+            imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
+            utils.save_screenshot(filename=imagePath)
+            
+            text_notice = f"[!!!]有人已停留{int(time.time() - self.others_notice_time)}s, 当前地图人数{num}"
+            self.send_message(text=text_notice,
+                            image=config.capture.frame, imagePath=imagePath)
+
+    def notifyOtherComing(self, num):
         timestamp = int(time.time())
         imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
         utils.save_screenshot(filename=imagePath)
-        
-        text_notice = f"有人来了，当前地图人数{num}"
-        print(f"[!!!!]{text_notice}")
-        if config.telegram_chat_id is not None:
-            # self.telegram_bot.send_text(text_notice)
-            self.telegram_bot.send_photo(imagePath, text_notice)
-        elif config.mail_user is not None:
-            mail.sendImage(text_notice, imagePath)
-        
-            
-    def notifyPlayerLeaved(self, num):
-        text_notice = f"[~]有人走了，当前地图人数{num}"
-        self.send_text(text_notice)
 
-            
+        text_notice = f"[!]有人来了，当前地图人数{num}"
+        self.send_message(text=text_notice,
+                          image=config.capture.frame, imagePath=imagePath)
+
+    def notifyOtherLeaved(self, num):
+        text_notice = f"[~]有人走了，当前地图人数{num}"
+        self.send_message(text=text_notice)
+
     def notifyRuneAppeared(self):
         text_notice = f"[~]出现符文"
-        self.send_text(text_notice)
-            
+        self.send_message(text=text_notice)
+
     def notifyRuneResolved(self):
         timestamp = int(time.time())
         imagePath = f"screenshot/rune_solved/maple_{timestamp}.webp"
@@ -167,32 +220,25 @@ class Notifier:
 
         text_notice = f"[~]解符文成功"
         print(f"[~]{text_notice}")
-        if config.telegram_chat_id is not None:
-            # self.telegram_bot.send_text(text_notice)
-            self.telegram_bot.send_photo(imagePath, text_notice)
-        elif config.mail_user is not None:
-            mail.sendText(text_notice)
-            
+        self.send_message(text=text_notice,
+                          image=config.capture.frame, imagePath=imagePath)
+
     def notifyRuneResolveFailed(self):
         timestamp = int(time.time())
         imagePath = f"screenshot/rune_failed/maple_{timestamp}.webp"
         utils.save_screenshot(filename=imagePath)
+
+        text_notice = f"[!]解符文失败, 已持续{int(time.time() - self.rune_start_time)}s"
+        self.send_message(text=text_notice,
+                          image=config.capture.frame, imagePath=imagePath)
         
-        text_notice = f"解符文失败, 已持续{time.time() - self.rune_start_time}s"
-        print(f"[!!!!!!]{text_notice}")
-        if config.telegram_chat_id is not None:
-            # self.telegram_bot.send_text(text_notice)
-            self.telegram_bot.send_photo(imagePath, text_notice)
-        elif config.mail_user is not None:
-            mail.sendText(text_notice)
-            
-    def send_text(self, text: str):
+    def notifyRuneError(self):
+        pass
+
+    def send_message(self, text=None, image=None, imagePath=None):
         print(text)
-        if config.telegram_chat_id is not None:
-            self.telegram_bot.send_text(text)
-        elif config.mail_user is not None:
-            mail.sendText(text)
-                    
+        self.chat_bot.send_message(text, image=image, imagePath=imagePath)
+
     def _alert(self, name, volume=0.75):
         """
         Plays an alert to notify user of a dangerous event. Stops the alert

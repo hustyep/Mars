@@ -45,6 +45,8 @@ class Key:
 #########################
 #       Movement        #
 #########################
+
+@utils.run_if_enabled
 def step(direction, target):
     """
     Performs one movement step in the given DIRECTION towards TARGET.

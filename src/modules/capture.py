@@ -4,7 +4,6 @@ import numpy as np
 import win32gui
 import time
 import threading
-from threading import Timer
 import ctypes
 import mss
 import mss.windows
@@ -58,10 +57,9 @@ class Capture:
             'height': 768
         }
 
-        self.lostPlayer = True
+        self.lost_player_time = 0
         self.ready = False
         self.calibrated = False
-        self.stop_timer: Timer = None
         
         self.thread = threading.Thread(target=self._main)
         self.thread.daemon = True
@@ -92,21 +90,25 @@ class Capture:
 
                     if not self.ready:
                         self.ready = True
-                    time.sleep(0.001)
+                    time.sleep(0.01)
         
     def start_auto_calibrate(self):
         # auto recalibrate
+        
         timer = threading.Timer(5, self.start_auto_calibrate)
         timer.start()
-        self.recalibrate(auto=True)
+        if config.enabled:
+            self.recalibrate(auto=True)
 
     def recalibrate(self, auto = False):
         # Calibrate screen capture
         hwnd = win32gui.FindWindow(None, "MapleStory")
         if (hwnd == 0):
             notice = f"[!!!]cant find maplestory"
-            config.notifier.send_text(notice)
-            config.bot.toggle(False)
+            if config.enabled:
+                config.notifier.send_message(text=notice)
+                config.bot.toggle(False)
+
             return False
 
         x1, y1, x2, y2 = win32gui.GetWindowRect(hwnd)  # 获取当前窗口大小
@@ -115,7 +117,7 @@ class Capture:
             self.window['top'] == y1 and \
             self.window['width'] == x2 - x1 and \
             self.window['height'] == y2 - y1 and \
-            self.lostPlayer == False:
+            self.lost_player_time == 0:
             return True
         
         self.window['left'] = x1
@@ -128,16 +130,16 @@ class Capture:
             self.frame = self.screenshot(sct=sct)
         if self.frame is None:
             notice = f"[!!!]screenshot failed"
-            config.notifier.send_text(notice)
-            self.delay_to_stop()
+            # config.notifier.send_message(text=notice)
+            config.bot.delay_to_stop(5)
             return False
 
         tl, _ = utils.single_match(self.frame, MM_TL_TEMPLATE)
         _, br = utils.single_match(self.frame, MM_BR_TEMPLATE)
-        if tl == -1 and br == -1:
+        if tl == None or br == None:
             notice = f"[!!!]cant locate minimap"
-            config.notifier.send_text(notice)
-            self.delay_to_stop()
+            # config.notifier.send_message(text=notice)
+            config.bot.delay_to_stop()
             return False
         
         mm_tl = (
@@ -185,16 +187,16 @@ class Capture:
             # h, w, _ = minimap.shape
             # print(f"{player[0]} | {w}")
             config.player_pos = utils.convert_to_relative(player[0], minimap)
-            self.lostPlayer = False
-            if self.stop_timer:
-                self.stop_timer.cancel()
-                self.stop_timer = None
+            self.lost_player_time = 0
+            config.bot.cancel_delay_stop()
         elif config.enabled:
-            notice = f"[!!!]cant locate player"
-            print(notice)
-            config.notifier.send_text(notice)
-            self.lostPlayer = True
-            self.delay_to_stop()
+            if self.lost_player_time == 0:
+                self.lost_player_time = time.time()
+                print(f"[!!!]{config.enabled}")
+            elif time.time() - self.lost_player_time > 3:
+                notice = f"[!!!]cant locate player"
+                config.notifier.send_message(text=notice)
+                config.bot.toggle(False)
 
         # Package display information to be polled by GUI
         self.minimap = {
@@ -231,10 +233,3 @@ class Capture:
             br[1] - 25
         )
         return frame[mm_tl[1]:mm_br[1], mm_tl[0]:mm_br[0]]
-    
-    def delay_to_stop(self, delay = 2):
-        if self.stop_timer:
-            return
-        
-        self.stop_timer = Timer(delay, config.bot.toggle, enabled = False)
-        self.stop_timer.start()

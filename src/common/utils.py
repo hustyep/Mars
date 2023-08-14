@@ -10,6 +10,9 @@ import threading
 import numpy as np
 from src.common import config, settings
 from random import random
+import win32gui
+import win32ui
+import win32con
 
 
 def run_if_enabled(function):
@@ -75,7 +78,7 @@ def separate_args(arguments):
     return args, kwargs
 
 
-def single_match(frame, template):
+def single_match(frame, template, threshold=0.95):
     """
     Finds the best match within FRAME.
     :param frame:       The image in which to search for TEMPLATE.
@@ -89,12 +92,15 @@ def single_match(frame, template):
 
     result = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF)
     _, maxVal, _, top_left = cv2.minMaxLoc(result)
-    if (maxVal > 0.95):
+    # locations = np.where(result >= threshold)
+    # locations = list(zip(*locations[::-1]))
+    if top_left is not None:
+        # top_left = locations[0]
         h, w = template.shape[::-1]
         bottom_right = (top_left[0] + w, top_left[1] + h)
         return top_left, bottom_right
     else:
-        return -1, -1
+        return None, None
 
 
 def multi_match(frame, template, threshold=0.95):
@@ -115,14 +121,14 @@ def multi_match(frame, template, threshold=0.95):
     locations = np.where(result >= threshold)
     locations = list(zip(*locations[::-1]))
     results = []
-    # src_copy = frame.copy()
+    src_copy = frame.copy()
     for p in locations:
         x = int(round(p[0] + template.shape[1] / 2))
         y = int(round(p[1] + template.shape[0] / 2))
         results.append((x, y))
 
-        # cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
-        #               p[1]+template.shape[0]), (0, 0, 225), 2)
+        cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
+                      p[1]+template.shape[0]), (0, 0, 225), 2)
     # cv2.imshow("result", src_copy)
     # cv2.waitKey()
     return results
@@ -324,3 +330,63 @@ def bot_status() -> str:
     f"other players: {config.notifier.prev_others}"
     )
     return message
+
+def cvt2Plt(cv_image):
+    rgb_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+    image = Image.fromarray(rgb_img)
+    return image
+
+
+#########################
+#        Capture        #
+#########################
+
+# 通过窗口句柄截取当前句柄图片 返回cv2格式的Mat数据
+def window_capture(hwnd, picture_name=None):
+    if not hwnd:
+        return None
+    
+    x1, y1, x2, y2 = win32gui.GetWindowRect(hwnd)  # 获取当前窗口大小
+    hwndDC = win32gui.GetWindowDC(hwnd)  # 通过应用窗口句柄获得窗口DC
+    # 通过hwndDC获得mfcDC(注意主窗口用的是win32gui库，操作位图截图是用win32ui库)
+    mfcDC = win32ui.CreateDCFromHandle(hwndDC)
+    # 创建兼容DC，实际在内存开辟空间（ 将位图BitBlt至屏幕缓冲区（内存），而不是将屏幕缓冲区替换成自己的位图。同时解决绘图闪烁等问题）
+    cacheDC = mfcDC.CreateCompatibleDC()
+    savebitmap = win32ui.CreateBitmap()  # 创建位图
+    width = x2 - x1
+    height = y2 - y1
+    try: 
+        savebitmap.CreateCompatibleBitmap(mfcDC, width, height)  # 设置位图的大小以及内容
+    except Exception as e:
+        print(e)
+        return None
+    cacheDC.SelectObject(savebitmap)  # 将位图放置在兼容DC，即 将位图数据放置在刚开辟的内存里
+    cacheDC.BitBlt((0, 0), (width, height), mfcDC, (0, 0),
+                   win32con.SRCCOPY)  # 截取位图部分，并将截图保存在剪贴板
+    if picture_name is not None:
+        # 将截图数据从剪贴板中取出，并保存为bmp图片
+        savebitmap.SaveBitmapFile(cacheDC, picture_name)
+    img_buf = savebitmap.GetBitmapBits(True)
+
+    img = np.frombuffer(img_buf, dtype="uint8")
+    img.shape = (height, width, 4)
+    # mat_img = cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)  # 转换RGB顺序
+
+    # cv2.imshow('MapleStory', img)
+    # cv2.waitKey()
+
+    # 释放内存
+    win32gui.DeleteObject(savebitmap.GetHandle())
+    cacheDC.DeleteDC()
+    mfcDC.DeleteDC()
+    win32gui.ReleaseDC(hwnd, hwndDC)
+
+    return img
+
+
+def maple_screenshot():
+    hwnd = win32gui.FindWindow(None, "MapleStory")
+    if hwnd != 0 :
+        img_name = f"maple_{int(time.time() * 1000)}.png"
+        img = window_capture(hwnd, img_name)
+        return img

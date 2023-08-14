@@ -40,10 +40,40 @@ def single_match(frame, template):
     h, w = template.shape[::-1]
     bottom_right = (top_left[0] + w, top_left[1] + h)
 
-    cv2.rectangle(frame, top_left, (top_left[0]+template.shape[1],
-                                    top_left[1]+template.shape[0]), (0, 0, 225), 2)
+    # cv2.rectangle(frame, top_left, (top_left[0]+template.shape[1],
+    #                                 top_left[1]+template.shape[0]), (0, 0, 225), 2)
     return top_left, bottom_right
 
+
+def multi_match(frame, template, threshold=0.95):
+    """
+    Finds all matches in FRAME that are similar to TEMPLATE by at least THRESHOLD.
+    :param frame:       The image in which to search.
+    :param template:    The template to match with.
+    :param threshold:   The minimum percentage of TEMPLATE that each result must match.
+    :return:            An array of matches that exceed THRESHOLD.
+    """
+
+    if template.shape[0] > frame.shape[0] or template.shape[1] > frame.shape[1]:
+        return []
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    if (template.ndim > 2):
+        template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    result = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
+    locations = np.where(result >= threshold)
+    locations = list(zip(*locations[::-1]))
+    results = []
+    src_copy = frame.copy()
+    for p in locations:
+        x = int(round(p[0] + template.shape[1] / 2))
+        y = int(round(p[1] + template.shape[0] / 2))
+        results.append((x, y))
+
+        cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
+                      p[1]+template.shape[0]), (0, 0, 225), 2)
+    # cv2.imshow("result", src_copy)
+    # cv2.waitKey()
+    return results
 
 def crop_arrow_area(frame):
     height, width, channels = frame.shape
@@ -325,7 +355,19 @@ def show_multi_images(images):
         plt.axis('off')  # 不显示坐标轴
 
     plt.show()
-
+    
+def located_arrows(frame):
+    height, width, _ = frame.shape
+    if width < 1000:
+        cropped = frame[120:height//2, 100:width-100]
+    else:
+        cropped = frame[120:height//2, width//4:3*width//4]
+    canned = canny(cropped)
+    cv2.imshow("", canned)
+    cv2.waitKey(0)
+    result = multi_match(canned, ARROW_TL_TEMPLATE, 0.3)
+    return len(result) > 0
+     
 # def preprocess(img):
 #     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #     img_blur = cv2.GaussianBlur(img_gray, (5, 5), 1)#进行高斯滤波ret,
