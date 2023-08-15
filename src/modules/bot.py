@@ -125,7 +125,7 @@ class Bot(Configurable):
                 elif len(solution) == 4:
                     inferences.append(solution)
             time.sleep(0.1)
-        threading.Timer(2, self.notify_rune_solved).start()
+        threading.Timer(3, self.notify_rune_solved).start()
 
     def notify_rune_solved(self):
         self.rune_active = False

@@ -52,6 +52,7 @@ class Notifier:
         self.prev_others = 0
         self.prev_others_last_update = 0
         self.other_comming_time = 0
+        self.noticed_other_short_stay = False
         self.noticed_other_long_stay = False
         
         self.rune_start_time = 0
@@ -108,9 +109,8 @@ class Notifier:
                         else:
                             self.notifyRuneResolveFailed()
                     elif self.rune_start_time != 0:
-                        if len(rune_buff) > 1:
+                        if len(rune_buff) > 1 and len(matches) == 0:
                             self.rune_start_time = 0
-                            config.bot.rune_active = False
                             self.notifyRuneResolved()
                         else:
                             config.bot.rune_active = True
@@ -132,7 +132,7 @@ class Notifier:
         if np.count_nonzero(gray < 15) / height / width > self.room_change_threshold:
             if not self.noticed_black_screen:
                 config.bot.delay_to_stop(5)
-                self.send_message('[!!!]black screen]')
+                self.send_message('[!!!]black screen')
                 self.noticed_black_screen = True
         else:
             self.noticed_black_screen = False            
@@ -176,6 +176,7 @@ class Notifier:
                 if others == 0:
                     self.other_comming_time = 0
                     self.noticed_other_long_stay = False
+                    self.noticed_other_short_stay = False
             self.prev_others = others
             self.prev_others_last_update = now
 
@@ -197,13 +198,18 @@ class Notifier:
                             image=config.capture.frame, imagePath=imagePath)
 
     def notifyOtherComing(self, num):
-        timestamp = int(time.time())
-        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
-        utils.save_screenshot(filename=imagePath)
+        if self.noticed_other_short_stay:
+            return
+        
+        if time.time() - self.other_comming_time >= 10:
+            self.noticed_other_short_stay = True
+            timestamp = int(time.time())
+            imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
+            utils.save_screenshot(filename=imagePath)
 
-        text_notice = f"[!]有人来了，当前地图人数{num}"
-        self.send_message(text=text_notice,
-                          image=config.capture.frame, imagePath=imagePath)
+            text_notice = f"[!]有人来了，当前地图人数{num}"
+            self.send_message(text=text_notice,
+                            image=config.capture.frame, imagePath=imagePath)
 
     def notifyOtherLeaved(self, num):
         text_notice = f"[~]有人走了，当前地图人数{num}"
