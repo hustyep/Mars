@@ -36,11 +36,11 @@ class TelegramBot():
         self.apiTolen = apiToken
         self.chatID = chatID
         self.application = ApplicationBuilder().token(apiToken).build()
-        # self.application.add_handler(CommandHandler('start', self.start))
-        # self.application.add_handler(CommandHandler('pause', self.pause))
-        # self.application.add_handler(
-        #     CommandHandler('screenshot', self.screenshot))
-        # self.application.add_handler(CommandHandler('info', self.info))
+        self.application.add_handler(CommandHandler('start', self.start))
+        self.application.add_handler(CommandHandler('pause', self.pause))
+        self.application.add_handler(
+            CommandHandler('screenshot', self.screenshot))
+        self.application.add_handler(CommandHandler('info', self.info))
         
         self.bot = telegram.Bot(apiToken)
 

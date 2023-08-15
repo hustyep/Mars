@@ -166,7 +166,7 @@ class Notifier:
         now = time.time()
         if others > 0 and self.other_comming_time > 0 and now - self.other_comming_time >= 30:
             self.othersLongStayWarnning()
-        if others != self.prev_others and now - self.prev_others_last_update > 2: 
+        if others != self.prev_others and now - self.prev_others_last_update > 5: 
             if others > self.prev_others:
                 self.notifyOtherComing(others)
                 if self.prev_others == 0:
