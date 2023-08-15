@@ -233,3 +233,10 @@ class Capture:
             br[1] - 25
         )
         return frame[mm_tl[1]:mm_br[1], mm_tl[0]:mm_br[0]]
+    
+    def delay_to_stop(self, delay = 2):
+        if self.stop_timer:
+            return
+        
+        self.stop_timer = threading.Timer(delay, config.bot.toggle, (False, ))
+        self.stop_timer.start()

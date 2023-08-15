@@ -102,7 +102,7 @@ class Bot(Configurable):
         move(*self.rune_pos).execute()
         adjust = self.command_book['adjust']
         adjust(*self.rune_pos).execute()
-        time.sleep(0.2)
+        time.sleep(0.5)
         press(self.config['Interact'], 1, down_time=0.2)        # Inherited from Configurable
         time.sleep(0.2)
         utils.save_screenshot(config.capture.frame)
