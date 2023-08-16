@@ -60,7 +60,7 @@ class Notifier:
         self.noticed_black_screen = False
 
         self.room_change_threshold = 0.9
-        self.white_room_threshold = 0.4
+        self.white_room_threshold = 0.2
         self.rune_alert_delay = 90         # 3 minutes
 
         self.chat_bot = ChatBot()
@@ -166,11 +166,11 @@ class Notifier:
         now = time.time()
         if others > 0 and self.other_comming_time > 0 and now - self.other_comming_time >= 30:
             self.othersLongStayWarnning()
-        if others != self.prev_others and now - self.prev_others_last_update > 5: 
+        if others != self.prev_others and now - self.prev_others_last_update > 3: 
             if others > self.prev_others:
-                self.notifyOtherComing(others)
                 if self.prev_others == 0:
                     self.other_comming_time = now
+                self.notifyOtherComing(others)
             elif others < self.prev_others:
                 self.notifyOtherLeaved(others)
                 if others == 0:
@@ -212,8 +212,9 @@ class Notifier:
                             image=config.capture.frame, imagePath=imagePath)
 
     def notifyOtherLeaved(self, num):
-        text_notice = f"[~]有人走了，当前地图人数{num}"
-        self.send_message(text=text_notice)
+        if self.noticed_other_short_stay or self.noticed_other_long_stay:
+            text_notice = f"[~]有人走了，当前地图人数{num}"
+            self.send_message(text=text_notice)
 
     def notifyRuneAppeared(self):
         text_notice = f"[~]出现符文"
