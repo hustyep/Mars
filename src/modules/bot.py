@@ -204,14 +204,17 @@ class Bot(Configurable):
         self.setText(text)
             
         config.usb.key_press('enter')
-        time.sleep(0.1)
+        time.sleep(0.3)
         config.usb.key_down('ctrl')
+        time.sleep(0.05)
         config.usb.key_press("v")
+        time.sleep(0.05)
         config.usb.key_up('ctrl')
-        time.sleep(0.1)
+        time.sleep(0.3)
         config.usb.key_press('enter')
-        time.sleep(0.1)
+        time.sleep(0.3)
         config.usb.key_press('enter')
+        time.sleep(0.05)
         
     def say_to_all(self, text):
         self.toggle(False)

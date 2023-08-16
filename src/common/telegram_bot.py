@@ -58,11 +58,8 @@ class TelegramBot():
     def send_text(self, message: str):
         if not message:
             return
-        
-        try:
-            retry_on_error(self._send_text, retry=3, message=message)
-        except Exception as e:
-            print(e)
+        retry_on_error(self._send_text, retry=3, message=message)
+
             
     def _send_text(self, message):
         asyncio.run(self.__send_text(message=message))
@@ -70,17 +67,8 @@ class TelegramBot():
     async def __send_text(self, message: str, chat_id=None):
         if chat_id is None:
             chat_id = self.chatID
-        try:
-            async with self.bot:
-                await self.bot.send_message(chat_id=chat_id, text=message)
-        except Exception as e:
-            print(e)
-            
-    def send_image(self, image=None, imagePath=None):
-        try:
-            asyncio.run(self._send_photo(imagePath))
-        except Exception as e:
-            print(e)
+        async with self.bot:
+            await self.bot.send_message(chat_id=chat_id, text=message)
             
     def send_message(self, text=None, image=None, imagePath=None):
         if image is None and imagePath is None:
@@ -92,12 +80,20 @@ class TelegramBot():
         except Exception as e:
             print(e)
 
-    async def _send_photo(self, filePath: str, message: str=None):
+    def send_image(self, image=None, imagePath=None):
         try:
-            async with self.bot:
-                    await self.bot.send_photo(self.chatID, photo=open(filePath, 'rb'), caption=message)
+            asyncio.run(self._send_photo(imagePath))
         except Exception as e:
+            print(e)
+            try:
+                asyncio.run(self._send_photo(imagePath))
+            except Exception as e:
                 print(e)
+
+
+    async def _send_photo(self, filePath: str, message: str=None):
+        async with self.bot:
+                await self.bot.send_photo(self.chatID, photo=open(filePath, 'rb'), caption=message)
             
                 
     async def replyText(self, update: Update, message: str):

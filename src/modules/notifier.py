@@ -49,11 +49,10 @@ class Notifier:
         self.thread = threading.Thread(target=self._main)
         self.thread.daemon = True
 
-        self.prev_others = 0
-        self.prev_others_last_update = 0
+        self.cur_others = 0
         self.other_comming_time = 0
-        self.noticed_other_short_stay = False
-        self.noticed_other_long_stay = False
+        self.detect_count = 0
+        self.no_detect_count = 0
         
         self.rune_start_time = 0
         self.noticed_white_room = False
@@ -163,58 +162,67 @@ class Notifier:
         others = len(utils.multi_match(
             filtered, OTHER_TEMPLATE, threshold=0.7))
         config.stage_fright = others > 0
-        now = time.time()
-        if others > 0 and self.other_comming_time > 0 and now - self.other_comming_time >= 30:
-            self.othersLongStayWarnning()
-        if others != self.prev_others and now - self.prev_others_last_update > 3: 
-            if others > self.prev_others:
-                if self.prev_others == 0:
-                    self.other_comming_time = now
-                self.notifyOtherComing(others)
-            elif others < self.prev_others:
+        
+        self.cur_others = others
+        print(f"others:{others} | detect_count:{self.detect_count} | no_detect_count:{self.no_detect_count}")
+        if others > 0:
+            self.detect_count += 1
+            self.no_detect_count = 0
+            if self.other_comming_time == 0:
+                self.other_comming_time = time.time()
+        else:
+            self.no_detect_count += 1
+        
+        if self.no_detect_count == 150:
+            if self.other_comming_time > 0:
                 self.notifyOtherLeaved(others)
-                if others == 0:
-                    self.other_comming_time = 0
-                    self.noticed_other_long_stay = False
-                    self.noticed_other_short_stay = False
-            self.prev_others = others
-            self.prev_others_last_update = now
+                self.other_comming_time = 0
+            self.detect_count = 0
+        elif self.detect_count == 700:
+            self.detect_count == 0
+            self.othersLongStayWarnning(others)
+        elif self.detect_count == 400:
+            self.othersStayWarnning(others)
+        elif self.detect_count == 200:
+            self.notifyOtherComing(others)
 
 
     def othersLongStayWarnning(self, num):
+        timestamp = int(time.time())
+        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
+        utils.save_screenshot(filename=imagePath)
         
-        if time.time() - self.other_comming_time >= 60:
-            config.bot.go_home()
-        elif self.noticed_other_long_stay == False:
-            self.noticed_other_long_stay = True
-            config.bot.say_to_all('bro?')
+        text_notice = f"[!!!]回城。。。有人已停留{int(time.time() - self.other_comming_time)}s, 当前地图人数{num}"
+        self.send_message(text=text_notice,
+                        image=config.capture.frame, imagePath=imagePath)
+        config.bot.go_home()        
+        
             
-            timestamp = int(time.time())
-            imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
-            utils.save_screenshot(filename=imagePath)
+    def othersStayWarnning(self, num):
+        config.bot.say_to_all('bro123?')
+        
+        timestamp = int(time.time())
+        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
+        utils.save_screenshot(filename=imagePath)
+        
+        text_notice = f"[!!!]有人已停留{int(time.time() - self.other_comming_time)}s, 当前地图人数{num}"
+        self.send_message(text=text_notice,
+                        image=config.capture.frame, imagePath=imagePath)
             
-            text_notice = f"[!!!]有人已停留{int(time.time() - self.others_notice_time)}s, 当前地图人数{num}"
-            self.send_message(text=text_notice,
-                            image=config.capture.frame, imagePath=imagePath)
 
     def notifyOtherComing(self, num):
-        if self.noticed_other_short_stay:
-            return
-        
-        if time.time() - self.other_comming_time >= 10:
-            self.noticed_other_short_stay = True
-            timestamp = int(time.time())
-            imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
-            utils.save_screenshot(filename=imagePath)
+        self.noticed_other_short_stay = True
+        timestamp = int(time.time())
+        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
+        utils.save_screenshot(filename=imagePath)
 
-            text_notice = f"[!]有人来了，当前地图人数{num}"
-            self.send_message(text=text_notice,
-                            image=config.capture.frame, imagePath=imagePath)
+        text_notice = f"[!!!]有人来了, 已停留{int(time.time() - self.other_comming_time)}s, 当前地图人数{num}"
+        self.send_message(text=text_notice,
+                        image=config.capture.frame, imagePath=imagePath)
 
     def notifyOtherLeaved(self, num):
-        if self.noticed_other_short_stay or self.noticed_other_long_stay:
-            text_notice = f"[~]有人走了，当前地图人数{num}"
-            self.send_message(text=text_notice)
+        text_notice = f"[~]有人走了，当前地图人数{num}"
+        self.send_message(text=text_notice)
 
     def notifyRuneAppeared(self):
         text_notice = f"[~]出现符文"

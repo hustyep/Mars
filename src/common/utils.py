@@ -327,7 +327,7 @@ def bot_status() -> str:
     message = (
     f"bot status: {'running' if config.enabled  else 'pause'}\n"
     f"rune status: {config.notifier.rune_start_time if config.bot.rune_active else 'clear'}\n"
-    f"other players: {config.notifier.prev_others}"
+    f"other players: {config.notifier.cur_others}"
     )
     return message
 
