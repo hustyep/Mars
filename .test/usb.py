@@ -22,6 +22,9 @@ CMD_MOUSE_RIGHT_UP = "mouse:rightup"
 CMD_MOUSE_MOVE = "mouse:move"
 CMD_MOUSE_ABS_MOVE = "mouse:absmove"
 
+# 多媒体
+CMD_CONSUMER_SLEEP = "consumer:powersleep"
+
 
 class USB:
     dll = None
@@ -124,4 +127,8 @@ class USB:
         
     def mouse_abs_move(self, x, y):
         cmd = self.buildCMD(CMD_MOUSE_ABS_MOVE, str(x), str(y))
+        self.sendCMD(cmd)
+        
+    def consumer_sleep(self):
+        cmd = self.buildCMD(CMD_CONSUMER_SLEEP)
         self.sendCMD(cmd)
