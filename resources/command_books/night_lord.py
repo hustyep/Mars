@@ -24,7 +24,10 @@ class Key:
     MAPLE_WARRIOR = '6'
     SHADOW_WALKER = 'shift'
     THROW_BLASTING = 'v'
-
+    
+    FOR_THE_GUILD = '7'
+    HARD_HITTER = '8'
+    
     # SHADOW_PARTNER = '3'
     # SPEED_INFUSION = '8'
     # HOLY_SYMBOL = '4'
@@ -397,13 +400,15 @@ class Buff(Command):
                       MEMORIES(),
                       MAPLE_WARRIOR(),
                       SHADOW_WALKER(),
-                      THROW_BLASTING()]
+                      THROW_BLASTING(),
+                      FOR_THE_GUILD(),
+                      HARD_HITTER()]
 
     def main(self):
         for buff in self.buffs:
             if buff.canUse():
                 buff.main()
-                # break
+                break
 
 
 class GODDESS_BLESSING(Command):
@@ -446,3 +451,25 @@ class THROW_BLASTING(Command):
     key = Key.THROW_BLASTING
     cooldown = 180
     backswing = 0.8
+    
+class FOR_THE_GUILD(Command):
+    key = Key.FOR_THE_GUILD
+    cooldown = 3610
+    backswing = 0.1
+    
+    def canUse(self, next_t: float = 0) -> bool:
+        if time.time() - HARD_HITTER.castedTime <= 1800 and HARD_HITTER.castedTime > 0:
+            return False
+        
+        return super().canUse(next_t)  
+
+class HARD_HITTER(Command):
+    key = Key.HARD_HITTER
+    cooldown = 3610
+    backswing = 0.1
+    
+    def canUse(self, next_t: float = 0) -> bool:
+        if time.time() - FOR_THE_GUILD.castedTime <= 1800:
+            return False
+        
+        return super().canUse(next_t)  

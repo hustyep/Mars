@@ -41,6 +41,9 @@ class TelegramBot():
         self.application.add_handler(
             CommandHandler('screenshot', self.screenshot))
         self.application.add_handler(CommandHandler('info', self.info))
+        self.application.add_handler(CommandHandler('buff', self.buff))
+        self.application.add_handler(CommandHandler('say', self.say))
+        self.application.add_handler(CommandHandler('tp', self.tp))
         
         self.bot = telegram.Bot(apiToken)
 
@@ -140,6 +143,18 @@ class TelegramBot():
         filepath = utils.save_screenshot()
         await self.replayPhoto(update, filepath, "screenshot")
 
+    async def buff(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        message = 'buff done'
+        await self.replyText(update, message)
+
+    async def say(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_says = " ".join(context.args)
+        config.bot.say_to_all(user_says)
+        await self.replyText(update, f'"said "{user_says}')
+        
+    async def tp(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        config.bot.go_home()
+        await self.replyText(update, 'go home done')
 
 # def send_text(message):
 # apiURL = f'https://api.telegram.org/bot{config.telegram_apiToken}/sendMessage'
