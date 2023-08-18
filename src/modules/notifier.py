@@ -6,11 +6,14 @@ import cv2
 import pygame
 import threading
 import numpy as np
+from random import random
 from src.routine.components import Point
 from src.common import config, utils
 from src.common.chat_bot import ChatBot
 
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
+BUTTON_OK_TEMPLATE = cv2.imread('assets/btn_ok_template.png', 0)
+END_TALK_TEMPLATE = cv2.imread('assets/end_talk_template.png', 0)
 
 # A rune's symbol on the minimap
 RUNE_RANGES = (
@@ -84,6 +87,8 @@ class Notifier:
                 self.exceptionCheck(frame)
                 
                 self.checkOtherPlayer(minimap)
+                
+                self.checkAlert(frame)
 
                 # Check for rune
                 now = time.time()
@@ -157,6 +162,19 @@ class Notifier:
 
         # Check for other players entering the map
 
+    def checkAlert(self, frame):
+        x = (frame.shape[1] - 260) // 2
+        y = (frame.shape[0] - 100) // 2
+        ok_btn = utils.multi_match(frame[y:y+100, x:x+260], BUTTON_OK_TEMPLATE, threshold=0.9)
+        if ok_btn:
+            config.usb.key_press('esc')
+            
+        x = (frame.shape[1] - 520) // 2
+        y = (frame.shape[0] - 190) // 2
+        end_talk = utils.multi_match(frame[y:y+190, x:x+520], END_TALK_TEMPLATE, threshold=0.9)
+        if end_talk:
+            config.usb.key_press('esc')
+
     def checkOtherPlayer(self, minimap):
         filtered = utils.filter_color(minimap, OTHER_RANGES)
         others = len(utils.multi_match(
@@ -164,7 +182,7 @@ class Notifier:
         config.stage_fright = others > 0
         
         self.cur_others = others
-        print(f"others:{others} | detect_count:{self.detect_count} | no_detect_count:{self.no_detect_count}")
+        # print(f"others:{others} | detect_count:{self.detect_count} | no_detect_count:{self.no_detect_count}")
         if others > 0:
             self.detect_count += 1
             self.no_detect_count = 0
@@ -199,7 +217,12 @@ class Notifier:
         
             
     def othersStayWarnning(self, num):
-        config.bot.say_to_all('bro123?')
+        str = '?'
+        if random() >= 0.7:
+            str = 'bor?'
+        elif random() >= 0.4:
+            str = 'cc pls'
+        config.bot.say_to_all(str)
         
         timestamp = int(time.time())
         imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
