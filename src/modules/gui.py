@@ -23,7 +23,7 @@ class GUI:
         icon = tk.PhotoImage(file='assets/icon.png')
         self.root.iconphoto(False, icon)
         self.root.geometry(GUI.RESOLUTIONS['DEFAULT'])
-        self.root.resizable(False, False)
+        self.root.resizable(True, True)
 
         # Initialize GUI variables
         self.routine_var = tk.StringVar()

@@ -66,6 +66,7 @@ class Bot(Configurable):
         while True:
             if config.enabled and len(config.routine) > 0:
                 # Buff and feed pets
+
                 pet_settings = config.gui.settings.pets
                 auto_feed = pet_settings.auto_feed.get()
                 num_pets = pet_settings.num_pets.get()
@@ -226,6 +227,7 @@ class Bot(Configurable):
         for i in range(0, 6):
             self.toggle(False)
             config.usb.key_press("H")
+            
             time.sleep(0.5)
             config.usb.key_press("H")
             time.sleep(5)
@@ -240,7 +242,7 @@ class Bot(Configurable):
         config.usb.key_up('alt')  
         time.sleep(0.5)   
         config.usb.key_press('enter')
-        time.sleep(1)
+        time.sleep(10)
         config.usb.consumer_sleep()
 
         # config.usb.key_press('esc')

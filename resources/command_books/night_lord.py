@@ -458,6 +458,10 @@ class FOR_THE_GUILD(Command):
     backswing = 0.1
     
     def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Guild Buff')
+        if not enabled:
+            return False
+        
         if time.time() - HARD_HITTER.castedTime <= 1800 and HARD_HITTER.castedTime > 0:
             return False
         
@@ -469,6 +473,10 @@ class HARD_HITTER(Command):
     backswing = 0.1
     
     def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Guild Buff')
+        if not enabled:
+            return False
+        
         if time.time() - FOR_THE_GUILD.castedTime <= 1800:
             return False
         
