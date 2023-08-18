@@ -92,11 +92,15 @@ class TelegramBot():
                 asyncio.run(self._send_photo(imagePath))
             except Exception as e:
                 print(e)
+                try:
+                    asyncio.run(self._send_photo(imagePath))
+                except Exception as e:
+                    print(e)
 
 
     async def _send_photo(self, filePath: str, message: str=None):
         async with self.bot:
-                await self.bot.send_photo(self.chatID, photo=open(filePath, 'rb'), caption=message)
+            await self.bot.send_photo(self.chatID, photo=open(filePath, 'rb'), caption=message)
             
                 
     async def replyText(self, update: Update, message: str):
@@ -144,6 +148,9 @@ class TelegramBot():
         await self.replayPhoto(update, filepath, "screenshot")
 
     async def buff(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        config.usb.key_press('0')
+        time.sleep(0.5)
+        config.usb.key_press('-')
         message = 'buff done'
         await self.replyText(update, message)
 
@@ -153,8 +160,9 @@ class TelegramBot():
         await self.replyText(update, f'"said "{user_says}')
         
     async def tp(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        config.bot.go_home()
         await self.replyText(update, 'go home done')
+        config.bot.go_home()
+
 
 # def send_text(message):
 # apiURL = f'https://api.telegram.org/bot{config.telegram_apiToken}/sendMessage'

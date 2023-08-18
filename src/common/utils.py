@@ -172,7 +172,8 @@ def filter_color(img, ranges):
     :param ranges:  A list of tuples, each of which is a pair upper and lower HSV bounds.
     :return:        A filtered copy of IMG.
     """
-
+    if len(img) == 0:
+        return None
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, ranges[0][0], ranges[0][1])
     for i in range(1, len(ranges)):

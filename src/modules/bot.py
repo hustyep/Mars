@@ -131,7 +131,7 @@ class Bot(Configurable):
             time.sleep(0.1)
         
         self.cancel_rune_buff()
-        threading.Timer(5, self.notify_rune_solved).start()
+        threading.Timer(3, self.notify_rune_solved).start()
 
     def notify_rune_solved(self):
         self.rune_active = False
@@ -223,12 +223,14 @@ class Bot(Configurable):
         time.sleep(0.3)
         config.usb.key_press('enter')
         time.sleep(0.05)
-        
+
     def say_to_all(self, text):
+        last_status = config.enabled
         self.toggle(False)
         time.sleep(1)
         self.say(text)
-        self.toggle(True)
+        if last_status:
+            self.toggle(True)
         
     def go_home(self):
         for i in range(0, 6):

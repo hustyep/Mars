@@ -192,16 +192,19 @@ class Notifier:
             self.no_detect_count += 1
         
         if self.no_detect_count == 150:
-            if self.other_comming_time > 0:
+            self.no_detect_count += 1
+            if self.other_comming_time > 0 and self.detect_count > 200:
                 self.notifyOtherLeaved(others)
-                self.other_comming_time = 0
             self.detect_count = 0
+            self.other_comming_time = 0
         elif self.detect_count == 700:
-            self.detect_count == 0
+            self.detect_count += 1
             self.othersLongStayWarnning(others)
         elif self.detect_count == 400:
+            self.detect_count += 1
             self.othersStayWarnning(others)
         elif self.detect_count == 200:
+            self.detect_count += 1
             self.notifyOtherComing(others)
 
 
@@ -217,11 +220,11 @@ class Notifier:
         
             
     def othersStayWarnning(self, num):
-        str = '?'
+        str = 'cc pls'
         if random() >= 0.7:
-            str = 'bor?'
+            str = 'cc pls '
         elif random() >= 0.4:
-            str = 'cc pls'
+            str = ' cc pls'
         config.bot.say_to_all(str)
         
         timestamp = int(time.time())

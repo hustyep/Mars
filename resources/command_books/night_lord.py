@@ -65,15 +65,15 @@ def step(direction, target):
     if direction == 'down':
         # print(f"step_down: {d_y}")
         if d_y > settings.move_tolerance:
-            press_acc(Key.JUMP, 3, down_time=0.1,up_time=0.1)
-            # time.sleep(d_y * 10)
+            press_acc(Key.JUMP, 2, down_time=0.1,up_time=0.1)
+            time.sleep(d_y)
         return
     elif direction == 'up':
         # print(f"step_up: {d_y}")
         MoveUp(dy=d_y)
         return
         
-    if d_x >=0.1:
+    if d_x >=0.11:
         press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
         press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
         ShowDown().execute()
@@ -270,10 +270,10 @@ class RopeLift(Command):
 
     def main(self):
         if self.dy >= 0.3:
-            press(Key.JUMP, up_time=0.1)
-        press_acc(self.__class__.key, up_time=self.dy * 10)
+            press(Key.JUMP, up_time=0.12)
+        press_acc(self.__class__.key, up_time=self.dy * 9.5)
         if self.dy >= 0.3:
-            time.sleep(self.dy * 4)
+            time.sleep(self.dy * 3)
         # if self.cancel is not None:
         #     time.sleep(self.cancel)
         #     press(self.__class__.key)
@@ -414,19 +414,19 @@ class Buff(Command):
 class GODDESS_BLESSING(Command):
     key = Key.GODDESS_BLESSING
     cooldown = 180
-    backswing = 0.8
+    backswing = 0.75
 
 
 class LAST_RESORT(Command):
     key = Key.LAST_RESORT
     cooldown = 75
-    backswing = 0.8
+    backswing = 0.75
 
 
 class EPIC_ADVENTURE(Command):
     key = Key.EPIC_ADVENTURE
     cooldown = 120
-    backswing = 0.8
+    backswing = 0.75
 
 
 class MEMORIES(Command):
@@ -438,7 +438,7 @@ class MEMORIES(Command):
 class MAPLE_WARRIOR(Command):
     key = Key.MAPLE_WARRIOR
     cooldown = 900
-    backswing = 0.8
+    backswing = 0.75
 
 
 class SHADOW_WALKER(Command):
