@@ -18,6 +18,9 @@ class Controls(Frame):
 
         self.new = tk.Button(self, text='\U00002795', width=6, command=self.new)
         self.new.grid(row=0, column=3, padx=(5, 0))
+        
+        self.save = tk.Button(self, text="save", command=self.save)
+        self.save.grid(row=0, column=4, padx=(5, 0))
 
     def move(self, direction):
         """
@@ -86,3 +89,6 @@ class Controls(Frame):
 
     def new(self):
         self.parent.parent.editor.create_add_prompt()
+
+    def save(self):
+        config.routine.save()

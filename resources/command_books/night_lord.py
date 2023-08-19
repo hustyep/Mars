@@ -24,9 +24,14 @@ class Key:
     MAPLE_WARRIOR = '6'
     SHADOW_WALKER = 'shift'
     THROW_BLASTING = 'v'
-    
     FOR_THE_GUILD = '7'
     HARD_HITTER = '8'
+    
+    # Potion
+    EXP_POTION = '0'
+    WEALTH_POTION = "-"
+    GOLD_POTION = "="
+    GUILD_POTION = "9"
     
     # SHADOW_PARTNER = '3'
     # SPEED_INFUSION = '8'
@@ -481,3 +486,51 @@ class HARD_HITTER(Command):
             return False
         
         return super().canUse(next_t)  
+    
+class EXP_POTION(Command):
+    key = Key.EXP_POTION
+    cooldown = 7250
+    backswing = 0
+    
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
+        if not enabled:
+            return False
+        
+        return super().canUse(next_t)  
+        
+class WEALTH_POTION(Command):
+    key = Key.WEALTH_POTION
+    cooldown = 7250
+    backswing = 0
+    
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Wealthy Potion')
+        if not enabled:
+            return False
+        
+        return super().canUse(next_t)  
+    
+class GOLD_POTION(Command):
+    key = Key.GOLD_POTION
+    cooldown = 1800
+    backswing = 0
+    
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
+        if not enabled:
+            return False
+        
+        return super().canUse(next_t)  
+    
+class GUILD_POTION(Command):
+    key = Key.GUILD_POTION
+    cooldown = 1800
+    backswing = 0
+    
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
+        if not enabled:
+            return False
+        
+        return super().canUse(next_t)          

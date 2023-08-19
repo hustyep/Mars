@@ -161,8 +161,10 @@ class Routine:
 
         self.index = (self.index + 1) % len(self.sequence)
 
-    def save(self, file_path):
+    def save(self, file_path=None):
         """Encodes and saves the current Routine at location PATH."""
+        if not file_path:
+            file_path = self.path
 
         result = []
         for item in self.sequence:

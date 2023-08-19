@@ -17,9 +17,6 @@ import win32clipboard as wc
 # The rune's buff icon
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 
-BIG_MOUSE_TEMPLATE = cv2.imread('assets/big_mouse_template.png', 0)
-BIG_MOUSE_LEFT_TEMPLATE = cv2.imread('assets/big_mouse_left_template.png', 0)
-
 
 class Bot(Configurable):
     """A class that interprets and executes user-defined routines."""
@@ -130,7 +127,6 @@ class Bot(Configurable):
                     inferences.append(solution)
             time.sleep(0.1)
         
-        self.cancel_rune_buff()
         threading.Timer(3, self.notify_rune_solved).start()
 
     def notify_rune_solved(self):
@@ -142,32 +138,6 @@ class Bot(Configurable):
             config.gui.settings.update_class_bindings()
         except ValueError:
             pass    # TODO: UI warning popup, say check cmd for errors
-
-    def cancel_rune_buff(self):
-        time.sleep(1)
-        frame = config.capture.frame
-        
-        big_mouse = utils.multi_match(frame, BIG_MOUSE_TEMPLATE, threshold=0.9)
-        if not big_mouse:
-            big_mouse = utils.multi_match(frame, BIG_MOUSE_LEFT_TEMPLATE, threshold=0.9)
-            
-        if not big_mouse:
-            return
-        
-        rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :],
-                                        RUNE_BUFF_TEMPLATE,
-                                        threshold=0.9)
-        if rune_buff:
-            for i in range(3):
-                rune_buff_pos = min(rune_buff, key=lambda p: p[0])
-                x = round(rune_buff_pos[0] + config.capture.window['left']) - 35
-                y = round(rune_buff_pos[1] + config.capture.window['top']) + 10
-                config.usb.mouse_abs_move(x, y)
-                time.sleep(0.1)
-                config.usb.mouse_right_down()
-                time.sleep(0.3)
-                config.usb.mouse_right_up()     
-                time.sleep(0.1)
         
     def toggle(self, enabled: bool):
         config.bot.rune_active = False

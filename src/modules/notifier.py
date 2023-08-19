@@ -14,6 +14,8 @@ from src.common.chat_bot import ChatBot
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 BUTTON_OK_TEMPLATE = cv2.imread('assets/btn_ok_template.png', 0)
 END_TALK_TEMPLATE = cv2.imread('assets/end_talk_template.png', 0)
+BIG_MOUSE_TEMPLATE = cv2.imread('assets/big_mouse_template.png', 0)
+BIG_MOUSE_LEFT_TEMPLATE = cv2.imread('assets/big_mouse_left_template.png', 0)
 
 # A rune's symbol on the minimap
 RUNE_RANGES = (
@@ -197,12 +199,15 @@ class Notifier:
                 self.notifyOtherLeaved(others)
             self.detect_count = 0
             self.other_comming_time = 0
-        elif self.detect_count == 700:
+        elif self.detect_count == 1200:
             self.detect_count += 1
             self.othersLongStayWarnning(others)
+        elif self.detect_count == 700:
+            self.detect_count += 1
+            self.othersStayWarnning2(others)
         elif self.detect_count == 400:
             self.detect_count += 1
-            self.othersStayWarnning(others)
+            self.othersStayWarnning1(others)
         elif self.detect_count == 200:
             self.detect_count += 1
             self.notifyOtherComing(others)
@@ -217,14 +222,30 @@ class Notifier:
         self.send_message(text=text_notice,
                         image=config.capture.frame, imagePath=imagePath)
         config.bot.go_home()        
-        
-            
-    def othersStayWarnning(self, num):
+
+    def othersStayWarnning1(self, num):
         str = 'cc pls'
         if random() >= 0.7:
             str = 'cc pls '
         elif random() >= 0.4:
             str = ' cc pls'
+        config.bot.say_to_all(str)
+        
+        timestamp = int(time.time())
+        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
+        utils.save_screenshot(filename=imagePath)
+        
+        text_notice = f"[!!!]有人已停留{int(time.time() - self.other_comming_time)}s, 当前地图人数{num}"
+        self.send_message(text=text_notice,
+                        image=config.capture.frame, imagePath=imagePath)
+        
+            
+    def othersStayWarnning2(self, num):
+        str = '??'
+        if random() >= 0.7:
+            str = 'bro?'
+        elif random() >= 0.4:
+            str = '???'
         config.bot.say_to_all(str)
         
         timestamp = int(time.time())
@@ -304,6 +325,28 @@ class Notifier:
         self.mixer.set_volume(volume)
         self.mixer.play()
 
+    def cancel_rune_buff(self, frame):
+        
+        big_mouse = utils.multi_match(frame, BIG_MOUSE_TEMPLATE, threshold=0.9)
+        if not big_mouse:
+            big_mouse = utils.multi_match(frame, BIG_MOUSE_LEFT_TEMPLATE, threshold=0.9)
+            
+        if not big_mouse:
+            return
+        
+        rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :],
+                                        RUNE_BUFF_TEMPLATE,
+                                        threshold=0.9)
+        if rune_buff:
+            rune_buff_pos = min(rune_buff, key=lambda p: p[0])
+            x = round(rune_buff_pos[0] + config.capture.window['left']) - 35
+            y = round(rune_buff_pos[1] + config.capture.window['top']) + 10
+            config.usb.mouse_abs_move(x, y)
+            time.sleep(0.1)
+            config.usb.mouse_right_down()
+            time.sleep(0.3)
+            config.usb.mouse_right_up()     
+            time.sleep(0.1)
 
 #################################
 #       Helper Functions        #

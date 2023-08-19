@@ -16,7 +16,10 @@ class Buffs(LabelFrame):
         self.check_boxes = []
         self.check_values = []
         for k, v in self.buff_settings.config.items():
-            value = tk.BooleanVar(value=v)
+            try:
+                value = tk.BooleanVar(value=v)
+            except Exception as e:
+                value = False
             check = tk.Checkbutton(
                 buff_row,
                 variable= value,
@@ -27,7 +30,6 @@ class Buffs(LabelFrame):
             index += 1
             self.check_boxes.append(check)
             self.check_values.append(value)
-
                 
                 
     def _on_change(self):
@@ -44,6 +46,7 @@ class BuffSettings(Configurable):
         'Exp Potion': False,
         'Wealthy Potion': False,
         'Gold Potion': False,
+        'Candied Apple': False,
     }
 
     def get(self, key):
