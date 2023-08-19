@@ -164,8 +164,8 @@ class Notifier:
 
     def checkAlert(self, frame):
         x = (frame.shape[1] - 260) // 2
-        y = (frame.shape[0] - 100) // 2
-        ok_btn = utils.multi_match(frame[y:y+100, x:x+260], BUTTON_OK_TEMPLATE, threshold=0.9)
+        y = (frame.shape[0] - 220) // 2
+        ok_btn = utils.multi_match(frame[y:y+220, x:x+260], BUTTON_OK_TEMPLATE, threshold=0.9)
         if ok_btn:
             config.usb.key_press('esc')
             
