@@ -75,14 +75,15 @@ class Editor(LabelFrame):
         entry.pack(side=tk.RIGHT, expand=True, fill='x')
         entry.config(state=tk.DISABLED)
 
-    def create_entry(self, key, value):
+    def create_entry(self, key, value, arr=None, i=None, func=None):
         """
         Creates an input row for a single Component attribute. KEY is the name
         of the attribute while VALUE is its currently assigned value.
         """
 
-        self.vars[key] = tk.StringVar(value=str(value))
-
+        var = tk.StringVar(value=str(value))
+        self.vars[key] = var
+        var.trace("w", lambda name, index,mode, var=var: self.callback(arr, i, func))
         row = Frame(self.contents, highlightthickness=0)
         row.pack(expand=True, fill='x')
 
@@ -93,6 +94,10 @@ class Editor(LabelFrame):
 
         entry = tk.Entry(row, textvariable=self.vars[key])
         entry.pack(side=tk.RIGHT, expand=True, fill='x')
+        
+    def callback(self, arr, i, func):
+        f = func(arr, i, self.vars)
+        f()
 
     def create_edit_ui(self, arr, i, func):
         """
@@ -115,9 +120,9 @@ class Editor(LabelFrame):
 
         if len(arr[i].kwargs) > 0:
             for key, value in arr[i].kwargs.items():
-                self.create_entry(key, value)
-            button = tk.Button(self.contents, text='Save', command=func(arr, i, self.vars))
-            button.pack(pady=5)
+                self.create_entry(key, value, arr, i, func)
+            # button = tk.Button(self.contents, text='Save', command=func(arr, i, self.vars))
+            # button.pack(pady=5)
         else:
             self.create_disabled_entry()
 
