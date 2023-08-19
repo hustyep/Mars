@@ -10,13 +10,6 @@ from src.modules.listener import Listener
 from src.modules.gui import GUI
 from src.common import config
 
-def loadDefault():
-    file_path = 'resources/command_books/night_lord.py'
-    config.bot.load_commands(file_path)
-
-    routinepath = 'resources/routines/night_lord/TrainNoDestination2.csv'
-    config.routine.load(routinepath)
-
 print(platform.architecture())
     
 bot = Bot()
@@ -43,8 +36,6 @@ while not listener.ready:
 print('\n[~] Successfully initialized Mars')
 
 threading.Timer(1, DllLoader.load).start()
-
-threading.Timer(1, loadDefault).start()
 
 gui = GUI()
 gui.start()

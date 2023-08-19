@@ -4,12 +4,16 @@ from src.common import config, utils
 from src.gui.interfaces import MenuBarItem
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesno
-
+from src.common.interfaces import Configurable
+import threading
 
 class File(MenuBarItem):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, 'File', **kwargs)
         # parent.add_cascade(label='File', menu=self)
+        config.file_setting = File_Setting('files')
+
+        threading.Timer(1, self.loadDefault).start()
 
         self.add_command(
             label='New Routine',
@@ -28,6 +32,11 @@ class File(MenuBarItem):
             command=utils.async_callback(self, File._load_routine),
             state=tk.DISABLED
         )
+
+    def loadDefault(self):
+
+        config.bot.load_commands(config.file_setting.get('command_book_path'))
+        config.routine.load(config.file_setting.get("routine_path"))
 
     def enable_routine_state(self):
         self.entryconfig('New Routine', state=tk.NORMAL)
@@ -68,6 +77,8 @@ class File(MenuBarItem):
                                     title='Select a routine',
                                     filetypes=[('*.csv', '*.csv')])
         if file_path:
+            config.file_setting.set('routine_path', file_path)
+            config.file_setting.save_config()
             config.routine.load(file_path)
 
     @staticmethod
@@ -83,6 +94,8 @@ class File(MenuBarItem):
                                     title='Select a command book',
                                     filetypes=[('*.py', '*.py')])
         if file_path:
+            config.file_setting.set('command_book_path', file_path)
+            config.file_setting.save_config()
             config.bot.load_commands(file_path)
 
 
@@ -91,3 +104,17 @@ def get_routines_dir():
     if not os.path.exists(target):
         os.makedirs(target)
     return target
+
+
+class File_Setting(Configurable):
+    DEFAULT_CONFIG = {
+        'command_book_path': 'resources/command_books/shadower.py',
+        'routine_path': 'resources/routines/shadower/ResarchTrain1.csv'
+    }
+
+    def get(self, key):
+        return self.config[key]
+
+    def set(self, key, value):
+        assert key in self.config
+        self.config[key] = value

@@ -66,3 +66,5 @@ usb = None
 dllTool = None  
 
 notifier = None
+
+file_setting = None
