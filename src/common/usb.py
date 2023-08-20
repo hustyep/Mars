@@ -1,6 +1,6 @@
 import ctypes
 from ctypes import *
-from src.common import config
+from src.common.common import singleton
 
 # 字符串命令接口
 # https://note.youdao.com/s/Gyrcngxs
@@ -26,13 +26,10 @@ CMD_MOUSE_ABS_MOVE = "mouse:absmove"
 # 多媒体
 CMD_CONSUMER_SLEEP = "consumer:powersleep"
 
-
+@singleton
 class USB:
     dll = None
     usbopen = False
-
-    def __init__(self):
-        config.usb = self
 
     def load(self):
         self.dll = cdll.LoadLibrary('./hiddll.dll')

@@ -13,6 +13,7 @@ from src.common.vkeys import press, click, releaseAll
 from src.common.interfaces import Configurable
 import win32con
 import win32clipboard as wc
+from src.common.usb import USB
 
 # The rune's buff icon
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
@@ -181,17 +182,17 @@ class Bot(Configurable):
     def say(self, text):
         self.setText(text)
             
-        config.usb.key_press('enter')
+        USB().key_press('enter')
         time.sleep(0.3)
-        config.usb.key_down('ctrl')
+        USB().key_down('ctrl')
         time.sleep(0.05)
-        config.usb.key_press("v")
+        USB().key_press("v")
         time.sleep(0.05)
-        config.usb.key_up('ctrl')
+        USB().key_up('ctrl')
         time.sleep(0.3)
-        config.usb.key_press('enter')
+        USB().key_press('enter')
         time.sleep(0.3)
-        config.usb.key_press('enter')
+        USB().key_press('enter')
         time.sleep(0.05)
 
     def say_to_all(self, text):
@@ -205,39 +206,44 @@ class Bot(Configurable):
     def go_home(self):
         for i in range(0, 6):
             self.toggle(False)
-            config.usb.key_press("H")
+            USB().key_press("H")
             
             time.sleep(0.5)
-            config.usb.key_press("H")
+            USB().key_press("H")
             time.sleep(5)
             
     def stop_game(self):
         self.toggle(False)
         
-        config.usb.key_down('alt')
+        USB().key_down('alt')
         time.sleep(0.5)        
-        config.usb.key_press('f4')
+        USB().key_press('f4')
         time.sleep(0.5)   
-        config.usb.key_up('alt')  
+        USB().key_up('alt')  
         time.sleep(0.5)   
-        config.usb.key_press('enter')
+        USB().key_press('enter')
         time.sleep(10)
-        config.usb.consumer_sleep()
+        USB().consumer_sleep()
 
-        # config.usb.key_press('esc')
+        # USB().key_press('esc')
         # time.sleep(0.5)        
-        # config.usb.key_press('esc')
+        # USB().key_press('esc')
         # time.sleep(0.5)        
-        # config.usb.key_press('esc')
+        # USB().key_press('esc')
         # time.sleep(0.5)        
-        # config.usb.key_press('up')
+        # USB().key_press('up')
         # time.sleep(0.1)
-        # config.usb.key_press('enter')
+        # USB().key_press('enter')
         # time.sleep(0.1)
-        # config.usb.key_press('enter')
+        # USB().key_press('enter')
         # time.sleep(5)
-        # config.usb.key_press('esc')
+        # USB().key_press('esc')
         # time.sleep(0.1)        
-        # config.usb.key_press('enter')
+        # USB().key_press('enter')
         # time.sleep(0.1)        
-        # config.usb.key_press('enter')
+        # USB().key_press('enter')
+        
+    def potion_buff(self):
+        USB().key_press('0')
+        time.sleep(0.5)
+        USB().key_press('-')

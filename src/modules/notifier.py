@@ -10,6 +10,7 @@ from random import random
 from src.routine.components import Point
 from src.common import config, utils
 from src.common.chat_bot import ChatBot
+from src.common.usb import USB
 
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 BUTTON_OK_TEMPLATE = cv2.imread('assets/btn_ok_template.png', 0)
@@ -184,13 +185,13 @@ class Notifier:
         y = (frame.shape[0] - 220) // 2
         ok_btn = utils.multi_match(frame[y:y+220, x:x+260], BUTTON_OK_TEMPLATE, threshold=0.9)
         if ok_btn:
-            config.usb.key_press('esc')
+            USB().key_press('esc')
             
         x = (frame.shape[1] - 520) // 2
         y = (frame.shape[0] - 190) // 2
         end_talk = utils.multi_match(frame[y:y+190, x:x+520], END_TALK_TEMPLATE, threshold=0.9)
         if end_talk:
-            config.usb.key_press('esc')
+            USB().key_press('esc')
 
     def checkOtherPlayer(self, minimap):
         filtered = utils.filter_color(minimap, OTHER_RANGES)
@@ -363,11 +364,11 @@ class Notifier:
         rune_buff_pos = min(rune_buff, key=lambda p: p[0])
         x = round(rune_buff_pos[0] + config.capture.window['left']) - 35
         y = round(rune_buff_pos[1] + config.capture.window['top']) + 10
-        config.usb.mouse_abs_move(x, y)
+        USB().mouse_abs_move(x, y)
         time.sleep(0.1)
-        config.usb.mouse_right_down()
+        USB().mouse_right_down()
         time.sleep(0.3)
-        config.usb.mouse_right_up()     
+        USB().mouse_right_up()     
         time.sleep(0.1)
             
 

@@ -3,7 +3,7 @@
 import time
 from random import random
 from src.common import utils
-from src.common import config
+from src.common.usb import USB
 
 
 INPUT_MOUSE = 0
@@ -121,7 +121,7 @@ def key_down(key):
     if key not in KEY_MAP.keys():
         print(f"Invalid keyboard input: '{key}'.")
     else:
-        config.usb.key_down(key)
+        USB().key_down(key)
 
 
 def key_up(key):
@@ -136,10 +136,10 @@ def key_up(key):
     if key not in KEY_MAP.keys():
         print(f"Invalid keyboard input: '{key}'.")
     else:
-        config.usb.key_up(key)
+        USB().key_up(key)
 
 def releaseAll():
-    config.usb.key_release()
+    USB().key_release()
 
 
 @utils.run_if_enabled
@@ -179,9 +179,9 @@ def click(position, button='left'):
     if button not in ['left', 'right']:
         print(f"'{button}' is not a valid mouse button.")
     else:
-        config.usb.mouse_abs_move(position[0], position[1])
+        USB().mouse_abs_move(position[0], position[1])
         if button == 'left':
-            config.usb.mouse_left_click()
+            USB().mouse_left_click()
         else:
-            config.usb.mouse_right_click()
+            USB().mouse_right_click()
 

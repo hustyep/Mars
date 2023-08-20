@@ -1,7 +1,6 @@
 # import requests
 
 # import aiohttp
-import cv2
 import asyncio
 import time
 import telegram
@@ -148,9 +147,7 @@ class TelegramBot():
         await self.replayPhoto(update, filepath, "screenshot")
 
     async def buff(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        config.usb.key_press('0')
-        time.sleep(0.5)
-        config.usb.key_press('-')
+        config.bot.potion_buff()
         message = 'buff done'
         await self.replyText(update, message)
 

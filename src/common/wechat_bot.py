@@ -10,6 +10,7 @@ from src.common import config, utils
 from mss import mss
 import numpy as np
 import cv2
+from src.common.usb import USB
 
 WECHAT_CALL_TEMPLATE = cv2.imread('assets/wechat_call.png', 0)
 WECHAT_CALL_TEMPLATE_2X = cv2.imread('assets/wechat_call@2x.png', 0)
@@ -132,9 +133,9 @@ class WechatBot:
             str = list[1]
         
         self.pause_command()
-        config.usb.key_press('enter')
-        config.usb.key_string(str)
-        config.usb.key_press('enter')
+        USB().key_press('enter')
+        USB().key_string(str)
+        USB().key_press('enter')
         
         time.sleep(0.1)
         self.send_text(f'sayed "{str}" to all')
@@ -150,10 +151,10 @@ class WechatBot:
         wc.EmptyClipboard()
         wc.CloseClipboard()
          
-        config.usb.key_down('ctrl')
+        USB().key_down('ctrl')
         win32gui.SendMessage(self.hwnd, win32con.WM_KEYDOWN, 0x43, 0)
         win32gui.SendMessage(self.hwnd, win32con.WM_KEYUP, 0x43, 0)
-        config.usb.key_up('ctrl')
+        USB().key_up('ctrl')
         
         wc.OpenClipboard()
         try:
@@ -165,13 +166,13 @@ class WechatBot:
         return data
 
     def paste(self):                
-        config.usb.key_down('ctrl')
+        USB().key_down('ctrl')
         win32gui.SendMessage(self.hwnd, win32con.WM_KEYDOWN, 86, 0)
         win32gui.SendMessage(self.hwnd, win32con.WM_KEYUP, 86, 0)
-        config.usb.key_up('ctrl')
+        USB().key_up('ctrl')
 
     def send_text(self, text):
-        if not config.usb:
+        if not USB():
             return
         
         wc.OpenClipboard()
@@ -187,7 +188,7 @@ class WechatBot:
 
     
     def send_image(self, image=None, imagePath=None):
-        if not config.usb:
+        if not USB():
             return
         
         image = utils.cvt2Plt(image)
