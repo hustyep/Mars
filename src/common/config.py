@@ -59,12 +59,6 @@ listener = None
 # Shares the gui to all modules
 gui = None
 
-# Shares the usb dll
-usb = None
-
-# Shares the tool dll
-dllTool = None  
-
 notifier = None
 
 file_setting = None

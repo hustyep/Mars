@@ -53,6 +53,10 @@ def say(text):
     usb.key_press('enter')
     time.sleep(0.1)
     usb.key_press('enter')
+    
+def cancelBuff():
+    usb = USB()
+    usb.load()
 
 def multi_match(frame, template, threshold=0.95):
     """
@@ -107,6 +111,11 @@ def filter_color(img, ranges):
     cv2.imshow("result", result)
     cv2.waitKey()
     return result
+    usb.mouse_abs_move(1437, 300)
+    usb.mouse_abs_move(2437, 400)
+    usb.mouse_right_down()
+    time.sleep(0.5)
+    usb.mouse_right_up()
         
 if __name__ == "__main__":
     # telegram_apiToken = '6497654972:AAExWRJvmuswPb2MzbtHi8fIp140TdeDSQM'
@@ -142,3 +151,5 @@ if __name__ == "__main__":
     if not big_mouse:
         big_mouse = multi_match(filtered, BIG_MOUSE_TEMPLATE, threshold=0.7)
     
+    # say("hello1")
+    cancelBuff()

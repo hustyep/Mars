@@ -6,11 +6,12 @@ import cv2
 import pygame
 import threading
 import numpy as np
-from random import random
+import random
 from src.routine.components import Point
 from src.common import config, utils
 from src.common.chat_bot import ChatBot
 from src.common.usb import USB
+from src.common.dll_loader import DllHelper
 
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 BUTTON_OK_TEMPLATE = cv2.imread('assets/btn_ok_template.png', 0)
@@ -20,10 +21,12 @@ BIG_MOUSE_RANGES = (
     ((0, 180, 119), (4, 255, 187)),
     ((0, 255, 17), (0, 255, 153)),
 )
-big_mouse = cv2.imread('assets/big_mouse_template.png')
-big_mouse_left = cv2.imread('assets/big_mouse_left_template.png')
-BIG_MOUSE_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
-BIG_MOUSE_LEFT_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse_left, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
+# big_mouse = cv2.imread('assets/big_mouse_template.png')
+# big_mouse_left = cv2.imread('assets/big_mouse_left_template.png')
+# BIG_MOUSE_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
+# BIG_MOUSE_LEFT_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse_left, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
+BIG_MOUSE_TEMPLATE = DllHelper().loadImage('assets/big_mouse_template.png')
+
 
 # A rune's symbol on the minimap
 RUNE_RANGES = (
@@ -133,6 +136,7 @@ class Notifier:
                     elif self.rune_start_time != 0:
                         if len(rune_buff) > 1 and len(matches) == 0:
                             self.rune_start_time = 0
+                            self.cancel_rune_buff(rune_buff)
                             self.notifyRuneResolved()
                         else:
                             config.bot.rune_active = True
@@ -222,7 +226,7 @@ class Notifier:
                 self.notifyOtherLeaved(others)
             self.detect_count = 0
             self.other_comming_time = 0
-        elif self.detect_count == 1200:
+        elif self.detect_count == 2400:
             self.detect_count += 1
             self.othersLongStayWarnning(others)
         elif self.detect_count == 700:
@@ -247,12 +251,9 @@ class Notifier:
         config.bot.go_home()        
 
     def othersStayWarnning1(self, num):
-        str = 'cc pls'
-        if random() >= 0.7:
-            str = 'cc pls '
-        elif random() >= 0.4:
-            str = ' cc pls'
-        config.bot.say_to_all(str)
+        words = ['cc plz', 'cc plz ', ' cc plz']
+        random_word = random.choice(words)
+        config.bot.say_to_all(random_word)
         
         timestamp = int(time.time())
         imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
@@ -264,12 +265,9 @@ class Notifier:
         
             
     def othersStayWarnning2(self, num):
-        str = '??'
-        if random() >= 0.7:
-            str = 'bro?'
-        elif random() >= 0.4:
-            str = '???'
-        config.bot.say_to_all(str)
+        words = ['??', 'hello?', ' cc plz', 'bro?']
+        random_word = random.choice(words)
+        config.bot.say_to_all(random_word)
         
         timestamp = int(time.time())
         imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
@@ -299,6 +297,7 @@ class Notifier:
         self.send_message(text=text_notice)
 
     def notifyRuneResolved(self):
+        
         timestamp = int(time.time())
         imagePath = f"screenshot/rune_solved/maple_{timestamp}.webp"
         utils.save_screenshot(filename=imagePath)
@@ -348,17 +347,22 @@ class Notifier:
         self.mixer.set_volume(volume)
         self.mixer.play()
 
-    def cancel_rune_buff(self, frame, rune_buff):
+    def cancel_rune_buff(self, rune_buff):
         
         if len(rune_buff) <= 1:
             return
-        filtered = utils.filter_color(frame, BIG_MOUSE_RANGES)
-        big_mouse = utils.multi_match(filtered, BIG_MOUSE_TEMPLATE, threshold=0.7)
-        if not big_mouse:
-            big_mouse = utils.multi_match(filtered, BIG_MOUSE_LEFT_TEMPLATE, threshold=0.7)
-            
-        if not big_mouse:
+        
+        x, y = DllHelper().screenSearch(BIG_MOUSE_TEMPLATE)
+        if x == -1 or y == -1:
             return
+
+        # filtered = utils.filter_color(frame, BIG_MOUSE_RANGES)
+        # big_mouse = utils.multi_match(filtered, BIG_MOUSE_TEMPLATE, threshold=0.7)
+        # if not big_mouse:
+        #     big_mouse = utils.multi_match(filtered, BIG_MOUSE_LEFT_TEMPLATE, threshold=0.7)
+            
+        # if not big_mouse:
+        #     return
         
         print("Found big mouse")
         rune_buff_pos = min(rune_buff, key=lambda p: p[0])
