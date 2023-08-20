@@ -14,8 +14,15 @@ from src.common.chat_bot import ChatBot
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 BUTTON_OK_TEMPLATE = cv2.imread('assets/btn_ok_template.png', 0)
 END_TALK_TEMPLATE = cv2.imread('assets/end_talk_template.png', 0)
-BIG_MOUSE_TEMPLATE = cv2.imread('assets/big_mouse_template.png', 0)
-BIG_MOUSE_LEFT_TEMPLATE = cv2.imread('assets/big_mouse_left_template.png', 0)
+
+BIG_MOUSE_RANGES = (
+    ((0, 180, 119), (4, 255, 187)),
+    ((0, 255, 17), (0, 255, 153)),
+)
+big_mouse = cv2.imread('assets/big_mouse_template.png')
+big_mouse_left = cv2.imread('assets/big_mouse_left_template.png')
+BIG_MOUSE_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
+BIG_MOUSE_LEFT_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse_left, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
 
 # A rune's symbol on the minimap
 RUNE_RANGES = (
@@ -32,6 +39,13 @@ OTHER_RANGES = (
 other_filtered = utils.filter_color(cv2.imread(
     'assets/other_template.png'), OTHER_RANGES)
 OTHER_TEMPLATE = cv2.cvtColor(other_filtered, cv2.COLOR_BGR2GRAY)
+
+# guildmate' symbols on the minimap
+GUILDMATE_RANGES = (
+    ((120, 40, 180), (120, 110, 255)),
+)
+guildmate_filtered = utils.filter_color(cv2.imread('assets/guildmate_template.png'), GUILDMATE_RANGES)
+GUILDMATE_TEMPLATE = cv2.cvtColor(guildmate_filtered, cv2.COLOR_BGR2GRAY)
 
 # The Elite Boss's warning sign
 # ELITE_TEMPLATE = cv2.imread('assets/elite_template.jpg', 0)
@@ -91,15 +105,16 @@ class Notifier:
                 self.checkOtherPlayer(minimap)
                 
                 self.checkAlert(frame)
-
+                
                 # Check for rune
                 now = time.time()
-                if not config.bot.rune_active:
+                if not config.bot.rune_active:                    
                     filtered = utils.filter_color(minimap, RUNE_RANGES)
                     matches = utils.multi_match(
                         filtered, RUNE_TEMPLATE, threshold=0.9)
                     rune_buff = utils.multi_match(
                         frame[:frame.shape[0] // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+                    # self.cancel_rune_buff(frame, rune_buff)
                     if matches and config.routine.sequence and len(rune_buff) == 0:
                         abs_rune_pos = (matches[0][0], matches[0][1])
                         config.bot.rune_pos = utils.convert_to_relative(
@@ -181,6 +196,13 @@ class Notifier:
         filtered = utils.filter_color(minimap, OTHER_RANGES)
         others = len(utils.multi_match(
             filtered, OTHER_TEMPLATE, threshold=0.7))
+        
+        guild_filtered = utils.filter_color(minimap, GUILDMATE_RANGES)
+        guildmates = len(utils.multi_match(
+            guild_filtered, GUILDMATE_TEMPLATE, threshold=0.7))
+        
+        others += guildmates
+        
         config.stage_fright = others > 0
         
         self.cur_others = others
@@ -325,28 +347,29 @@ class Notifier:
         self.mixer.set_volume(volume)
         self.mixer.play()
 
-    def cancel_rune_buff(self, frame):
+    def cancel_rune_buff(self, frame, rune_buff):
         
-        big_mouse = utils.multi_match(frame, BIG_MOUSE_TEMPLATE, threshold=0.9)
+        if len(rune_buff) <= 1:
+            return
+        filtered = utils.filter_color(frame, BIG_MOUSE_RANGES)
+        big_mouse = utils.multi_match(filtered, BIG_MOUSE_TEMPLATE, threshold=0.7)
         if not big_mouse:
-            big_mouse = utils.multi_match(frame, BIG_MOUSE_LEFT_TEMPLATE, threshold=0.9)
+            big_mouse = utils.multi_match(filtered, BIG_MOUSE_LEFT_TEMPLATE, threshold=0.7)
             
         if not big_mouse:
             return
         
-        rune_buff = utils.multi_match(frame[:frame.shape[0] // 8, :],
-                                        RUNE_BUFF_TEMPLATE,
-                                        threshold=0.9)
-        if rune_buff:
-            rune_buff_pos = min(rune_buff, key=lambda p: p[0])
-            x = round(rune_buff_pos[0] + config.capture.window['left']) - 35
-            y = round(rune_buff_pos[1] + config.capture.window['top']) + 10
-            config.usb.mouse_abs_move(x, y)
-            time.sleep(0.1)
-            config.usb.mouse_right_down()
-            time.sleep(0.3)
-            config.usb.mouse_right_up()     
-            time.sleep(0.1)
+        print("Found big mouse")
+        rune_buff_pos = min(rune_buff, key=lambda p: p[0])
+        x = round(rune_buff_pos[0] + config.capture.window['left']) - 35
+        y = round(rune_buff_pos[1] + config.capture.window['top']) + 10
+        config.usb.mouse_abs_move(x, y)
+        time.sleep(0.1)
+        config.usb.mouse_right_down()
+        time.sleep(0.3)
+        config.usb.mouse_right_up()     
+        time.sleep(0.1)
+            
 
 #################################
 #       Helper Functions        #

@@ -3,7 +3,7 @@
 import math
 import time
 from src.common import config, utils, settings
-from src.common.vkeys import key_down, key_up, press, releaseAll
+from src.common.vkeys import key_down, key_up, press, releaseAll, press_acc
 
 
 #################################
@@ -242,15 +242,16 @@ class Command(Component):
     
     def main(self):
         if not self.canUse():
-            return
+            return False
         
         if self.__class__.key is None:
-            return
+            return False
         
         # print(f"cast skill: {self.key}")
         time.sleep(self.__class__.precast)
         self.__class__.castedTime = time.time()
-        press(self.__class__.key, up_time=self.__class__.backswing)
+        press_acc(self.__class__.key, up_time=self.__class__.backswing)
+        return True
 
 
 class Move(Command):

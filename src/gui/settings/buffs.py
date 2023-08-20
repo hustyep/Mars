@@ -19,7 +19,7 @@ class Buffs(LabelFrame):
             try:
                 value = tk.BooleanVar(value=v)
             except Exception as e:
-                value = False
+                value = tk.BooleanVar(value=False)
             check = tk.Checkbutton(
                 buff_row,
                 variable= value,

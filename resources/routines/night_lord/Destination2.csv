@@ -3,10 +3,6 @@
 
 @, label=Bottom mobbing
 *, x=0.06, y=0.478, frequency=1, skip=False, adjust=False
-*, x=0.28, y=0.478, frequency=1, skip=False, adjust=False
-*, x=0.48, y=0.478, frequency=1, skip=False, adjust=False
-*, x=0.7, y=0.478, frequency=1, skip=False, adjust=False
-*, x=0.925, y=0.478, frequency=1, skip=False, adjust=False
-*, x=0.7, y=0.478, frequency=1, skip=False, adjust=False
-*, x=0.48, y=0.478, frequency=1, skip=False, adjust=False
-*, x=0.28, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0.522, y=0.282, frequency=1, skip=False, adjust=True
+*, x=0.533, y=0.474, frequency=1, skip=False, adjust=True
+*, x=0.881, y=0.244, frequency=1, skip=False, adjust=True

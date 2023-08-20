@@ -19,9 +19,9 @@ class Key:
     # Buffs
     GODDESS_BLESSING = '1'
     LAST_RESORT = '2'
-    EPIC_ADVENTURE = '4'
-    MEMORIES = '5'
-    MAPLE_WARRIOR = '6'
+    EPIC_ADVENTURE = '3'
+    MEMORIES = '4'
+    MAPLE_WARRIOR = '5'
     SHADOW_WALKER = 'shift'
     THROW_BLASTING = 'v'
     FOR_THE_GUILD = '7'
@@ -32,6 +32,8 @@ class Key:
     WEALTH_POTION = "-"
     GOLD_POTION = "="
     GUILD_POTION = "9"
+    CANDIED_APPLE= '6'
+
     
     # SHADOW_PARTNER = '3'
     # SPEED_INFUSION = '8'
@@ -68,23 +70,27 @@ def step(direction, target):
     d_y = abs(target[1] - config.player_pos[1])
     # if d_y > settings.move_tolerance * 1.5:
     if direction == 'down':
-        # print(f"step_down: {d_y}")
+        print(f"step_down: {d_y}")
         if d_y > settings.move_tolerance:
-            press_acc(Key.JUMP, 2, down_time=0.1,up_time=0.1)
-            time.sleep(d_y)
+            press_acc(Key.JUMP, 1, down_time=0.1,up_time=d_y*3)
+            # time.sleep(d_y)
         return
     elif direction == 'up':
         # print(f"step_up: {d_y}")
         MoveUp(dy=d_y)
         return
         
-    if d_x >=0.11:
+    if d_x >=0.16:
         press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
         press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
         ShowDown().execute()
+    elif d_x >= 0.09:
+        # time.sleep(0.05)
+        if not ShadowSurge().execute():
+            time.sleep(0.02)
     else:
-        time.sleep(0.05)
-    
+        time.sleep(0.02)
+        
     # if direction == "left" or direction == "right":
 
 
@@ -110,14 +116,14 @@ class Adjust(Command):
                     if d_x < 0:
                         key_down('left')
                         while config.enabled and d_x < -1 * threshold and walk_counter < 60:
-                            time.sleep(0.05)
+                            time.sleep(0.01)
                             walk_counter += 1
                             d_x = self.target[0] - config.player_pos[0]
                         key_up('left')
                     else:
                         key_down('right')
                         while config.enabled and d_x > threshold and walk_counter < 60:
-                            time.sleep(0.05)
+                            time.sleep(0.01)
                             walk_counter += 1
                             d_x = self.target[0] - config.player_pos[0]
                             # print(f'dx: {d_x}; threshold: {threshold}')
@@ -134,9 +140,9 @@ class Adjust(Command):
                         print(f"adjust down {d_y}")
                         key_down('down')
                         time.sleep(0.05)
-                        press(Key.JUMP, 2, down_time=0.2, up_time=0.3)
+                        press(Key.JUMP, 1, down_time=0.2, up_time=0.3)
                         key_up('down')
-                        time.sleep(0.05)
+                        time.sleep(0.8)
                     counter -= 1
             error = utils.distance(config.player_pos, self.target)
             toggle = not toggle
@@ -261,8 +267,9 @@ class ShadowLeap(Command):
 # 水平位移
 class ShadowSurge(Command):
     key = Key.SHADOW_SURGE
-    cooldown = 10
-    backswing = 1
+    cooldown = 5
+    precast = 0
+    backswing = 0
 
 # 绳索
 class RopeLift(Command):
@@ -271,17 +278,14 @@ class RopeLift(Command):
 
     def __init__(self, dy: float = 0.2):
         super().__init__(locals())
-        self.dy = dy
+        self.dy = abs(dy)
 
     def main(self):
         if self.dy >= 0.3:
             press(Key.JUMP, up_time=0.12)
-        press_acc(self.__class__.key, up_time=self.dy * 9.5)
+        press_acc(self.__class__.key, up_time=self.dy * 9)
         if self.dy >= 0.3:
             time.sleep(self.dy * 3)
-        # if self.cancel is not None:
-        #     time.sleep(self.cancel)
-        #     press(self.__class__.key)
 
 
 #######################
@@ -345,7 +349,7 @@ class ErdaShower(Command):
 
 class ShowDown(Command):
     key = Key.SHOW_DOWN
-    backswing = 0.54
+    backswing = 0.57
 
     def main(self):
         time.sleep(self.__class__.precast)
@@ -356,7 +360,7 @@ class ShowDown(Command):
 class SuddenRaid(Command):
     key = Key.SUDDEN_RAID
     cooldown = 30
-    backswing = 0.8
+    backswing = 0.7
 
 
 class Omen(Command):
@@ -407,7 +411,12 @@ class Buff(Command):
                       SHADOW_WALKER(),
                       THROW_BLASTING(),
                       FOR_THE_GUILD(),
-                      HARD_HITTER()]
+                      HARD_HITTER(),
+                      EXP_POTION(),
+                      WEALTH_POTION(),
+                      GOLD_POTION(),
+                      GUILD_POTION(),
+                      CANDIED_APPLE()]
 
     def main(self):
         for buff in self.buffs:
@@ -533,4 +542,16 @@ class GUILD_POTION(Command):
         if not enabled:
             return False
         
-        return super().canUse(next_t)          
+        return super().canUse(next_t)
+
+class CANDIED_APPLE(Command):
+    key = Key.CANDIED_APPLE
+    cooldown = 1800
+    backswing = 0
+    
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
+        if not enabled:
+            return False
+        
+        return super().canUse(next_t)    
