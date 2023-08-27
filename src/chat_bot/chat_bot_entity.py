@@ -8,7 +8,9 @@ class ChatBotCommand(Enum):
     PAUSE = 'pause'
     INFO = 'info'
     SCREENSHOT = 'screenshot'
-    BUFF = 'buff'
+    PRINTSCREEN = 'printscreen'
+    LEVEL = 'level'
+    CLICK = 'click'
     SAY = 'say'
     TP = 'tp'
 

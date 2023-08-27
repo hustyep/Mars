@@ -202,9 +202,18 @@ class Bot(Configurable, Observer):
             case ChatBotCommand.SCREENSHOT:
                 filepath = utils.save_screenshot(capture.frame)
                 return None, filepath
-            case ChatBotCommand.BUFF:
+            case ChatBotCommand.PRINTSCREEN:
+                filepath = utils.save_screenshot()
+                return None, filepath
+            case ChatBotCommand.CLICK:
+                ActionSimulator.click_key(args[0])
                 filepath = utils.save_screenshot(capture.frame)
                 return "done", filepath
+            case ChatBotCommand.LEVEL:
+                level = int(args[0])
+                config.notice_level = level
+                config.gui.settings.notification.notice_level.set(level)
+                return "done", None
             case ChatBotCommand.SAY:
                 ActionSimulator.say_to_all(args[0])
                 filepath = utils.save_screenshot(capture.frame)
