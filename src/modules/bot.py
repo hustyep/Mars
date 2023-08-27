@@ -105,6 +105,8 @@ class Bot(Configurable, Observer):
         adjust = config.command_book['adjust']
         adjust(*config.rune_pos).execute()
         time.sleep(0.5)
+        if not config.rune_active:
+            return
         press(self.config['Interact'], 1, down_time=0.2,
               up_time=0.8)        # Inherited from Configurable
 
@@ -115,6 +117,8 @@ class Bot(Configurable, Observer):
         inferences = []
         used_frame = None
         for i in range(10):
+            if not config.rune_active:
+                return
             frame = capture.frame
             used_frame = frame
             solution = rune.show_magic(frame)
@@ -128,8 +132,8 @@ class Bot(Configurable, Observer):
                 elif len(solution) == 4:
                     inferences.append(solution)
             time.sleep(0.1)
-
-        threading.Timer(0.3, self.check_rune_solve_result, (used_frame, )).start()
+        time.sleep(0.3)
+        threading.Timer(0.01, self.check_rune_solve_result, (used_frame, )).start()
                 
     def check_rune_solve_result(self, used_frame):
         for _ in range(4):

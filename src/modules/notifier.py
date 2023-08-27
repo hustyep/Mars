@@ -199,7 +199,7 @@ class Notifier(Subject, Observer):
             config.rune_active = False
             self.rune_active_time = 0
         # Alert if rune hasn't been solved
-        elif len(rune_buff) == 0 and now - self.rune_active_time > self.rune_alert_delay:
+        elif len(rune_buff) == 0 and now - self.rune_active_time > self.rune_alert_delay and self.rune_active_time != 0:
             self.notifyRuneError(now - self.rune_active_time)
 
     def _notify(self, event: Enum, arg=None, info: str = '') -> None:
@@ -275,13 +275,15 @@ class Notifier(Subject, Observer):
         self._notify(BotInfo.RUNE_LIBERATED, info=rune_type)
 
     def notifyRuneResolveFailed(self):
+        if not config.rune_active:
+            return
         duration = int(time.time() - self.rune_active_time)
         text_notice = f"{duration}s"
         self._notify(BotWarnning.RUNE_FAILED, arg=duration, info=text_notice)
 
     def notifyRuneError(self, time):
         text_notice = f"{int(time)}s"
-        self._notify(BotWarnning.RUNE_FAILED, arg=time, info=text_notice)
+        self._notify(BotError.RUNE_ERROR, arg=time, info=text_notice)
 
     def send_message(self, text=None, image=None, image_path=None):
         print(text)
