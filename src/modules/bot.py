@@ -133,7 +133,7 @@ class Bot(Configurable, Observer):
                     inferences.append(solution)
             time.sleep(0.1)
         time.sleep(0.3)
-        threading.Timer(0.01, self.check_rune_solve_result, (used_frame, )).start()
+        threading.Timer(0.001, self.check_rune_solve_result, (used_frame, )).start()
                 
     def check_rune_solve_result(self, used_frame):
         for _ in range(4):

@@ -185,8 +185,9 @@ class Notifier(Subject, Observer):
         if not config.rune_active:
             if matches and config.routine.sequence and len(rune_buff) == 0:
                 abs_rune_pos = (matches[0][0], matches[0][1])
-                config.rune_pos = utils.convert_to_relative(
-                    abs_rune_pos, minimap)
+                # config.rune_pos = utils.convert_to_relative(
+                #     abs_rune_pos, minimap)
+                config.rune_pos = abs_rune_pos
                 distances = list(
                     map(distance_to_rune, config.routine.sequence))
                 index = np.argmin(distances)
@@ -276,8 +277,6 @@ class Notifier(Subject, Observer):
         self._notify(BotInfo.RUNE_LIBERATED, info=rune_type)
 
     def notifyRuneResolveFailed(self):
-        if not config.rune_active:
-            return
         duration = int(time.time() - self.rune_active_time)
         text_notice = f"{duration}s"
         self._notify(BotWarnning.RUNE_FAILED, arg=duration, info=text_notice)
