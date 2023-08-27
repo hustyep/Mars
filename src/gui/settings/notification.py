@@ -12,6 +12,7 @@ class Notification(LabelFrame):
         self.notice_level = tk.IntVar(
             value=self.notification_settings.get('notice_level'))
         self.notice_levels = ['Fatal', 'Error', 'Warnning', 'Info', 'Debug']
+        config.notice_level = int(self.notice_level.get())
 
         channel_row = Frame(self)
         channel_row.pack(side=tk.TOP, fill='x', expand=True, pady=5, padx=5)
