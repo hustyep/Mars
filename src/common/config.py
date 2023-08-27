@@ -47,18 +47,22 @@ routine = None
 # Stores the Layout object associated with the current routine
 layout = None
 
-# Shares the main bot loop
-bot = None
-
-# Shares the video capture loop
-capture = None
-
-# Shares the keyboard listener
-listener = None
-
 # Shares the gui to all modules
 gui = None
 
-notifier = None
 
 file_setting = None
+
+command_book = None
+
+rune_active = False
+rune_pos = None
+rune_closest_pos = None
+
+minimap_ratio = 1
+
+started_time = None
+
+default_notice_interval = 30
+
+notice_level = 1

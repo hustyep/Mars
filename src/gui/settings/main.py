@@ -5,6 +5,7 @@ from src.gui.interfaces import KeyBindings
 from src.gui.settings.pets import Pets
 from src.gui.settings.crontab import Crontab
 from src.gui.settings.buffs import Buffs
+from src.gui.settings.notification import Notification
 from src.gui.interfaces import Tab, Frame
 from src.common import config
 
@@ -18,12 +19,11 @@ class Settings(Tab):
 
         self.column1 = Frame(self)
         self.column1.grid(row=0, column=1, sticky=tk.N, padx=10, pady=10)
-        self.controls = KeyBindings(self.column1, 'Mars Controls', config.listener)
-        self.controls.pack(side=tk.TOP, fill='x', expand=True)
-        self.common_bindings = KeyBindings(self.column1, 'In-game Keybindings', config.bot)
-        self.common_bindings.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
-        self.notification = Crontab(self.column1)
+
+        self.notification = Notification(self.column1)
         self.notification.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
+        self.crontab = Crontab(self.column1)
+        self.crontab.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
         self.buffs = Buffs(self.column1)
         self.buffs.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
         self.pets = Pets(self.column1)
@@ -31,11 +31,15 @@ class Settings(Tab):
 
         self.column2 = Frame(self)
         self.column2.grid(row=0, column=2, sticky=tk.N, padx=10, pady=10)
+        self.controls = KeyBindings(self.column2, 'Mars Controls', config.listener)
+        self.controls.pack(side=tk.TOP, fill='x', expand=True)
         self.class_bindings = KeyBindings(self.column2, f'No Command Book Selected', None)
-        self.class_bindings.pack(side=tk.TOP, fill='x', expand=True)
-
+        self.class_bindings.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
+        self.common_bindings = KeyBindings(self.column2, 'In-game Keybindings', config.bot)
+        self.common_bindings.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
+        
     def update_class_bindings(self):
         self.class_bindings.destroy()
-        class_name = config.bot.command_book.name.capitalize()
-        self.class_bindings = KeyBindings(self.column2, f'{class_name} Keybindings', config.bot.command_book)
+        class_name = config.command_book.name.capitalize()
+        self.class_bindings = KeyBindings(self.column2, f'{class_name} Keybindings', config.command_book)
         self.class_bindings.pack(side=tk.TOP, fill='x', expand=True)

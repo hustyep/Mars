@@ -4,6 +4,8 @@ import time
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from pylab import *
+import pytesseract as tess
+
 mpl.rcParams['font.sans-serif'] = ['SimHei']
 mpl.rcParams['axes.unicode_minus'] = False
 
@@ -21,8 +23,21 @@ ARROW_RANGES2 = (
     ((0, 100, 200), (180, 255, 255))
 )
 
-ARROW_RESULT = []
+RUNE_LIBERATED_TEXT_RANGES = (
+    ((50, 200, 46), (77, 255, 255)),
+)
+RUNE_FAILED_TEXT_RANGES = (
+    ((0, 43, 46), (10, 255, 255)),
+    ((156, 43, 46), (180, 255, 255)),
+)
 
+RUNE_LIBERATED_TEXT_RANGES = (
+        ((50, 200, 46), (77, 255, 255)),
+)
+RUNE_FAILED_TEXT_RANGES = (
+    ((0, 43, 46), (10, 255, 255)),
+    ((156, 43, 46), (180, 255, 255)),
+)
 
 def single_match(frame, template):
     """
@@ -179,8 +194,6 @@ def solve_all_in_one(image, filter_type, blur, arc_filter):
 def show_magic(image):
     # blur: 70,40
     # arc_filter: 0.015,0.02
-
-    ARROW_RESULT.clear()
 
     cropped = crop_arrow_area(image)
 
@@ -367,7 +380,34 @@ def located_arrows(frame):
     cv2.waitKey(0)
     result = multi_match(canned, ARROW_TL_TEMPLATE, 0.3)
     return len(result) > 0
-     
+
+def rune_liberate_result(frame):
+    image = frame[50:400, 50:-50]
+    image_success = filter_color(image, RUNE_LIBERATED_TEXT_RANGES)
+    # cv2.imshow("", image)
+    # cv2.waitKey()
+    # hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    image_rgb = cv2.cvtColor(image_success, cv2.COLOR_BGR2RGB)
+    text = tess.image_to_string(image_rgb, lang="eng")
+    content = text.replace("\f", "").split("\n")
+    for c in content:
+        if len(c) > 0 and 'rune' in c.lower():
+            print(c)
+            print('\n')
+            list = c.split(":")
+            return list[0]
+    
+    # image_failed = filter_color(image, RUNE_FAILED_TEXT_RANGES)
+    # image_rgb = cv2.cvtColor(image_failed, cv2.COLOR_BGR2RGB)
+    # text = tess.image_to_string(image_rgb, lang="eng")
+    # content = text.replace("\f", "").split("\n")
+    # for c in content:
+    #     if len(c) > 0:
+    #         print(c)
+    #         return None
+    return None         
+    
+
 # def preprocess(img):
 #     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 #     img_blur = cv2.GaussianBlur(img_gray, (5, 5), 1)#进行高斯滤波ret,

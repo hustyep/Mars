@@ -8,12 +8,14 @@ import queue
 import cv2
 import threading
 import numpy as np
-from src.common import config, settings
 from random import random
+from mss import mss
 import win32gui
 import win32ui
 import win32con
-
+import win32api
+from src.common import config, settings
+from src.common.dll_helper import dll_helper
 
 def run_if_enabled(function):
     """
@@ -77,6 +79,8 @@ def separate_args(arguments):
             args.append(a)
     return args, kwargs
 
+def image_search(template):
+    return dll_helper.screenSearch(template)
 
 def single_match(frame, template, threshold=0.95):
     """
@@ -85,6 +89,9 @@ def single_match(frame, template, threshold=0.95):
     :param template:    The template to match with.
     :return:            The top-left and bottom-right positions of the best match.
     """
+
+    if frame is None:
+        return
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     if (template.ndim > 2):
@@ -112,7 +119,7 @@ def multi_match(frame, template, threshold=0.95):
     :return:            An array of matches that exceed THRESHOLD.
     """
 
-    if template.shape[0] > frame.shape[0] or template.shape[1] > frame.shape[1]:
+    if frame is None or template.shape[0] > frame.shape[0] or template.shape[1] > frame.shape[1]:
         return []
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     if (template.ndim > 2):
@@ -145,7 +152,7 @@ def convert_to_relative(point, frame):
     """
 
     x = point[0] / frame.shape[1]
-    y = point[1] / config.capture.minimap_ratio / frame.shape[0]
+    y = point[1] / config.minimap_ratio / frame.shape[0]
     return x, y
 
 
@@ -160,7 +167,7 @@ def convert_to_absolute(point, frame):
     """
 
     x = int(round(point[0] * frame.shape[1]))
-    y = int(round(point[1] * config.capture.minimap_ratio * frame.shape[0]))
+    y = int(round(point[1] * config.minimap_ratio * frame.shape[0]))
     return x, y
 
 
@@ -172,7 +179,7 @@ def filter_color(img, ranges):
     :param ranges:  A list of tuples, each of which is a pair upper and lower HSV bounds.
     :return:        A filtered copy of IMG.
     """
-    if len(img) == 0:
+    if img is None or len(img) == 0:
         return None
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, ranges[0][0], ranges[0][1])
@@ -316,27 +323,41 @@ def image_search(template_path):
 def timeStr() -> str:
     return time.strftime("%y_%m_%d_%H_%M_%S", time.localtime()) 
 
-def save_screenshot(frame=None, filename=None):
+def save_screenshot(frame=None, file_path=None, compress=True):
     if frame is None:
-        frame = config.capture.frame
-    if filename is None:
-        filename = f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}.webp'
-    cv2.imwrite(filename, frame, [int(cv2.IMWRITE_WEBP_QUALITY), 0])
-    return filename
+        frame = screenshot()
+    
+    if file_path is None:
+        file_path = 'screenshot/tmp'
+    
+    filename = f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}'    
+    if compress:
+        threading.Timer(1, cv2.imwrite, (filename + '.png', frame)).start()
+        cv2.imwrite(filename + '.webp', frame, [int(cv2.IMWRITE_WEBP_QUALITY), 0])
+        return filename + '.webp'
+    else:
+        cv2.imwrite(filename + ".png", frame)
+        return filename + ".png"
 
-def bot_status() -> str:
-    message = (
-    f"bot status: {'running' if config.enabled  else 'pause'}\n"
-    f"rune status: {config.notifier.rune_start_time if config.bot.rune_active else 'clear'}\n"
-    f"other players: {config.notifier.cur_others}"
-    )
-    return message
 
 def cvt2Plt(cv_image):
     rgb_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(rgb_img)
     return image
 
+def screenshot():
+    width = win32api.GetSystemMetrics(win32con.SM_CXSCREEN)
+    height = win32api.GetSystemMetrics(win32con.SM_CYSCREEN)
+
+    window = {
+    'left': 0,
+    'top': 0,
+    'width': width,
+    'height': height
+    }
+    with mss() as sct:
+        frame = np.array(sct.grab(window))
+    return frame
 
 #########################
 #        Capture        #

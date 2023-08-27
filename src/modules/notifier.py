@@ -7,321 +7,285 @@ import pygame
 import threading
 import numpy as np
 import random
+import operator
+import win32gui
+
 from src.routine.components import Point
 from src.common import config, utils
-from src.common.chat_bot import ChatBot
 from src.common.usb import USB
-from src.common.dll_loader import DllHelper
-
-RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
-BUTTON_OK_TEMPLATE = cv2.imread('assets/btn_ok_template.png', 0)
-END_TALK_TEMPLATE = cv2.imread('assets/end_talk_template.png', 0)
-
-BIG_MOUSE_RANGES = (
-    ((0, 180, 119), (4, 255, 187)),
-    ((0, 255, 17), (0, 255, 153)),
-)
-# big_mouse = cv2.imread('assets/big_mouse_template.png')
-# big_mouse_left = cv2.imread('assets/big_mouse_left_template.png')
-# BIG_MOUSE_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
-# BIG_MOUSE_LEFT_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse_left, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
-BIG_MOUSE_TEMPLATE = DllHelper().loadImage('assets/big_mouse_template.png')
+from src.common.common import Subject, Observer
+from src.common.image_template import *
+from src.common.bot_notification import *
+from src.modules.capture import capture
+from src.modules.chat_bot import chat_bot
 
 
-# A rune's symbol on the minimap
-RUNE_RANGES = (
-    ((141, 148, 245), (146, 158, 255)),
-)
-rune_filtered = utils.filter_color(
-    cv2.imread('assets/rune_template.png'), RUNE_RANGES)
-RUNE_TEMPLATE = cv2.cvtColor(rune_filtered, cv2.COLOR_BGR2GRAY)
-
-# Other players' symbols on the minimap
-OTHER_RANGES = (
-    ((0, 245, 215), (10, 255, 255)),
-)
-other_filtered = utils.filter_color(cv2.imread(
-    'assets/other_template.png'), OTHER_RANGES)
-OTHER_TEMPLATE = cv2.cvtColor(other_filtered, cv2.COLOR_BGR2GRAY)
-
-# guildmate' symbols on the minimap
-GUILDMATE_RANGES = (
-    ((120, 40, 180), (120, 110, 255)),
-)
-guildmate_filtered = utils.filter_color(cv2.imread('assets/guildmate_template.png'), GUILDMATE_RANGES)
-GUILDMATE_TEMPLATE = cv2.cvtColor(guildmate_filtered, cv2.COLOR_BGR2GRAY)
-
-# The Elite Boss's warning sign
-# ELITE_TEMPLATE = cv2.imread('assets/elite_template.jpg', 0)
-
-
-def get_alert_path(name):
-    return os.path.join(Notifier.ALERTS_DIR, f'{name}.mp3')
-
-
-class Notifier:
+class Notifier(Subject, Observer):
     ALERTS_DIR = os.path.join('assets', 'alerts')
+
+    _default_notice_interval = 30
 
     def __init__(self):
         """Initializes this Notifier object's main thread."""
-
+        super().__init__()
         pygame.mixer.init()
         self.mixer = pygame.mixer.music
+
+        capture.attach(self)
+
+        self.player_pos_updated_time = 0
+        self.player_pos = (0, 0)
+
+        self.others_count = 0
+        self.others_comming_time = 0
+        self.others_detect_count = 0
+        self.others_no_detect_count = 0
+
+        self.rune_active_time = 0
+        self.rune_alert_delay = 300         # 5 minutes
+
+        self.black_screen_threshold = 0.9
+        self.white_room_threshold = 0.2
+
+        self.notice_time_record = {}
 
         self.ready = False
         self.thread = threading.Thread(target=self._main)
         self.thread.daemon = True
 
-        self.cur_others = 0
-        self.other_comming_time = 0
-        self.detect_count = 0
-        self.no_detect_count = 0
-        
-        self.rune_start_time = 0
-        self.noticed_white_room = False
-        self.noticed_black_screen = False
-
-        self.room_change_threshold = 0.9
-        self.white_room_threshold = 0.2
-        self.rune_alert_delay = 90         # 3 minutes
-
-        self.chat_bot = ChatBot()
-
-        config.notifier = self
-
     def start(self):
         """Starts this Notifier's thread."""
-
-        threading.Timer(3, self.chat_bot.run).start()
 
         print('\n[~] Started notifier')
         self.thread.start()
 
     def _main(self):
         self.ready = True
-        while True:                        
-            if config.enabled:
-                frame = config.capture.frame
-                minimap = config.capture.minimap['minimap']
+        while True:
+            frame = capture.frame
+            minimap = capture.minimap
 
-                self.exceptionCheck(frame)
-                
-                self.checkOtherPlayer(minimap)
-                
-                self.checkAlert(frame)
-                
-                # Check for rune
-                now = time.time()
-                if not config.bot.rune_active:                    
-                    filtered = utils.filter_color(minimap, RUNE_RANGES)
-                    matches = utils.multi_match(
-                        filtered, RUNE_TEMPLATE, threshold=0.9)
-                    rune_buff = utils.multi_match(
-                        frame[:frame.shape[0] // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
-                    # self.cancel_rune_buff(frame, rune_buff)
-                    if matches and config.routine.sequence and len(rune_buff) == 0:
-                        abs_rune_pos = (matches[0][0], matches[0][1])
-                        config.bot.rune_pos = utils.convert_to_relative(
-                            abs_rune_pos, minimap)
-                        distances = list(
-                            map(distance_to_rune, config.routine.sequence))
-                        index = np.argmin(distances)
-                        config.bot.rune_closest_pos = config.routine[index].location
-                        config.bot.rune_active = True
-                        if self.rune_start_time == 0:
-                            self.rune_start_time = now
-                            self.notifyRuneAppeared()
-                        else:
-                            self.notifyRuneResolveFailed()
-                    elif self.rune_start_time != 0:
-                        if len(rune_buff) > 1 and len(matches) == 0:
-                            self.rune_start_time = 0
-                            self.cancel_rune_buff(rune_buff)
-                            self.notifyRuneResolved()
-                        else:
-                            config.bot.rune_active = True
-                            self.notifyRuneResolveFailed()
-                elif now - self.rune_start_time > self.rune_alert_delay:     # Alert if rune hasn't been solved
-                    self.notifyRuneError()
+            self.check_exception(frame)
+
+            if config.enabled:
+                self.check_others(minimap)
+
+                self.check_alert(frame)
+
+                self.check_rune_status(frame, minimap)
             time.sleep(0.05)
 
-    def exceptionCheck(self, frame):
+    def check_exception(self, frame):
         if frame is None:
-            return 
+            return
         height, width, _ = frame.shape
         if width < 400 and height < 400:
             return
-        
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Check for unexpected black screen
-        if np.count_nonzero(gray < 15) / height / width > self.room_change_threshold:
-            if not self.noticed_black_screen:
-                config.bot.delay_to_stop(5)
-                self.send_message('[!!!]black screen')
-                self.noticed_black_screen = True
-        else:
-            self.noticed_black_screen = False            
+        if config.enabled and np.count_nonzero(gray < 15) / height / width > self.black_screen_threshold:
+            self._notify(BotError.BLACK_SCREEN)
 
         # Check for white room
-        white_radio = np.count_nonzero(gray == 255) / height / width
-        if white_radio >= self.white_room_threshold and config.capture.lost_player_time > 0:
-            if not self.noticed_white_room:
-                self.noticed_white_room = True  
-                config.bot.toggle(False)
-                self.chat_bot.voice_call()
-                for i in range(3):
-                    self.send_message('[!!!!!!!!!!]white home')
-                    time.sleep(0.2)
+        if config.started_time and np.count_nonzero(gray == 255) / height / width >= self.white_room_threshold:
+            self._notify(BotFatal.WHITE_ROOM)
+
+        # Check for no movement
+        if config.enabled and operator.eq(config.player_pos, self.player_pos):
+            interval = int(time.time() - self.player_pos_updated_time)
+            if interval >= 20 and self.player_pos_updated_time:
+                self._notify(BotError.NO_MOVEMENT, arg=interval,
+                             info=f'duration:{interval}s')
         else:
-            self.noticed_white_room = False
-            
-        # # Check for elite warning
-        # elite_frame = frame[height // 4:3 * height // 4, width // 4:3 * width // 4]
-        # elite = utils.multi_match(elite_frame, ELITE_TEMPLATE, threshold=0.9)
-        # if len(elite) > 0:
-        #     self._alert('siren')
+            self.player_pos = config.player_pos
+            self.player_pos_updated_time = time.time()
 
-        # Check for other players entering the map
+    def check_alert(self, frame):
+        if frame is None:
+            return
 
-    def checkAlert(self, frame):
         x = (frame.shape[1] - 260) // 2
         y = (frame.shape[0] - 220) // 2
-        ok_btn = utils.multi_match(frame[y:y+220, x:x+260], BUTTON_OK_TEMPLATE, threshold=0.9)
-        if ok_btn:
-            USB().key_press('esc')
-            
-        x = (frame.shape[1] - 520) // 2
-        y = (frame.shape[0] - 190) // 2
-        end_talk = utils.multi_match(frame[y:y+190, x:x+520], END_TALK_TEMPLATE, threshold=0.9)
-        if end_talk:
-            USB().key_press('esc')
+        ok_btn = utils.multi_match(
+            frame[y:y+220, x:x+260], BUTTON_OK_TEMPLATE, threshold=0.9)
 
-    def checkOtherPlayer(self, minimap):
+        x = (frame.shape[1] - 520) // 2
+        y = (frame.shape[0] - 400) // 2
+        end_talk = utils.multi_match(
+            frame[y:y+400, x:x+520], END_TALK_TEMPLATE, threshold=0.9)
+        if ok_btn or end_talk:
+            USB().key_press('esc')
+            time.sleep(0.1)
+
+        # Check if window is forground
+        if capture.hwnd and capture.hwnd != win32gui.GetForegroundWindow():
+            try:
+                win32gui.SetForegroundWindow(capture.hwnd)
+            except Exception as e:
+                print(e)
+            time.sleep(0.5)
+
+    def check_others(self, minimap):
         filtered = utils.filter_color(minimap, OTHER_RANGES)
         others = len(utils.multi_match(
             filtered, OTHER_TEMPLATE, threshold=0.7))
-        
+
         guild_filtered = utils.filter_color(minimap, GUILDMATE_RANGES)
         guildmates = len(utils.multi_match(
             guild_filtered, GUILDMATE_TEMPLATE, threshold=0.7))
-        
+
         others += guildmates
-        
+
         config.stage_fright = others > 0
-        
-        self.cur_others = others
-        # print(f"others:{others} | detect_count:{self.detect_count} | no_detect_count:{self.no_detect_count}")
+
+        self.others_count = others
+        # print(f"others:{others} | others_detect_count:{self.others_detect_count} | others_no_detect_count:{self.others_no_detect_count}")
         if others > 0:
-            self.detect_count += 1
-            self.no_detect_count = 0
-            if self.other_comming_time == 0:
-                self.other_comming_time = time.time()
+            self.others_detect_count += 1
+            self.others_no_detect_count = 0
+            if self.others_comming_time == 0:
+                self.others_comming_time = time.time()
         else:
-            self.no_detect_count += 1
-        
-        if self.no_detect_count == 150:
-            self.no_detect_count += 1
-            if self.other_comming_time > 0 and self.detect_count > 200:
+            self.others_no_detect_count += 1
+
+        if self.others_no_detect_count == 150:
+            self.others_no_detect_count += 1
+            if self.others_comming_time > 0 and self.others_detect_count > 200:
                 self.notifyOtherLeaved(others)
-            self.detect_count = 0
-            self.other_comming_time = 0
-        elif self.detect_count == 2400:
-            self.detect_count += 1
+            self.others_detect_count = 0
+            self.others_comming_time = 0
+        elif self.others_detect_count == 2400:
+            self.others_detect_count += 1
             self.othersLongStayWarnning(others)
-        elif self.detect_count == 700:
-            self.detect_count += 1
+        elif self.others_detect_count == 700:
+            self.others_detect_count += 1
             self.othersStayWarnning2(others)
-        elif self.detect_count == 400:
-            self.detect_count += 1
+        elif self.others_detect_count == 400:
+            self.others_detect_count += 1
             self.othersStayWarnning1(others)
-        elif self.detect_count == 200:
-            self.detect_count += 1
+        elif self.others_detect_count == 200:
+            self.others_detect_count += 1
             self.notifyOtherComing(others)
 
+    def check_rune_status(self, frame, minimap):
+        if frame is None or minimap is None:
+            config.rune_active = False
+            self.rune_active_time = 0
+            return
+
+        now = time.time()
+        filtered = utils.filter_color(minimap, RUNE_RANGES)
+        matches = utils.multi_match(
+            filtered, RUNE_TEMPLATE, threshold=0.9)
+        # TODO rune buff bottom
+        rune_buff = utils.multi_match(
+            frame[:200 // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+
+        if not config.rune_active:
+            if matches and config.routine.sequence and len(rune_buff) == 0:
+                abs_rune_pos = (matches[0][0], matches[0][1])
+                config.rune_pos = utils.convert_to_relative(
+                    abs_rune_pos, minimap)
+                distances = list(
+                    map(distance_to_rune, config.routine.sequence))
+                index = np.argmin(distances)
+                config.rune_closest_pos = config.routine[index].location
+                config.rune_active = True
+                if self.rune_active_time == 0:
+                    self.rune_active_time = now
+                    self._notify(BotInfo.RUNE_ACTIVE)
+        elif len(rune_buff) > 1:
+            config.rune_active = False
+            self.rune_active_time = 0
+        # Alert if rune hasn't been solved
+        elif len(rune_buff) == 0 and now - self.rune_active_time > self.rune_alert_delay:
+            self.notifyRuneError(now - self.rune_active_time)
+
+    def _notify(self, event: Enum, arg=None, info: str = '') -> None:
+        now = time.time()
+        noticed_time = self.notice_time_record.get(event, 0)
+        self.notify(event, min(noticed_time, now - noticed_time))
+
+        if noticed_time == 0 or now - noticed_time >= config.default_notice_interval:
+            self.notice_time_record[event] = now
+
+            event_type = type(event)
+            if event_type == BotFatal:
+                chat_bot.voice_call()
+                text = f'‼️{event.value}'
+                image_path = utils.save_screenshot(frame=capture.frame)
+                self.send_message(text=text, image_path=image_path)
+                time.sleep(1)
+                for _ in range(3):
+                    self.send_message(text=text)
+                    time.sleep(1)
+            elif event_type == BotError:
+                if config.notice_level < 2:
+                    return
+                text = f'❗[{event.value}] {info}'
+                image_path = utils.save_screenshot()
+                self.send_message(text=text, image_path=image_path)
+            elif event_type == BotWarnning:
+                if config.notice_level < 3:
+                    return
+                text = f'⚠️[{event.value}] {info}'
+                image_path = utils.save_screenshot(frame=capture.frame)
+                self.send_message(text=text, image_path=image_path)
+            elif event_type == BotInfo:
+                if config.notice_level < 4:
+                    return
+                text = f'💡[{event.value}] {info}'
+                self.send_message(text=text)
+            elif event_type == BotDebug:
+                if config.notice_level < 5:
+                    return
+                text = f'🔎[{event.value}] {info}'
 
     def othersLongStayWarnning(self, num):
-        timestamp = int(time.time())
-        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
-        utils.save_screenshot(filename=imagePath)
-        
-        text_notice = f"[!!!]回城。。。有人已停留{int(time.time() - self.other_comming_time)}s, 当前地图人数{num}"
-        self.send_message(text=text_notice,
-                        image=config.capture.frame, imagePath=imagePath)
-        config.bot.go_home()        
+        duration = int(time.time() - self.others_comming_time)
+        text_notice = f"TP...duration:{duration}s, count:{num}"
+        self._notify(BotError.OTHERS_STAY_OVER_120S,
+                     arg=duration, info=text_notice)
 
     def othersStayWarnning1(self, num):
-        words = ['cc plz', 'cc plz ', ' cc plz']
-        random_word = random.choice(words)
-        config.bot.say_to_all(random_word)
-        
-        timestamp = int(time.time())
-        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
-        utils.save_screenshot(filename=imagePath)
-        
-        text_notice = f"[!!!]有人已停留{int(time.time() - self.other_comming_time)}s, 当前地图人数{num}"
-        self.send_message(text=text_notice,
-                        image=config.capture.frame, imagePath=imagePath)
-        
-            
+        duration = int(time.time() - self.others_comming_time)
+        text_notice = f"duration:{duration}s, count:{num}"
+        self._notify(BotWarnning.OTHERS_STAY_OVER_30S,
+                     args=duration, info=text_notice)
+
     def othersStayWarnning2(self, num):
-        words = ['??', 'hello?', ' cc plz', 'bro?']
-        random_word = random.choice(words)
-        config.bot.say_to_all(random_word)
-        
-        timestamp = int(time.time())
-        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
-        utils.save_screenshot(filename=imagePath)
-        
-        text_notice = f"[!!!]有人已停留{int(time.time() - self.other_comming_time)}s, 当前地图人数{num}"
-        self.send_message(text=text_notice,
-                        image=config.capture.frame, imagePath=imagePath)
-            
+        duration = int(time.time() - self.others_comming_time)
+        text_notice = f"duration:{duration}s, count:{num}"
+        self._notify(BotWarnning.OTHERS_STAY_OVER_60S,
+                     args=duration, info=text_notice)
 
     def notifyOtherComing(self, num):
-        self.noticed_other_short_stay = True
-        timestamp = int(time.time())
-        imagePath = f"screenshot/new_player/maple_{timestamp}.webp"
-        utils.save_screenshot(filename=imagePath)
-
-        text_notice = f"[!!!]有人来了, 已停留{int(time.time() - self.other_comming_time)}s, 当前地图人数{num}"
-        self.send_message(text=text_notice,
-                        image=config.capture.frame, imagePath=imagePath)
+        duration = int(time.time() - self.others_comming_time)
+        text_notice = f"duration:{duration}s, count:{num}"
+        self._notify(BotInfo.OTHERS_COMMING, arg=duration, info=text_notice)
 
     def notifyOtherLeaved(self, num):
-        text_notice = f"[~]有人走了，当前地图人数{num}"
-        self.send_message(text=text_notice)
+        text_notice = f"count:{num}"
+        self._notify(BotInfo.OTHERS_LEAVED, arg=num, info=text_notice)
 
-    def notifyRuneAppeared(self):
-        text_notice = f"[~]出现符文"
-        self.send_message(text=text_notice)
-
-    def notifyRuneResolved(self):
-        
-        timestamp = int(time.time())
-        imagePath = f"screenshot/rune_solved/maple_{timestamp}.webp"
-        utils.save_screenshot(filename=imagePath)
-
-        text_notice = f"[~]解符文成功"
-        print(f"[~]{text_notice}")
-        self.send_message(text=text_notice,
-                          image=config.capture.frame, imagePath=imagePath)
+    def notifyRuneResolved(self, rune_type):
+        config.rune_active = False
+        self.rune_active_time = 0
+        self._notify(BotInfo.RUNE_LIBERATED, info=rune_type)
 
     def notifyRuneResolveFailed(self):
-        timestamp = int(time.time())
-        imagePath = f"screenshot/rune_failed/maple_{timestamp}.webp"
-        utils.save_screenshot(filename=imagePath)
+        duration = int(time.time() - self.rune_active_time)
+        text_notice = f"{duration}s"
+        self._notify(BotWarnning.RUNE_FAILED, arg=duration, info=text_notice)
 
-        text_notice = f"[!]解符文失败, 已持续{int(time.time() - self.rune_start_time)}s"
-        self.send_message(text=text_notice,
-                          image=config.capture.frame, imagePath=imagePath)
-        
-    def notifyRuneError(self):
-        pass
+    def notifyRuneError(self, time):
+        text_notice = f"{int(time)}s"
+        self._notify(BotWarnning.RUNE_FAILED, arg=time, info=text_notice)
 
-    def send_message(self, text=None, image=None, imagePath=None):
+    def send_message(self, text=None, image=None, image_path=None):
         print(text)
-        self.chat_bot.send_message(text, image=image, imagePath=imagePath)
+        chat_bot.send_message(text=text, image=image, image_path=image_path)
 
     def _alert(self, name, volume=0.75):
         """
@@ -347,38 +311,23 @@ class Notifier:
         self.mixer.set_volume(volume)
         self.mixer.play()
 
-    def cancel_rune_buff(self, rune_buff):
-        
-        if len(rune_buff) <= 1:
-            return
-        
-        x, y = DllHelper().screenSearch(BIG_MOUSE_TEMPLATE)
-        if x == -1 or y == -1:
-            return
+    def update(self, subject: Subject, *args, **kwargs) -> None:
+        event = args[0]
+        arg = args[1] if len(args) > 1 else None
+        self._notify(event, arg)
 
-        # filtered = utils.filter_color(frame, BIG_MOUSE_RANGES)
-        # big_mouse = utils.multi_match(filtered, BIG_MOUSE_TEMPLATE, threshold=0.7)
-        # if not big_mouse:
-        #     big_mouse = utils.multi_match(filtered, BIG_MOUSE_LEFT_TEMPLATE, threshold=0.7)
-            
-        # if not big_mouse:
-        #     return
-        
-        print("Found big mouse")
-        rune_buff_pos = min(rune_buff, key=lambda p: p[0])
-        x = round(rune_buff_pos[0] + config.capture.window['left']) - 35
-        y = round(rune_buff_pos[1] + config.capture.window['top']) + 10
-        USB().mouse_abs_move(x, y)
-        time.sleep(0.1)
-        USB().mouse_right_down()
-        time.sleep(0.3)
-        USB().mouse_right_up()     
-        time.sleep(0.1)
-            
+
+notifier = Notifier()
 
 #################################
 #       Helper Functions        #
 #################################
+
+
+def get_alert_path(name):
+    return os.path.join(Notifier.ALERTS_DIR, f'{name}.mp3')
+
+
 def distance_to_rune(point):
     """
     Calculates the distance from POINT to the rune.
@@ -387,5 +336,5 @@ def distance_to_rune(point):
     """
 
     if isinstance(point, Point):
-        return utils.distance(config.bot.rune_pos, point.location)
+        return utils.distance(config.rune_pos, point.location)
     return float('inf')

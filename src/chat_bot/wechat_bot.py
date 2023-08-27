@@ -1,5 +1,4 @@
 import win32gui
-import win32ui
 import win32con
 import win32api
 import win32clipboard as wc
@@ -11,6 +10,7 @@ from mss import mss
 import numpy as np
 import cv2
 from src.common.usb import USB
+from src.modules.capture import capture
 
 WECHAT_CALL_TEMPLATE = cv2.imread('assets/wechat_call.png', 0)
 WECHAT_CALL_TEMPLATE_2X = cv2.imread('assets/wechat_call@2x.png', 0)
@@ -35,7 +35,7 @@ class WechatBot:
         }
 
         self.thread = threading.Thread(target=self._main)
-        self.thread.daemon = False
+        self.thread.daemon = True
 
     def run(self):
         """Starts this WechatBot's thread."""
@@ -93,8 +93,8 @@ class WechatBot:
                 
     def info_command(self):
         info = utils.bot_status()
-        frame = config.capture.frame
-        if frame is not None:
+        frame = capture.frame
+        if frame is None:
             width = win32api.GetSystemMetrics(win32con.SM_CXSCREEN)
             height = win32api.GetSystemMetrics(win32con.SM_CYSCREEN)
 
@@ -111,20 +111,20 @@ class WechatBot:
     
     def start_command(self):
         config.enabled = True
-        config.bot.rune_active = False
+        # bot.rune_active = False
         time.sleep(0.5)
         utils.print_state()
         self.info_command()
     
     def pause_command(self):
         config.enabled = False
-        config.bot.rune_active = False
+        # bot.rune_active = False
         time.sleep(0.5)
         utils.print_state()
         self.info_command()
     
     def screenshot_command(self):
-        self.send_image(config.capture.frame)
+        self.send_image(capture.frame)
     
     def say_command(self, msg: str):
         list = msg.split(" ")
@@ -258,8 +258,8 @@ class WechatBot:
 
 
 if __name__ == "__main__":
-    bot = WechatBot("yep")
-    bot.run()
+    chat_bot = WechatBot("yep")
+    chat_bot.run()
     # image = utily.window_capture(bot.hwnd)
     # image = bot.cvt2Plt(image)
     # image = Image.open('screenshot/Maple_230713_144732.png')

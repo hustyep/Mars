@@ -256,8 +256,8 @@ class Routine:
 
             if first in SYMBOLS:
                 c = SYMBOLS[first]
-            elif first in config.bot.command_book:
-                c = config.bot.command_book[first]
+            elif first in config.command_book:
+                c = config.command_book[first]
             else:
                 print(line_error + f"Command '{first}' does not exist.")
                 return
@@ -276,7 +276,7 @@ class Routine:
     def get_all_components():
         """Returns a dictionary mapping all creatable Components to their names."""
 
-        options = config.bot.command_book.dict.copy()
+        options = config.command_book.dict.copy()
         for e in (Point, Label, Jump, Setting):
             options[e.__name__.lower()] = e
         return options

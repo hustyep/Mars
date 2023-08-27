@@ -2,24 +2,24 @@
 
 import threading
 import time
-import cv2
-from os.path import splitext, basename
-from src.common import config, utils
+import random
+from src.command_book.command_book import CommandBook
+from src.chat_bot.chat_bot_entity import ChatBotCommand
 from src.detection import rune
 from src.routine.routine import Routine
-from src.command_book.command_book import CommandBook
 from src.routine.components import Point
-from src.common.vkeys import press, click, releaseAll
+from src.common import config, utils
+from src.common.action_simulator import ActionSimulator
+from src.common.bot_notification import *
+from src.common.vkeys import press, releaseAll
 from src.common.interfaces import Configurable
-import win32con
-import win32clipboard as wc
-from src.common.usb import USB
-
-# The rune's buff icon
-RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
+from src.common.common import Observer, Subject
+from src.modules.notifier import notifier
+from src.modules.capture import capture
+from src.modules.chat_bot import chat_bot
 
 
-class Bot(Configurable):
+class Bot(Configurable, Observer):
     """A class that interprets and executes user-defined routines."""
 
     DEFAULT_CONFIG = {
@@ -32,13 +32,13 @@ class Bot(Configurable):
 
         super().__init__('keybindings')
         config.bot = self
+        notifier.attach(self)
 
-        self.rune_active = False
-        self.rune_pos = (0, 0)
-        self.rune_closest_pos = (0, 0)      # Location of the Point closest to rune
+        # self.rune_active = False
+        # self.rune_pos = (0, 0)
+        # Location of the Point closest to rune
+        # self.rune_closest_pos = (0, 0)
         self.submodules = []
-        self.command_book = None            # CommandBook instance
-        self.stop_timer: threading.Timer = None
 
         config.routine = Routine()
 
@@ -66,8 +66,7 @@ class Bot(Configurable):
         last_fed = 0
         while True:
             if config.enabled and len(config.routine) > 0:
-                # Buff and feed pets
-
+                # feed pets
                 pet_settings = config.gui.settings.pets
                 auto_feed = pet_settings.auto_feed.get()
                 num_pets = pet_settings.num_pets.get()
@@ -75,8 +74,9 @@ class Bot(Configurable):
                 if auto_feed and now - last_fed > 600 / num_pets:
                     press(self.config['Feed pet'], 1)
                     last_fed = now
-                
-                self.command_book.buff.main()
+
+                # Buff 
+                config.command_book.buff.main()
 
                 # Highlight the current Point
                 config.gui.view.routine.select(config.routine.index)
@@ -84,8 +84,8 @@ class Bot(Configurable):
 
                 # Execute next Point in the routine
                 element = config.routine[config.routine.index]
-                if self.rune_active and isinstance(element, Point) \
-                        and element.location == self.rune_closest_pos:
+                if config.rune_active and isinstance(element, Point) \
+                        and element.location == config.rune_closest_pos:
                     self._solve_rune()
                 element.execute()
                 config.routine.step()
@@ -100,22 +100,23 @@ class Bot(Configurable):
         :return:        None
         """
 
-        move = self.command_book['move']
-        move(*self.rune_pos).execute()
-        adjust = self.command_book['adjust']
-        adjust(*self.rune_pos).execute()
+        move = config.command_book['move']
+        move(*config.rune_pos).execute()
+        adjust = config.command_book['adjust']
+        adjust(*config.rune_pos).execute()
         time.sleep(0.5)
-        press(self.config['Interact'], 1, down_time=0.2)        # Inherited from Configurable
-        time.sleep(0.2)
-        utils.save_screenshot(config.capture.frame)
+        press(self.config['Interact'], 1, down_time=0.2,
+              up_time=0.8)        # Inherited from Configurable
 
-        # if not rune.located_arrows(config.capture.frame):
+        # if not rune.located_arrows(capture.frame):
         #     press(self.config['Interact'], 1, down_time=0.2)
 
         print('\nSolving rune:')
         inferences = []
-        for _ in range(10):
-            frame = config.capture.frame
+        used_frame = None
+        for i in range(10):
+            frame = capture.frame
+            used_frame = frame
             solution = rune.show_magic(frame)
             if solution is not None:
                 print(', '.join(solution))
@@ -127,123 +128,134 @@ class Bot(Configurable):
                 elif len(solution) == 4:
                     inferences.append(solution)
             time.sleep(0.1)
-        
-        threading.Timer(3, self.notify_rune_solved).start()
 
-    def notify_rune_solved(self):
-        self.rune_active = False
-        
+        threading.Timer(0.3, self.check_rune_solve_result, (used_frame, )).start()
+                
+    def check_rune_solve_result(self, used_frame):
+        for _ in range(4):
+            rune_type = rune.rune_liberate_result(capture.frame)
+            if rune_type is not None:
+                break
+            time.sleep(0.1)
+        if rune_type is None:
+            notifier.notifyRuneResolveFailed()
+            file_path = 'screenshot/rune_failed'
+            utils.save_screenshot(frame=used_frame, file_path=file_path, compress=False)
+        else:
+            notifier.notifyRuneResolved(rune_type)
+            file_path = 'screenshot/rune_solved'
+            utils.save_screenshot(frame=used_frame, file_path=file_path, compress=False)
+            
+            if rune_type == 'Rune of Might':
+                ActionSimulator.cancel_rune_buff()
+
     def load_commands(self, file):
         try:
-            self.command_book = CommandBook(file)
+            config.command_book = CommandBook(file)
             config.gui.settings.update_class_bindings()
         except ValueError:
             pass    # TODO: UI warning popup, say check cmd for errors
-        
-    def toggle(self, enabled: bool):
-        config.bot.rune_active = False
-        
+
+    def toggle(self, enabled: bool, reason: str = ''):
+        config.rune_active = False
+        config.rune_pos = (0, 0)
+        config.rune_closest_pos = (0, 0)
+
         if enabled:
-            config.capture.calibrated = False
+            capture.calibrated = False
 
         if config.enabled == enabled:
             return
 
         config.enabled = enabled
         utils.print_state()
-        
-        config.notifier.send_message(text=utils.bot_status())
-        
-        self.cancel_delay_stop()
+
+        if reason:
+            notifier.send_message(self.bot_status(reason))
+
         releaseAll()
-        
-        time.sleep(0.267)
-       
-        
-    def delay_to_stop(self, delay: int = 3):
-        if self.stop_timer:
-            return
-        
-        self.stop_timer = threading.Timer(delay, self.toggle, (False, ))
-        self.stop_timer.start()
-        
-    def cancel_delay_stop(self):
-        if self.stop_timer is not None:
-            self.stop_timer.cancel()
-            self.stop_timer = None
 
-        
-    def setText(self, text):
-        wc.OpenClipboard()
-        wc.EmptyClipboard()
-        wc.SetClipboardData(win32con.CF_UNICODETEXT, text)
-        wc.CloseClipboard()
-            
-    def say(self, text):
-        self.setText(text)
-            
-        USB().key_press('enter')
-        time.sleep(0.3)
-        USB().key_down('ctrl')
-        time.sleep(0.05)
-        USB().key_press("v")
-        time.sleep(0.05)
-        USB().key_up('ctrl')
-        time.sleep(0.3)
-        USB().key_press('enter')
-        time.sleep(0.3)
-        USB().key_press('enter')
-        time.sleep(0.05)
+    
+    def bot_status(self, ext='') -> str:
+        message = (
+            f"bot status: {'running' if config.enabled  else 'pause'}\n"
+            f"rune status: {f'{time.time() - notifier.rune_active_time}s' if config.rune_active else 'clear'}\n"
+            f"other players: {notifier.others_count}\n"
+            f"reason: {ext}\n"
+        )
+        return message
 
-    def say_to_all(self, text):
-        last_status = config.enabled
-        self.toggle(False)
-        time.sleep(1)
-        self.say(text)
-        if last_status:
-            self.toggle(True)
-        
-    def go_home(self):
-        for i in range(0, 6):
-            self.toggle(False)
-            USB().key_press("H")
-            
-            time.sleep(0.5)
-            USB().key_press("H")
-            time.sleep(5)
-            
-    def stop_game(self):
-        self.toggle(False)
-        
-        USB().key_down('alt')
-        time.sleep(0.5)        
-        USB().key_press('f4')
-        time.sleep(0.5)   
-        USB().key_up('alt')  
-        time.sleep(0.5)   
-        USB().key_press('enter')
-        time.sleep(10)
-        USB().consumer_sleep()
+    def on_new_command(self, command: ChatBotCommand, *args):
+        match (command):
+            case ChatBotCommand.INFO:
+                return self.bot_status(), None
+            case ChatBotCommand.START:
+                self.toggle(True)
+                return self.bot_status(), None
+            case ChatBotCommand.PAUSE:
+                self.toggle(False)
+                return self.bot_status(), None
+            case ChatBotCommand.SCREENSHOT:
+                filepath = utils.save_screenshot(capture.frame)
+                return None, filepath
+            case ChatBotCommand.BUFF:
+                filepath = utils.save_screenshot(capture.frame)
+                return "done", filepath
+            case ChatBotCommand.SAY:
+                ActionSimulator.say_to_all(args[0])
+                filepath = utils.save_screenshot(capture.frame)
+                return f'"said "{args[0]}', filepath
+            case ChatBotCommand.TP:
+                ActionSimulator.go_home()
 
-        # USB().key_press('esc')
-        # time.sleep(0.5)        
-        # USB().key_press('esc')
-        # time.sleep(0.5)        
-        # USB().key_press('esc')
-        # time.sleep(0.5)        
-        # USB().key_press('up')
-        # time.sleep(0.1)
-        # USB().key_press('enter')
-        # time.sleep(0.1)
-        # USB().key_press('enter')
-        # time.sleep(5)
-        # USB().key_press('esc')
-        # time.sleep(0.1)        
-        # USB().key_press('enter')
-        # time.sleep(0.1)        
-        # USB().key_press('enter')
-        
-    def potion_buff(self):
-        USB().key_press('0')
-        time.sleep(0.5)
-        USB().key_press('-')
+
+    def update(self, subject: Subject, *args, **kwargs) -> None:
+        event_type = args[0]
+        if len(args) > 1:
+            arg = args[1]
+        else:
+            arg = 0
+        if isinstance(event_type, BotFatal):
+            self.toggle(False, event_type.value)
+            chat_bot.voice_call()
+
+        elif isinstance(event_type, BotError):
+            match (event_type):
+                case BotError.LOST_WINDOW:
+                    self.toggle(False, event_type.value)
+                case BotError.LOST_MINI_MAP:
+                    self.toggle(False, event_type.value)
+                case BotError.LOST_PLAYER:
+                    self.toggle(False, event_type.value)
+                case BotError.BLACK_SCREEN:
+                    if arg >= 10:
+                        self.toggle(False, event_type.value)
+                case BotError.NO_MOVEMENT:
+                    pass
+                case BotError.RUNE_ERROR:
+                    ActionSimulator.go_home()
+                case BotError.OTHERS_STAY_OVER_120S:
+                    ActionSimulator.go_home()
+                case (_):
+                    pass
+            # end match
+        elif isinstance(event_type, BotWarnning):
+            match event_type:
+                case BotWarnning.OTHERS_STAY_OVER_30S:
+                    words = ['cc plz', 'cc plz ', ' cc plz']
+                    random_word = random.choice(words)
+                    ActionSimulator.say_to_all(random_word)
+                case BotWarnning.OTHERS_STAY_OVER_60S:
+                    words = ['??', 'hello?', ' cc plz', 'bro?']
+                    random_word = random.choice(words)
+                    ActionSimulator.say_to_all(random_word)
+        elif isinstance(event_type, BotInfo):
+            match event_type:
+                case BotInfo.RUNE_ACTIVE:
+                    pass
+                case BotInfo.OTHERS_COMMING:
+                    pass
+        elif isinstance(event_type, BotDebug):
+            pass
+
+bot = Bot()

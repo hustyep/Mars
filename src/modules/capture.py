@@ -1,5 +1,4 @@
 
-import cv2
 import numpy as np
 import win32gui
 import time
@@ -7,60 +6,41 @@ import threading
 import ctypes
 import mss
 import mss.windows
+import operator
 from src.common import config, utils
+from src.common.image_template import *
+from src.common.bot_notification import *
+from src.common.common import Subject
 
 user32 = ctypes.windll.user32
 user32.SetProcessDPIAware()
 
-# The distance between the top of the minimap and the top of the screen
-MINIMAP_TOP_BORDER = 5
-
-# The thickness of the other three borders of the minimap
-MINIMAP_BOTTOM_BORDER = 9
-
-# Offset in pixels to adjust for windowed mode
-WINDOWED_OFFSET_TOP = 36
-WINDOWED_OFFSET_LEFT = 10
-
-# The top-left and bottom-right corners of the minimap
-MM_TL_TEMPLATE = cv2.imread('assets/minimap_tl_template.png', 0)
-MM_BR_TEMPLATE = cv2.imread('assets/minimap_br_template.png', 0)
-
-MMT_HEIGHT = max(MM_TL_TEMPLATE.shape[0], MM_BR_TEMPLATE.shape[0])
-MMT_WIDTH = max(MM_TL_TEMPLATE.shape[1], MM_BR_TEMPLATE.shape[1])
-
-# The player's symbol on the minimap
-PLAYER_TEMPLATE = cv2.imread('assets/player_template.png', 0)
-PT_HEIGHT, PT_WIDTH = PLAYER_TEMPLATE.shape
-
-PLAYER_TEMPLATE_L = cv2.imread('assets/player_template_l.png', 0)
-
-PLAYER_TEMPLATE_R = cv2.imread('assets/player_template_r.png', 0)
-
-
-class Capture:
+class Capture(Subject):
 
     def __init__(self):
-        config.capture = self
-
+        super().__init__()
         self.frame = None
-        self.minimap = {}
-        self.minimap_ratio = 1
+        self.minimap = None
         self.mm_tl = None
         self.mm_br = None
         self.minimap_sample = None
         self.sct = None
+        self.hwnd = None
         self.window = {
             'left': 0,
             'top': 0,
             'width': 1366,
             'height': 768
         }
-
-        self.lost_player_time = 0
-        self.ready = False
         self.calibrated = False
+
+        self.lost_window_time = 0
+        self.lost_minimap_time = 0
+        self.lost_player_time = 0
         
+        self.lost_time_threshold = 5
+        
+        self.ready = False
         self.thread = threading.Thread(target=self._main)
         self.thread.daemon = True
 
@@ -77,48 +57,43 @@ class Capture:
         self.start_auto_calibrate()
         while True:
             self.calibrated = self.recalibrate()
-            time.sleep(1)
+            if not self.calibrated:
+                if not self.ready:
+                    self.ready = True
+                time.sleep(0.1)
+                continue
 
             with mss.mss() as self.sct:
                 while True:
                     if not self.calibrated:
-                        if not self.ready:
-                            self.ready = True
                         break
 
                     self.locatePlayer()
 
                     if not self.ready:
                         self.ready = True
-                    time.sleep(0.01)
+                    time.sleep(0.001)
         
     def start_auto_calibrate(self):
         # auto recalibrate
         
-        timer = threading.Timer(5, self.start_auto_calibrate)
+        timer = threading.Timer(3, self.start_auto_calibrate)
         timer.start()
-        if config.enabled:
-            self.recalibrate(auto=True)
+        self.recalibrate(auto=True)
 
     def recalibrate(self, auto = False):
         # Calibrate screen capture
-        hwnd = win32gui.FindWindow(None, "MapleStory")
-        if (hwnd == 0):
-            notice = f"[!!!]cant find maplestory"
+        self.hwnd = win32gui.FindWindow(None, "MapleStory")
+        if (self.hwnd == 0):
             if config.enabled:
-                config.notifier.send_message(text=notice)
-                config.bot.toggle(False)
-
+                now = time.time()
+                if self.lost_window_time == 0:
+                    self.lost_window_time = now
+                self.notify(BotError.LOST_WINDOW, now - self.lost_window_time)
             return False
-
-        x1, y1, x2, y2 = win32gui.GetWindowRect(hwnd)  # 获取当前窗口大小
         
-        if auto and self.window['left'] == x1 and \
-            self.window['top'] == y1 and \
-            self.window['width'] == x2 - x1 and \
-            self.window['height'] == y2 - y1 and \
-            self.lost_player_time == 0:
-            return True
+        self.lost_window_time = 0
+        x1, y1, x2, y2 = win32gui.GetWindowRect(self.hwnd)  # 获取当前窗口大小
         
         self.window['left'] = x1
         self.window['top'] = y1
@@ -129,31 +104,40 @@ class Capture:
         with mss.mss() as sct:
             self.frame = self.screenshot(sct=sct)
         if self.frame is None:
-            notice = f"[!!!]screenshot failed"
-            # config.notifier.send_message(text=notice)
-            config.bot.delay_to_stop(5)
+            self.notify(BotDebug.SCREENSHOT_FAILED)
             return False
+        
+        tl = dll_helper.screenSearch(MM_TL_BMP, x1, y1, x2, y2)
+        if tl:
+            br= dll_helper.screenSearch(MM_BR_BMP,  x1, y1, x2, y2)
 
-        tl, _ = utils.single_match(self.frame, MM_TL_TEMPLATE)
-        _, br = utils.single_match(self.frame, MM_BR_TEMPLATE)
         if tl == None or br == None:
-            notice = f"[!!!]cant locate minimap"
-            # config.notifier.send_message(text=notice)
-            config.bot.delay_to_stop()
+            if config.enabled:
+                now = time.time()
+                if self.lost_minimap_time == 0:
+                    self.lost_minimap_time = now
+                if now - self.lost_player_time >= self.lost_time_threshold:
+                    self.notify(BotError.LOST_MINI_MAP, now - self.lost_minimap_time)
             return False
         
         mm_tl = (
-            tl[0] + MINIMAP_BOTTOM_BORDER,
-            tl[1] + MINIMAP_TOP_BORDER
+            tl[0] - x1 - 2,
+            tl[1] - y1 + 2
         )
         mm_br = (
-            max(mm_tl[0] + PT_WIDTH, br[0] + 6),
-            max(mm_tl[1] + PT_HEIGHT, br[1] - 25)
+            max(mm_tl[0] + PT_WIDTH, br[0] - x1 + 16),
+            max(mm_tl[1] + PT_HEIGHT, br[1] - y1)
         )
-        self.minimap_ratio = (mm_br[0] - mm_tl[0]) / (mm_br[1] - mm_tl[1])
+        
+        if operator.eq(mm_tl, self.mm_tl) and operator.eq(mm_br, self.mm_br):
+            return True
+        config.minimap_ratio = (mm_br[0] - mm_tl[0]) / (mm_br[1] - mm_tl[1])
         self.mm_tl = mm_tl
         self.mm_br = mm_br
         self.minimap_sample = self.frame[mm_tl[1]:mm_br[1], mm_tl[0]:mm_br[0]]
+        
+        self.lost_minimap_time = 0
+        self.notify(BotDebug.CALIBRATED)
         
         utils.print_tag("recalibrate")
         print("window: ", self.window)
@@ -167,9 +151,10 @@ class Capture:
             return
         # Crop the frame to only show the minimap
         minimap = self.frame[self.mm_tl[1]:self.mm_br[1], self.mm_tl[0]:self.mm_br[0]]
-
+        # cv2.imshow("", minimap)
+        # cv2.waitKey()
         # Determine the player's position
-        player = utils.multi_match( minimap, PLAYER_TEMPLATE, threshold=0.8)
+        player = utils.multi_match(minimap, PLAYER_TEMPLATE, threshold=0.8)
         if len(player) == 0:
             player = utils.multi_match(minimap, PLAYER_TEMPLATE_R, threshold=0.8)
             if player:
@@ -188,24 +173,17 @@ class Capture:
             # print(f"{player[0]} | {w}")
             config.player_pos = utils.convert_to_relative(player[0], minimap)
             self.lost_player_time = 0
-            config.bot.cancel_delay_stop()
+            
+            # Package display information to be polled by GUI
+            self.minimap = minimap
+            
+            self.notify(BotDebug.PLAYER_LOCATION_UPDATE)
         elif config.enabled:
+            now = time.time()
             if self.lost_player_time == 0:
-                self.lost_player_time = time.time()
-                print(f"[!!!]{config.enabled}")
-            elif time.time() - self.lost_player_time > 3:
-                notice = f"[!!!]cant locate player"
-                config.notifier.send_message(text=notice)
-                config.bot.toggle(False)
-
-        # Package display information to be polled by GUI
-        self.minimap = {
-            'minimap': minimap,
-            'rune_active': config.bot.rune_active,
-            'rune_pos': config.bot.rune_pos,
-            'path': config.path,
-            'player_pos': config.player_pos
-        }
+                self.lost_player_time = now
+            if now - self.lost_player_time >= self.lost_time_threshold:
+                self.notify(BotError.LOST_PLAYER, now - self.lost_player_time)
 
     def screenshot(self, delay=1, sct=None):
         try:
@@ -216,27 +194,7 @@ class Capture:
             print(f'\n[!] Error while taking screenshot, retrying in {delay} second'
                   + ('s' if delay != 1 else ''))
             time.sleep(delay)
-            
-    def findMinimap(self, frame):
-        tl, _ = utils.single_match(frame, MM_TL_TEMPLATE)
-        _, br = utils.single_match(frame, MM_BR_TEMPLATE)
-        if tl == -1 or br == -1:
-            # print("cant locate minimap")
-            return None
         
-        mm_tl = (
-            tl[0] + MINIMAP_BOTTOM_BORDER,
-            tl[1] + MINIMAP_TOP_BORDER
-        )
-        mm_br = (
-            br[0] + 5,
-            br[1] - 25
-        )
-        return frame[mm_tl[1]:mm_br[1], mm_tl[0]:mm_br[0]]
-    
-    def delay_to_stop(self, delay = 2):
-        if self.stop_timer:
-            return
-        
-        self.stop_timer = threading.Timer(delay, config.bot.toggle, (False, ))
-        self.stop_timer.start()
+
+
+capture = Capture()

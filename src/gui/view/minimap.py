@@ -4,6 +4,7 @@ from PIL import ImageTk, Image
 from src.gui.interfaces import LabelFrame
 from src.common import config, utils
 from src.routine.components import Point
+from src.modules.capture import capture
 
 
 class Minimap(LabelFrame):
@@ -21,13 +22,13 @@ class Minimap(LabelFrame):
     def display_minimap(self):
         """Updates the Main page with the current minimap."""
 
-        minimap = config.capture.minimap
-        if minimap and minimap['minimap'] is not None:
-            rune_active = minimap['rune_active']
-            rune_pos = minimap['rune_pos']
-            path = minimap['path']
-            player_pos = minimap['player_pos']
-            minimap_img = minimap['minimap']
+        minimap = capture.minimap
+        if minimap is not None:
+            rune_active = config.rune_active
+            rune_pos = config.rune_pos
+            path = config.path
+            player_pos = config.player_pos
+            minimap_img = minimap
             
             height, width, _ = minimap_img.shape
             if width == 0 or height == 0:

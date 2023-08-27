@@ -3,13 +3,13 @@ import tkinter as tk
 from src.common import config
 from src.gui.interfaces import MenuBarItem, LabelFrame, Frame
 from tkinter.messagebox import askyesno
-
+from src.modules.bot import bot
 
 class Update(MenuBarItem):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, 'Update', **kwargs)
 
-        for path in config.bot.submodules:
+        for path in bot.submodules:
             name = path.capitalize()
             self.add_command(
                 label=name,
@@ -80,7 +80,7 @@ class UpdatePrompt(tk.Toplevel):
                                     'Do you wish to proceed?',
                             icon='warning'):
                 return
-        config.bot.update_submodules(force=force)
+        bot.update_submodules(force=force)
         self._close()
 
     def _refresh_display(self):

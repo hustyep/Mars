@@ -6,6 +6,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesno
 from src.common.interfaces import Configurable
 import threading
+from src.modules.bot import bot
 
 class File(MenuBarItem):
     def __init__(self, parent, **kwargs):
@@ -35,7 +36,7 @@ class File(MenuBarItem):
 
     def loadDefault(self):
 
-        config.bot.load_commands(config.file_setting.get('command_book_path'))
+        bot.load_commands(config.file_setting.get('command_book_path'))
         config.routine.load(config.file_setting.get("routine_path"))
 
     def enable_routine_state(self):
@@ -96,11 +97,11 @@ class File(MenuBarItem):
         if file_path:
             config.file_setting.set('command_book_path', file_path)
             config.file_setting.save_config()
-            config.bot.load_commands(file_path)
+            bot.load_commands(file_path)
 
 
 def get_routines_dir():
-    target = os.path.join(config.RESOURCES_DIR, 'routines', config.bot.command_book.name)
+    target = os.path.join(config.RESOURCES_DIR, 'routines', config.command_book.name)
     if not os.path.exists(target):
         os.makedirs(target)
     return target

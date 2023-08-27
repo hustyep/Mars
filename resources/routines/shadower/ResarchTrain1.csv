@@ -2,8 +2,7 @@
 @, label=Summoning
 *, x=0.3, y=0.2, frequency=7, skip=False, adjust=false
     ShadowVeil, direction=right
-*, x=0.7, y=0.16, frequency=7, skip=False, adjust=True
-    Adjust, x=0.7, y=0.15, max_steps=1
+*, x=0.65, y=0.135, frequency=7, skip=False, adjust=True
     Wait, duration=0.5
     DarkFlare, direction=right
     Wait, duration=0.5

@@ -2,11 +2,8 @@ import ctypes
 from ctypes import *
 from ctypes import wintypes
 import time
-from src.common.usb import USB
-from src.common.common import singleton
 import threading
 
-@singleton
 class DllHelper:
     
     def __init__(self):
@@ -20,10 +17,9 @@ class DllHelper:
         self.thread.start()
 
     def _main(self):
-        USB().load()
         self.ready = True
 
-    def screenSearch(self, bitmap_template, path_template=None, frame=None):
+    def screenSearch(self, bitmap_template, x, y, width, height, path_template=None, frame=None):
         if path_template:
             path = path_template.encode('utf-8')
         else:
@@ -32,7 +28,7 @@ class DllHelper:
         ImageSearch.restype = ctypes.c_char_p
         ImageSearch.argtypes = [ctypes.c_int,ctypes.c_int,ctypes.c_int,ctypes.c_int,ctypes.c_char_p,wintypes.HBITMAP,wintypes.HBITMAP]
         start_time = time.time()
-        result = ImageSearch(0,0,1024,768,path,frame,bitmap_template)
+        result = ImageSearch(x,y,width,height,path,frame,bitmap_template)
         end_time = time.time()
         print("耗时: {:.4f}秒".format(end_time - start_time))
         array_result = str(result).split('|', -1)
@@ -48,12 +44,13 @@ class DllHelper:
         image = self.dll.dloadImage(path, 0, 0, 0, 0)
         return image
 
+dll_helper = DllHelper()
+
 if __name__ == '__main__':
-    load = DllHelper()
     # resut = load.screenSearch("./assets/minimap_me.bmp")
-    template = load.loadImage('assets/big_mouse_template.png')
-    frame = load.loadImage(".test/Maple_230819_152709.png")
-    result = load.screenSearch(template,frame=frame)
+    template = dll_helper.loadImage('assets/big_mouse_template.png')
+    frame = dll_helper.loadImage(".test/Maple_230819_152709.png")
+    result = dll_helper.screenSearch(template,frame=frame)
     print(result)
 
     

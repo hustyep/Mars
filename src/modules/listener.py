@@ -7,7 +7,7 @@ import keyboard as kb
 from src.common.interfaces import Configurable
 from src.common import config, utils
 from datetime import datetime
-
+from src.modules.capture import capture
 
 class Listener(Configurable):
     DEFAULT_CONFIG = {
@@ -71,10 +71,13 @@ class Listener(Configurable):
     def toggle_enabled():
         """Resumes or pauses the current routine. Plays a sound to notify the user."""
 
-        config.bot.rune_active = False
+        config.rune_active = False
 
         if not config.enabled:
             Listener.recalibrate_minimap()      # Recalibrate only when being enabled.
+            config.started_time = time.time()
+        else:
+            config.started_time = None
 
         config.enabled = not config.enabled
         utils.print_state()
@@ -97,10 +100,10 @@ class Listener(Configurable):
 
     @staticmethod
     def recalibrate_minimap():
-        config.capture.calibrated = False
-        while not config.capture.calibrated:
-            time.sleep(0.01)
-        config.gui.edit.minimap.redraw()
+        capture.calibrated = False
+        # while not capture.calibrated:
+        #     time.sleep(0.01)
+        # config.gui.edit.minimap.redraw()
 
     @staticmethod
     def record_position():
@@ -109,3 +112,5 @@ class Listener(Configurable):
         config.gui.edit.record.add_entry(now, pos)
         print(f'\n[~] Recorded position ({pos[0]}, {pos[1]}) at {now}')
         time.sleep(0.6)
+
+listener = Listener()

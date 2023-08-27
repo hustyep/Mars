@@ -69,7 +69,7 @@ class Components(Frame):
 
             edit = self.parent.parent.parent
             edit.minimap.redraw()
-            edit.editor.create_edit_ui(arr, i, self.update_obj)
+            # edit.editor.create_edit_ui(arr, i, self.update_obj)
         return f
 
     def select(self, i):

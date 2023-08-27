@@ -1,8 +1,7 @@
 import tkinter as tk
-from src.gui.interfaces import LabelFrame, Frame
-from src.common.interfaces import Configurable
 import threading
-from src.common import config
+from src.gui.interfaces import LabelFrame, Frame
+from src.common.action_simulator import ActionSimulator
 
 class Crontab(LabelFrame):
     def __init__(self, parent, **kwargs):
@@ -84,4 +83,4 @@ class Crontab(LabelFrame):
             self.stop_timer = None
 
     def _stop_game(self):
-        config.bot.stop_game()
+        ActionSimulator.stop_game()

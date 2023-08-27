@@ -1,22 +1,15 @@
 import time
 import platform 
-import threading
 
-from src.common.dll_loader import DllHelper
-from src.modules.bot import Bot
-from src.modules.capture import Capture
-from src.modules.notifier import Notifier
-from src.modules.listener import Listener
+from src.common.dll_helper import dll_helper
+from src.modules.bot import bot
+from src.modules.capture import capture
+from src.modules.notifier import notifier
+from src.modules.listener import listener
 from src.modules.gui import GUI
-from src.common import config
+from src.modules.chat_bot import chat_bot
 
 print(platform.architecture())
-    
-bot = Bot()
-capture = Capture()
-notifier = Notifier()
-listener = Listener()
-dll_helper = DllHelper()
 
 dll_helper.start()
 while not dll_helper.ready:
@@ -37,6 +30,8 @@ while not notifier.ready:
 listener.start()
 while not listener.ready:
     time.sleep(0.01)
+    
+chat_bot.start(command_handler=bot.on_new_command)
     
 print('\n[~] Successfully initialized Mars')
 
