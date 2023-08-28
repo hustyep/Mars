@@ -7,5 +7,6 @@ Pillow
 pygame
 pywin32
 python-telegram-bot
+pytesseract
 # tensorflow
 # matplotlib

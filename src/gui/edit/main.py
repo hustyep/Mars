@@ -96,6 +96,8 @@ class Editor(LabelFrame):
         entry.pack(side=tk.RIGHT, expand=True, fill='x')
         
     def callback(self, arr, i, func):
+        if not arr or func is None:
+            return
         f = func(arr, i, self.vars)
         f()
 

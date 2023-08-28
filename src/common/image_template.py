@@ -4,8 +4,6 @@ from src.common import utils
 
 # The rune's buff 
 RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
-
-RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
 BUTTON_OK_TEMPLATE = cv2.imread('assets/btn_ok_template.png', 0)
 END_TALK_TEMPLATE = cv2.imread('assets/end_talk_template.png', 0)
 
@@ -26,7 +24,7 @@ RUNE_RANGES = (
 )
 rune_filtered = utils.filter_color(
     cv2.imread('assets/rune_template.png'), RUNE_RANGES)
-RUNE_TEMPLATE = cv2.cvtColor(rune_filtered, cv2.COLOR_BGR2GRAY)
+RUNE_TEMPLATE = cv2.cvtColor(rune_filtered, cv2.COLOR_BGR2GRAY) # type: ignore
 
 # Other players' symbols on the minimap
 OTHER_RANGES = (
@@ -34,14 +32,14 @@ OTHER_RANGES = (
 )
 other_filtered = utils.filter_color(cv2.imread(
     'assets/other_template.png'), OTHER_RANGES)
-OTHER_TEMPLATE = cv2.cvtColor(other_filtered, cv2.COLOR_BGR2GRAY)
+OTHER_TEMPLATE = cv2.cvtColor(other_filtered, cv2.COLOR_BGR2GRAY) # type: ignore
 
 # guildmate' symbols on the minimap
 GUILDMATE_RANGES = (
     ((120, 40, 180), (120, 110, 255)),
 )
 guildmate_filtered = utils.filter_color(cv2.imread('assets/guildmate_template.png'), GUILDMATE_RANGES)
-GUILDMATE_TEMPLATE = cv2.cvtColor(guildmate_filtered, cv2.COLOR_BGR2GRAY)
+GUILDMATE_TEMPLATE = cv2.cvtColor(guildmate_filtered, cv2.COLOR_BGR2GRAY) # type: ignore
 
 # The Elite Boss's warning sign
 # ELITE_TEMPLATE = cv2.imread('assets/elite_template.jpg', 0)

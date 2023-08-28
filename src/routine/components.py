@@ -64,8 +64,8 @@ class Point(Component):
 
     def __init__(self, x, y, frequency=1, skip='False', adjust='False'):
         super().__init__(locals())
-        self.x = float(x)
-        self.y = float(y)
+        self.x = int(x)
+        self.y = int(y)
         self.location = (self.x, self.y)
         self.frequency = settings.validate_nonnegative_int(frequency)
         self.counter = int(settings.validate_boolean(skip))
@@ -258,7 +258,7 @@ class Move(Command):
 
     def __init__(self, x, y, max_steps=15):
         super().__init__(locals())
-        self.target = (float(x), float(y))
+        self.target = (int(x), int(y))
         self.max_steps = settings.validate_nonnegative_int(max_steps)
         self.prev_direction = ''
 
@@ -328,7 +328,7 @@ class Adjust(Command):
 
     def __init__(self, x, y, max_steps=5):
         super().__init__(locals())
-        self.target = (float(x), float(y))
+        self.target = (int(x), int(y))
         self.max_steps = settings.validate_nonnegative_int(max_steps)
 
 

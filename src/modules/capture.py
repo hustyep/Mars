@@ -131,7 +131,6 @@ class Capture(Subject):
         
         if operator.eq(mm_tl, self.mm_tl) and operator.eq(mm_br, self.mm_br):
             return True
-        config.minimap_ratio = (mm_br[0] - mm_tl[0]) / (mm_br[1] - mm_tl[1])
         self.mm_tl = mm_tl
         self.mm_br = mm_br
         self.minimap_sample = self.frame[mm_tl[1]:mm_br[1], mm_tl[0]:mm_br[0]]
@@ -171,7 +170,7 @@ class Capture(Subject):
         if player:
             # h, w, _ = minimap.shape
             # print(f"{player[0]} | {w}")
-            config.player_pos = utils.convert_to_relative(player[0], minimap)
+            config.player_pos = player[0]
             self.lost_player_time = 0
             
             # Package display information to be polled by GUI

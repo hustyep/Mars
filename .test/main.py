@@ -1,5 +1,7 @@
 import cv2
-import numexpr
+import cv2.typing
+import typing
+
 import numpy as np
 import time
 from dll_helper import dll_helper
@@ -67,7 +69,7 @@ def multi_match(frame, template, threshold=0.95):
     # cv2.waitKey()
     return results
 
-def filter_color(img, ranges):
+def filter_color(img: cv2.typing.MatLike, ranges) -> cv2.typing.MatLike:
     """
     Returns a filtered copy of IMG that only contains pixels within the given RANGES.
     on the HSV scale.
@@ -75,8 +77,8 @@ def filter_color(img, ranges):
     :param ranges:  A list of tuples, each of which is a pair upper and lower HSV bounds.
     :return:        A filtered copy of IMG.
     """
-    if img is None or len(img) == 0:
-        return None
+    if img is None or img.shape[0] == 0 or img.shape[1] == 0:
+        return None # type: ignore
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, ranges[0][0], ranges[0][1])
     for i in range(1, len(ranges)):
@@ -84,7 +86,7 @@ def filter_color(img, ranges):
             hsv, ranges[i][0], ranges[i][1]))
 
     # Mask the image
-    color_mask = mask > 0
+    color_mask = mask > 0 # type: ignore
     result = np.zeros_like(img, np.uint8)
     result[color_mask] = img[color_mask]
     return result

@@ -21,13 +21,13 @@ class Minimap(LabelFrame):
 
         self.draw_default()
 
-    def draw_point(self, location):
+    def draw_point(self, pos: Point):
         """Draws a circle representing a Point centered at LOCATION."""
 
         if capture.minimap_sample is not None:
             minimap = cv2.cvtColor(capture.minimap_sample, cv2.COLOR_BGR2RGB)
-            img = self.resize_to_fit(minimap)
-            utils.draw_location(img, location, (0, 255, 0))
+            img, ratio = self.resize_to_fit(minimap)
+            utils.draw_location(img, pos.location, ratio, (0, 255, 0), pos.adjust)
             self.draw(img)
 
     def draw_default(self):
@@ -35,7 +35,7 @@ class Minimap(LabelFrame):
 
         if capture.minimap_sample is not None:
             minimap = cv2.cvtColor(capture.minimap_sample, cv2.COLOR_BGR2RGB)
-            img = self.resize_to_fit(minimap)
+            img, _ = self.resize_to_fit(minimap)
             self.draw(img)
 
     def redraw(self):
@@ -46,7 +46,7 @@ class Minimap(LabelFrame):
             index = int(selects[0])
             obj = config.routine[index]
             if isinstance(obj, Point):
-                self.draw_point(obj.location)
+                self.draw_point(obj)
                 self.parent.record.clear_selection()
             else:
                 self.draw_default()
@@ -62,7 +62,7 @@ class Minimap(LabelFrame):
         new_height = int(height * ratio)
         if new_height * new_width > 0:
             img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_AREA)
-        return img
+        return img, ratio
 
     def draw(self, img):
         """Draws IMG onto the Canvas."""

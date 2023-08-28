@@ -67,8 +67,8 @@ def validate_horizontal_arrows(key):
 #########################
 # A dictionary that maps each setting to its validator function
 SETTING_VALIDATORS = {
-    'move_tolerance': float,
-    'adjust_tolerance': float,
+    'move_tolerance': int,
+    'adjust_tolerance': int,
     'record_layout': validate_boolean,
     'buff_cooldown': validate_nonnegative_int
 }
@@ -78,17 +78,17 @@ def reset():
     """Resets all settings to their default values."""
 
     global move_tolerance, adjust_tolerance, record_layout, buff_cooldown
-    move_tolerance = 0.1
-    adjust_tolerance = 0.02
+    move_tolerance = 10
+    adjust_tolerance = 3
     record_layout = False
     buff_cooldown = 180
 
 
 # The allowed error from the destination when moving towards a Point
-move_tolerance = 0.1
+move_tolerance = 10
 
 # The allowed error from a specific location while adjusting to that location
-adjust_tolerance = 0.02
+adjust_tolerance = 3
 
 # Whether the bot should save new player positions to the current layout
 record_layout = False

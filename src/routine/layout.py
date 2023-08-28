@@ -247,7 +247,7 @@ class Layout:
                 draw_helper(node.up_left)
                 draw_helper(node.down_left)
 
-                center = utils.convert_to_absolute(tuple(node), image)
+                center = tuple(node), image
                 cv2.circle(image, center, 1, (255, 165, 0), -1)
 
                 draw_helper(node.up_right)

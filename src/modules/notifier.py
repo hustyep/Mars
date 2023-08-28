@@ -180,7 +180,7 @@ class Notifier(Subject, Observer):
             filtered, RUNE_TEMPLATE, threshold=0.9)
         # TODO rune buff bottom
         rune_buff = utils.multi_match(
-            frame[:200 // 8, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+            frame[:200, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
 
         if not config.rune_active:
             if matches and config.routine.sequence and len(rune_buff) == 0:

@@ -6,7 +6,6 @@ from src.common import config, utils
 from src.routine.components import Point
 from src.modules.capture import capture
 
-
 class Minimap(LabelFrame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, 'Minimap', **kwargs)
@@ -46,7 +45,7 @@ class Minimap(LabelFrame):
             # Mark the position of the active rune
             if rune_active:
                 cv2.circle(img,
-                           utils.convert_to_absolute(rune_pos, img),
+                           utils.trans_point(rune_pos, ratio),
                            3,
                            (128, 0, 128),
                            -1)
@@ -54,8 +53,8 @@ class Minimap(LabelFrame):
             # Draw the current path that the program is taking
             if config.enabled and len(path) > 1:
                 for i in range(len(path) - 1):
-                    start = utils.convert_to_absolute(path[i], img)
-                    end = utils.convert_to_absolute(path[i + 1], img)
+                    start = utils.trans_point(path[i], ratio)
+                    end = utils.trans_point(path[i + 1], ratio)
                     cv2.line(img, start, end, (0, 255, 255), 1)
 
             # Draw each Point in the routine as a circle
@@ -63,7 +62,9 @@ class Minimap(LabelFrame):
                 if isinstance(p, Point):
                     utils.draw_location(img,
                                         p.location,
-                                        (0, 255, 0) if config.enabled else (255, 0, 0))
+                                        ratio,
+                                        (0, 255, 0) if config.enabled else (255, 0, 0),
+                                        p.adjust)
 
             # Display the current Layout
             if config.layout:
@@ -71,7 +72,7 @@ class Minimap(LabelFrame):
 
             # Draw the player's position on top of everything
             cv2.circle(img,
-                       utils.convert_to_absolute(player_pos, img),
+                       utils.trans_point(player_pos, ratio),
                        3,
                        (255, 0, 0),
                        -1)

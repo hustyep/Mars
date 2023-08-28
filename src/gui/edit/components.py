@@ -52,7 +52,7 @@ class Components(Frame):
 
                 if isinstance(obj, Point):
                     routine.commands_var.set([c.id for c in obj.commands])
-                    edit.minimap.draw_point(obj.location)
+                    edit.minimap.draw_point(obj)
                 else:
                     routine.commands_var.set([])
                     edit.minimap.draw_default()

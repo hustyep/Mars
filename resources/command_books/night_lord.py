@@ -99,7 +99,7 @@ class Adjust(Command):
 
     def __init__(self, x, y, max_steps=5):
         super().__init__(locals())
-        self.target = (float(x), float(y))
+        self.target = (int(x), int(y))
         self.max_steps = settings.validate_nonnegative_int(max_steps)
         # print(f'adjust: {self.target}')
 
@@ -152,7 +152,7 @@ class Move(Command):
 
     def __init__(self, x, y, max_steps=15):
         super().__init__(locals())
-        self.target = (float(x), float(y))
+        self.target = (int(x), int(y))
         self.max_steps = settings.validate_nonnegative_int(max_steps)
         self.prev_direction = ''
 
@@ -218,13 +218,13 @@ class Move(Command):
 
 # y轴移动
 class MoveUp(Command):
-    def __init__(self, dy: float = 0.2):
+    def __init__(self, dy: int = 20):
         super().__init__(locals())
         self.dy = abs(dy)
         
     def main(self):
-        if self.dy <= 0.125:
-            ShadowLeap(True if self.dy >= 0.11 else False).execute()
+        if self.dy <= 12:
+            ShadowLeap(True if self.dy >= 11 else False).execute()
         else:
             RopeLift(self.dy).execute()
         
@@ -276,16 +276,16 @@ class RopeLift(Command):
     key = Key.ROPE_LIFT
     cooldown = 3
 
-    def __init__(self, dy: float = 0.2):
+    def __init__(self, dy: int = 20):
         super().__init__(locals())
         self.dy = abs(dy)
 
     def main(self):
-        if self.dy >= 0.3:
+        if self.dy >= 30:
             press(Key.JUMP, up_time=0.12)
-        press_acc(self.__class__.key, up_time=self.dy * 9)
-        if self.dy >= 0.3:
-            time.sleep(self.dy * 3)
+        press_acc(self.__class__.key, up_time=self.dy * 0.1)
+        if self.dy >= 40:
+            time.sleep(self.dy * 0.05)
 
 
 #######################

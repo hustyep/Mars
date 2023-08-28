@@ -92,3 +92,4 @@ class Controls(Frame):
 
     def save(self):
         config.routine.save()
+        config.routine.load(config.routine.path)

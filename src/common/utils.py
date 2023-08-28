@@ -14,6 +14,7 @@ import win32gui
 import win32ui
 import win32con
 import win32api
+from datetime import datetime, timedelta
 from src.common import config, settings
 from src.common.dll_helper import dll_helper
 
@@ -79,9 +80,6 @@ def separate_args(arguments):
             args.append(a)
     return args, kwargs
 
-def image_search(template):
-    return dll_helper.screenSearch(template)
-
 def single_match(frame, template, threshold=0.95):
     """
     Finds the best match within FRAME.
@@ -140,35 +138,37 @@ def multi_match(frame, template, threshold=0.95):
     # cv2.waitKey()
     return results
 
+def trans_point(point:tuple[int, int], ratio:float):
+    return int(point[0] * ratio), int(point[1] * ratio)
 
-def convert_to_relative(point, frame):
-    """
-    Converts POINT into relative coordinates in the range [0, 1] based on FRAME.
-    Normalizes the units of the vertical axis to equal those of the horizontal
-    axis by using config.mm_ratio.
-    :param point:   The point in absolute coordinates.
-    :param frame:   The image to use as a reference.
-    :return:        The given point in relative coordinates.
-    """
+# def convert_to_relative(point, frame):
+#     """
+#     Converts POINT into relative coordinates in the range [0, 1] based on FRAME.
+#     Normalizes the units of the vertical axis to equal those of the horizontal
+#     axis by using config.mm_ratio.
+#     :param point:   The point in absolute coordinates.
+#     :param frame:   The image to use as a reference.
+#     :return:        The given point in relative coordinates.
+#     """
 
-    x = point[0] / frame.shape[1]
-    y = point[1] / config.minimap_ratio / frame.shape[0]
-    return x, y
+#     x = point[0] / frame.shape[1]
+#     y = point[1] / config.minimap_ratio / frame.shape[0]
+#     return x, y
 
 
-def convert_to_absolute(point, frame):
-    """
-    Converts POINT into absolute coordinates (in pixels) based on FRAME.
-    Normalizes the units of the vertical axis to equal those of the horizontal
-    axis by using config.mm_ratio.
-    :param point:   The point in relative coordinates.
-    :param frame:   The image to use as a reference.
-    :return:        The given point in absolute coordinates.
-    """
+# def convert_to_absolute(point, frame):
+#     """
+#     Converts POINT into absolute coordinates (in pixels) based on FRAME.
+#     Normalizes the units of the vertical axis to equal those of the horizontal
+#     axis by using config.mm_ratio.
+#     :param point:   The point in relative coordinates.
+#     :param frame:   The image to use as a reference.
+#     :return:        The given point in absolute coordinates.
+#     """
 
-    x = int(round(point[0] * frame.shape[1]))
-    y = int(round(point[1] * config.minimap_ratio * frame.shape[0]))
-    return x, y
+#     x = int(round(point[0] * frame.shape[1]))
+#     y = int(round(point[1] * config.minimap_ratio * frame.shape[0]))
+#     return x, y
 
 
 def filter_color(img, ranges):
@@ -194,7 +194,7 @@ def filter_color(img, ranges):
     return result
 
 
-def draw_location(minimap, pos, color):
+def draw_location(minimap, pos:tuple[int, int], ratio: float, color, adjust=False):
     """
     Draws a visual representation of POINT onto MINIMAP. The radius of the circle represents
     the allowed error when moving towards POINT.
@@ -204,10 +204,10 @@ def draw_location(minimap, pos, color):
     :return:            None
     """
 
-    center = convert_to_absolute(pos, minimap)
+    # center = convert_to_absolute(pos, minimap)
     cv2.circle(minimap,
-               center,
-               round(minimap.shape[1] * settings.move_tolerance),
+               trans_point(pos, ratio),
+               round((settings.adjust_tolerance if adjust else settings.move_tolerance) * ratio),
                color,
                1)
 
@@ -316,12 +316,10 @@ def compare_images(image_one, image_two):
     except ValueError as e:
         return False
 
-
-def image_search(template_path):
-    return config.dllTool.screenSearch(template_path)
-
 def timeStr() -> str:
-    return time.strftime("%y_%m_%d_%H_%M_%S", time.localtime()) 
+    now = datetime.utcnow() + timedelta(hours=8)
+    return now.strftime('%y%m%d%H%M%S%f')[:-3]
+    # return time.strftime("%y%m%d%H%M%S%f", time.localtime())[:-3] 
 
 def save_screenshot(frame=None, file_path=None, compress=True):
     if frame is None:
@@ -330,7 +328,7 @@ def save_screenshot(frame=None, file_path=None, compress=True):
     if file_path is None:
         file_path = 'screenshot/tmp'
     
-    filename = f'screenshot/tmp/screen_shot_{int(time.time() * 1000)}'    
+    filename = f'screenshot/tmp/maple_{timeStr()}'    
     if compress:
         threading.Timer(1, cv2.imwrite, (filename + '.png', frame)).start()
         cv2.imwrite(filename + '.webp', frame, [int(cv2.IMWRITE_WEBP_QUALITY), 0])
