@@ -3,6 +3,7 @@ from enum import Enum, auto
 class BotFatal(Enum):
     WHITE_ROOM = 'White Room'
     DEAD = 'Dead'
+    CRASH = 'Crash'
     
 class BotError(Enum):
     LOST_WINDOW = 'Lost Window'

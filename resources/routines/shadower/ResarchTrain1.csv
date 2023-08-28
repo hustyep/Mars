@@ -8,9 +8,9 @@
     Wait, duration=0.5
 
 @, label=Bottom mobbing
-*, x=10, y=38, frequency=1, skip=False, adjust=False
+*, x=23, y=38, frequency=1, skip=False, adjust=False
     MesoExplosion
 *, x=76, y=38, frequency=1, skip=False, adjust=False
     MesoExplosion
-*, x=160, y=38, frequency=1, skip=False, adjust=False
+*, x=155, y=38, frequency=1, skip=False, adjust=False
     MesoExplosion

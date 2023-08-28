@@ -53,13 +53,17 @@ def step(direction, target):
     if config.stage_fright and direction != 'up' and utils.bernoulli(0.75):
         time.sleep(utils.rand_float(0.1, 0.3))
     d_y = target[1] - config.player_pos[1]
-    if abs(d_y) > settings.move_tolerance * 1.5:
-        if direction == 'down':
-            press(Key.JUMP, 3)
-        elif direction == 'up':
-            press(Key.JUMP, 1)
-    press(Key.FLASH_JUMP, num_presses, down_time=0.04, up_time=0.05)
-    if direction == "left" or direction == "right":
+    # if abs(d_y) > settings.move_tolerance * 1.5:
+    #     if direction == 'down':
+    #         press(Key.JUMP, 3)
+    #     elif direction == 'up':
+    #         press(Key.JUMP, 1)
+    if direction == "up":
+        MoveUp(abs(d_y)).execute()
+    elif direction == "down":
+        press(Key.JUMP, 3)
+    else:
+        press(Key.FLASH_JUMP, num_presses, down_time=0.04, up_time=0.05)
         CruelStabRandomDirection().execute()
         time.sleep(0.05)
         MesoExplosion().execute()
@@ -102,17 +106,31 @@ class Adjust(Command):
                 d_y = self.target[1] - config.player_pos[1]
                 if abs(d_y) > settings.adjust_tolerance / math.sqrt(2):
                     if d_y < 0:
-                        FlashJump('up').main()
+                        MoveUp(abs(d_y)).execute()
                     else:
                         key_down('down')
                         time.sleep(0.05)
-                        press(Key.JUMP, 3, down_time=0.1)
+                        press(Key.JUMP, 1, down_time=1)
                         key_up('down')
                         time.sleep(0.05)
                     counter -= 1
             error = utils.distance(config.player_pos, self.target)
             toggle = not toggle
 
+# y轴移动
+class MoveUp(Command):
+    def __init__(self, dy: int = 20):
+        super().__init__(locals())
+        self.dy = abs(dy)
+        
+    def main(self):
+        if self.dy <= 6:
+            press('up')
+        elif self.dy <= 24:
+            FlashJump('up').execute()
+        else:
+            ShadowAssault('up', jump='True').execute()
+    
 
 class Buff(Command):
     """Uses each of Shadowers's buffs once."""
@@ -160,15 +178,13 @@ class FlashJump(Command):
         self.direction = settings.validate_arrows(direction)
 
     def main(self):
-        key_down(self.direction)
-        time.sleep(0.1)
-        press(Key.FLASH_JUMP, 1)
-        if self.direction == 'up':
-            press(Key.FLASH_JUMP, 1)
-        else:
-            press(Key.FLASH_JUMP, 1)
-        key_up(self.direction)
         time.sleep(0.5)
+        press(Key.JUMP, 1)
+        key_down(self.direction)
+        time.sleep(0.08)
+        press(Key.FLASH_JUMP, 1)
+        key_up(self.direction)
+        time.sleep(1.2)
 			
 class ShadowAssault(Command):
     """

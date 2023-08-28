@@ -328,7 +328,7 @@ def save_screenshot(frame=None, file_path=None, compress=True):
     if file_path is None:
         file_path = 'screenshot/tmp'
     
-    filename = f'screenshot/tmp/maple_{timeStr()}'    
+    filename = f'{file_path}/maple_{timeStr()}'    
     if compress:
         threading.Timer(1, cv2.imwrite, (filename + '.png', frame)).start()
         cv2.imwrite(filename + '.webp', frame, [int(cv2.IMWRITE_WEBP_QUALITY), 0])

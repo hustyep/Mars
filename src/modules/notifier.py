@@ -6,9 +6,10 @@ import cv2
 import pygame
 import threading
 import numpy as np
-import random
+import sys
 import operator
 import win32gui
+import win32con
 
 from src.routine.components import Point
 from src.common import config, utils
@@ -18,6 +19,26 @@ from src.common.image_template import *
 from src.common.bot_notification import *
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
+
+import sys
+
+def exception_hook(exc_type, exc_value, tb):
+    print('Traceback:')
+    filename = tb.tb_frame.f_code.co_filename
+    name = tb.tb_frame.f_code.co_name
+    line_no = tb.tb_lineno
+    info = (
+        f"File {filename} line {line_no}, in {name}\n"
+        f"{exc_type.__name__}, Message: {exc_value}\n"
+    )
+    notifier._notify(BotFatal.CRASH, info=info)
+    
+    print(f"File {filename} line {line_no}, in {name}")
+
+    # Exception type 和 value
+    print(f"{exc_type.__name__}, Message: {exc_value}")
+
+sys.excepthook = exception_hook
 
 
 class Notifier(Subject, Observer):
@@ -121,6 +142,8 @@ class Notifier(Subject, Observer):
         # Check if window is forground
         if capture.hwnd and capture.hwnd != win32gui.GetForegroundWindow():
             try:
+                if win32gui.IsIconic(capture.hwnd):
+                    win32gui.SendMessage(capture.hwnd, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
                 win32gui.SetForegroundWindow(capture.hwnd)
             except Exception as e:
                 print(e)
@@ -214,7 +237,7 @@ class Notifier(Subject, Observer):
             event_type = type(event)
             if event_type == BotFatal:
                 chat_bot.voice_call()
-                text = f'‼️{event.value}'
+                text = f'‼️[{event.value}] {info}'
                 image_path = utils.save_screenshot(frame=capture.frame)
                 self.send_message(text=text, image_path=image_path)
                 time.sleep(1)
