@@ -52,6 +52,8 @@ class Notifier(Subject, Observer):
         pygame.mixer.init()
         self.mixer = pygame.mixer.music
 
+        # sys.excepthook = exception_hook
+
         capture.attach(self)
 
         self.player_pos_updated_time = 0
@@ -115,8 +117,8 @@ class Notifier(Subject, Observer):
         # Check for no movement
         if config.enabled and operator.eq(config.player_pos, self.player_pos):
             interval = int(time.time() - self.player_pos_updated_time)
-            if interval >= 20 and self.player_pos_updated_time:
-                self._notify(BotError.NO_MOVEMENT, arg=interval,
+            if interval >= 60 and self.player_pos_updated_time:
+                self._notify(BotFatal.DEAD, arg=interval,
                              info=f'duration:{interval}s')
         else:
             self.player_pos = config.player_pos
@@ -142,6 +144,8 @@ class Notifier(Subject, Observer):
         # Check if window is forground
         if capture.hwnd and capture.hwnd != win32gui.GetForegroundWindow():
             try:
+                shell = win32com.client.Dispatch("WScript.Shell")
+                shell.SendKeys('%')
                 if win32gui.IsIconic(capture.hwnd):
                     win32gui.SendMessage(capture.hwnd, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
                 win32gui.SetForegroundWindow(capture.hwnd)
@@ -208,9 +212,9 @@ class Notifier(Subject, Observer):
         if not config.rune_active:
             if matches and config.routine.sequence and len(rune_buff) == 0:
                 abs_rune_pos = (matches[0][0], matches[0][1])
-                # config.rune_pos = utils.convert_to_relative(
-                #     abs_rune_pos, minimap)
-                config.rune_pos = abs_rune_pos
+                config.rune_pos = utils.convert_to_relative(
+                    abs_rune_pos, minimap)
+                # config.rune_pos = abs_rune_pos
                 distances = list(
                     map(distance_to_rune, config.routine.sequence))
                 index = np.argmin(distances)
@@ -236,14 +240,15 @@ class Notifier(Subject, Observer):
 
             event_type = type(event)
             if event_type == BotFatal:
+                time.sleep(20)
                 chat_bot.voice_call()
                 text = f'‼️[{event.value}] {info}'
                 image_path = utils.save_screenshot(frame=capture.frame)
                 self.send_message(text=text, image_path=image_path)
-                time.sleep(1)
-                for _ in range(3):
-                    self.send_message(text=text)
-                    time.sleep(1)
+                # time.sleep(1)
+                # for _ in range(3):
+                #     self.send_message(text=text)
+                #     time.sleep(1)
             elif event_type == BotError:
                 if config.notice_level < 2:
                     return
@@ -277,13 +282,13 @@ class Notifier(Subject, Observer):
         duration = int(time.time() - self.others_comming_time)
         text_notice = f"duration:{duration}s, count:{num}"
         self._notify(BotWarnning.OTHERS_STAY_OVER_30S,
-                     args=duration, info=text_notice)
+                     arg=duration, info=text_notice)
 
     def othersStayWarnning2(self, num):
         duration = int(time.time() - self.others_comming_time)
         text_notice = f"duration:{duration}s, count:{num}"
         self._notify(BotWarnning.OTHERS_STAY_OVER_60S,
-                     args=duration, info=text_notice)
+                     arg=duration, info=text_notice)
 
     def notifyOtherComing(self, num):
         duration = int(time.time() - self.others_comming_time)

@@ -250,7 +250,7 @@ class FlashJump(Command):
 class ShadowLeap(Command):
     key = Key.SHADOW_LEAP
     precast = 0.5
-    backswing = 0.75
+    backswing = 0.9
 
     def __init__(self, jump: bool = False):
         super().__init__(locals())
