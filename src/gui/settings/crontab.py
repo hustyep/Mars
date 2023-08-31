@@ -16,7 +16,7 @@ class Crontab(LabelFrame):
 
         # 定时任务
         delay_row = Frame(self)
-        delay_row.pack(side=tk.TOP, fill='x', expand=True, pady=(0, 5), padx=0)
+        delay_row.pack(side=tk.TOP, fill='x', expand=True, pady=(0, 5), padx=5)
         
         label = tk.Label(delay_row, text='Time to stop:')
         label.pack(side=tk.LEFT, padx=(0, 5), fill='x')

@@ -5,7 +5,7 @@ import threading
 import tkinter as tk
 from tkinter import ttk
 from src.common import config, settings
-from src.gui import Menu, View, Edit, Settings
+from src.gui import Menu, View, Edit, Settings, Macros
 
 
 class GUI:
@@ -37,6 +37,7 @@ class GUI:
         self.view = View(self.navigation)
         self.edit = Edit(self.navigation)
         self.settings = Settings(self.navigation)
+        self.macro = Macros(self.navigation)
 
         self.navigation.pack(expand=True, fill='both')
         self.navigation.bind('<<NotebookTabChanged>>', self._resize_window)

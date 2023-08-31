@@ -8,13 +8,12 @@ from src.common.interfaces import Configurable
 import threading
 from src.modules.bot import bot
 
+
 class File(MenuBarItem):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, 'File', **kwargs)
         # parent.add_cascade(label='File', menu=self)
         config.file_setting = File_Setting('files')
-
-        threading.Timer(1, self.loadDefault).start()
 
         self.add_command(
             label='New Routine',
@@ -27,12 +26,37 @@ class File(MenuBarItem):
             state=tk.DISABLED
         )
         self.add_separator()
-        self.add_command(label='Load Command Book', command=utils.async_callback(self, File._load_commands))
-        self.add_command(
-            label='Load Routine',
-            command=utils.async_callback(self, File._load_routine),
-            state=tk.DISABLED
-        )
+
+        load_command_menu = tk.Menu(self, tearoff=0)
+        load_command_menu.add_command(label='Open File...',
+                                      command=utils.async_callback(self, File._load_commands))
+        load_command_menu.add_separator()
+        # load_command_menu.add_command(label='night_load',
+        #                                   command=lambda: File._load_command_by_name('night_lord'))
+        # load_command_menu.add_command(label='shadower',
+        #                                   command=lambda: File._load_command_by_name('shadower'))
+        for file in get_command_books():
+            load_command_menu.add_command(label=file,
+                                          command=lambda name=file: File._load_command_by_name(name))
+        self.add_cascade(label='Load Command Book',
+                         menu=load_command_menu)
+
+        self.load_routine_menu = tk.Menu(self, tearoff=0)
+        self.load_routine_menu.add_command(label='Open File...',
+                                           command=utils.async_callback(self, File._load_routine))
+        self.load_routine_menu.add_separator()
+
+        self.add_cascade(label='Load Routine',
+                         menu=self.load_routine_menu,
+                         state=tk.DISABLED)
+
+        # self.add_command(
+        #     label='Load Routine',
+        #     command=utils.async_callback(self, File._load_routine),
+        #     state=tk.DISABLED
+        # )
+
+        threading.Timer(1, self.loadDefault).start()
 
     def loadDefault(self):
 
@@ -43,6 +67,15 @@ class File(MenuBarItem):
         self.entryconfig('New Routine', state=tk.NORMAL)
         self.entryconfig('Save Routine', state=tk.NORMAL)
         self.entryconfig('Load Routine', state=tk.NORMAL)
+
+        self.load_routine_menu.delete(2, tk.END)
+        
+        command_path = config.file_setting.get('command_book_path')
+        command_name = os.path.basename(command_path)[:-3]
+
+        for file in get_routines(command_name):
+            self.load_routine_menu.add_command(label=file,
+                                               command=lambda: File._load_command_by_name(file))
 
     @staticmethod
     @utils.run_if_disabled('\n[!] Cannot create a new routine while Mars is enabled')
@@ -91,17 +124,58 @@ class File(MenuBarItem):
                                     'which has unsaved changes. Would you like to proceed anyways?',
                             icon='warning'):
                 return
-        file_path = askopenfilename(initialdir=os.path.join(config.RESOURCES_DIR, 'command_books'),
+        file_path = askopenfilename(initialdir=get_command_books_dir(),
                                     title='Select a command book',
                                     filetypes=[('*.py', '*.py')])
+        File._load_command(file_path)
+
+    @staticmethod
+    @utils.run_if_disabled('\n[!] Cannot load command books while Mars is enabled')
+    def _load_command(file_path):
         if file_path:
             config.file_setting.set('command_book_path', file_path)
             config.file_setting.save_config()
             bot.load_commands(file_path)
 
+    def _load_command_by_name(name):
+        target = os.path.join(config.RESOURCES_DIR,
+                              'command_books', name + '.py')
+        File._load_command(target)
 
-def get_routines_dir():
-    target = os.path.join(config.RESOURCES_DIR, 'routines', config.command_book.name)
+
+def get_command_books_dir() -> str:
+    target = os.path.join(config.RESOURCES_DIR,
+                          'command_books')
+    if not os.path.exists(target):
+        os.makedirs(target)
+    return target
+
+
+def get_command_books() -> list:
+    books = []
+    folder = get_command_books_dir()
+    for root, ds, fs in os.walk(folder):
+        for f in fs:
+            if f.endswith(".py"):
+                books.append(f[:-3])
+    return books
+
+
+def get_routines(command_name) -> list:
+    routines = []
+    folder = get_routines_dir(command_name)
+    for root, ds, fs in os.walk(folder):
+        for f in fs:
+            if f.endswith(".csv"):
+                routines.append(f[:-4])
+    return routines
+
+
+def get_routines_dir(command_name=None):
+    if command_name is None:
+        command_name = config.command_book.name
+    target = os.path.join(config.RESOURCES_DIR,
+                          'routines', command_name)
     if not os.path.exists(target):
         os.makedirs(target)
     return target

@@ -75,7 +75,16 @@ class ActionSimulator:
     def release_key(key, delay=0.05):
         USB().key_up(key)
         time.sleep(delay * (1 + 0.2 * random()))
+        
+    @staticmethod
+    def mouse_left_click(position=None, delay=0.05):
+        if position:
+            USB().mouse_abs_move(position[0], position[1])
+            time.sleep(0.5)
 
+        USB().mouse_left_click()
+        time.sleep(delay * (1 + 0.2 * random()))
+        
     @staticmethod
     def cancel_rune_buff():
         rune_buff = None

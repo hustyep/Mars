@@ -217,6 +217,7 @@ class Bot(Configurable, Observer):
                 level = int(args[0])
                 config.notice_level = level
                 config.gui.settings.notification.notice_level.set(level)
+                config.gui.settings.notification.notification_settings.save_config()
                 return "done", None
             case ChatBotCommand.SAY:
                 ActionSimulator.say_to_all(args[0])
