@@ -279,6 +279,8 @@ class Move(Command):
             local_error = utils.distance(config.player_pos, point)
             global_error = utils.distance(config.player_pos, self.target)
             
+            if global_error <= settings.move_tolerance:
+                break
             while config.enabled and counter > 0 and \
                     local_error > settings.move_tolerance and \
                     global_error > settings.move_tolerance:
@@ -305,7 +307,7 @@ class Move(Command):
                             key = 'up'
                         else:
                             key = 'down'
-                        # print(f"move down: {local_error} | {global_error}" )
+                        print(f"move down: {local_error} | {global_error}" )
                         self._new_direction(key)
                         step(key, point)
                         if settings.record_layout:

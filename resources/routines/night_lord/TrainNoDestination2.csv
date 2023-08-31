@@ -1,21 +1,21 @@
 
 @, label=Bottom mobbing
-*, x=0.02, y=0.478, frequency=1, skip=False, adjust=False
-*, x=0.530, y=0.478, frequency=1, skip=False, adjust=False
+*, x=0, y=64, frequency=1, skip=False, adjust=False
+*, x=67, y=64, frequency=1, skip=False, adjust=False
     Arachnid
-*, x=0.53, y=0.478, frequency=6, skip=False, adjust=False
+*, x=67, y=64, frequency=6, skip=False, adjust=False
     Omen
-*, x=0.98, y=0.478, frequency=1, skip=False, adjust=False
+*, x=134, y=64, frequency=1, skip=False, adjust=False
 
 @, label=Summoning
-*, x=0.95, y=0.478, frequency=6, skip=False, adjust=True
-*, x=0.82, y=0.246, frequency=6, skip=False, adjust=True
+*, x=130, y=64, frequency=6, skip=False, adjust=True
+*, x=108, y=33, frequency=6, skip=False, adjust=True
     Wait, duration=0.05
     ErdaShower, direction=left
     Wait, duration=0.06
-*, x=0.26, y=0.157, frequency=6, skip=False, adjust=True
+*, x=33, y=21, frequency=6, skip=False, adjust=True
     DarkFlare, direction=right
-*, x=0.26, y=0.38, frequency=6, skip=False, adjust=False
+*, x=34, y=55, frequency=6, skip=False, adjust=False
     Wait, duration=0.1
     SuddenRaid
-*, x=0.98, y=0.478, frequency=6, skip=False, adjust=False
+*, x=134, y=64, frequency=6, skip=False, adjust=False

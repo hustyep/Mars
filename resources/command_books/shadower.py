@@ -125,7 +125,7 @@ class MoveUp(Command):
         
     def main(self):
         if self.dy <= 6:
-            press('up')
+            press(Key.JUMP)
         elif self.dy <= 24:
             FlashJump('up').execute()
         else:

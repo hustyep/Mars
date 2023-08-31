@@ -63,28 +63,30 @@ def step(direction, target):
     Should not press any arrow keys, as those are handled by Mars.
     """
 
-    if config.stage_fright and direction != 'up' and utils.bernoulli(0.75):
+    if config.stage_fright and direction != 'up' and utils.bernoulli(0.6):
         time.sleep(utils.rand_float(0.1, 0.3))
         
     d_x = abs(target[0] - config.player_pos[0])
     d_y = abs(target[1] - config.player_pos[1])
     # if d_y > settings.move_tolerance * 1.5:
     if direction == 'down':
-        print(f"step_down: {d_y}")
         if d_y > settings.move_tolerance:
-            press_acc(Key.JUMP, 1, down_time=0.1,up_time=d_y*3)
-            # time.sleep(d_y)
+            print(f"step_down: {d_y}")
+            key_down('down')
+            press_acc(Key.JUMP, 1, down_time=0.1,up_time=0.1)
+            key_up('down')
+            time.sleep(0.6)
         return
     elif direction == 'up':
         # print(f"step_up: {d_y}")
         MoveUp(dy=d_y)
         return
         
-    if d_x >=0.16:
+    if d_x >=28:
         press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
         press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
         ShowDown().execute()
-    elif d_x >= 0.09:
+    elif d_x >= 10:
         # time.sleep(0.05)
         if not ShadowSurge().execute():
             time.sleep(0.02)
@@ -140,9 +142,9 @@ class Adjust(Command):
                         print(f"adjust down {d_y}")
                         key_down('down')
                         time.sleep(0.05)
-                        press(Key.JUMP, 1, down_time=0.2, up_time=0.3)
+                        press(Key.JUMP, 1, down_time=0.1, up_time=0.1)
                         key_up('down')
-                        time.sleep(0.8)
+                        time.sleep(1)
                     counter -= 1
             error = utils.distance(config.player_pos, self.target)
             toggle = not toggle
@@ -157,7 +159,7 @@ class Move(Command):
         self.prev_direction = ''
 
     def _new_direction(self, new):
-        if new != 'up':
+        if new != 'up' and new != 'down':
             # 谨慎按上方向键
             key_down(new)
         if self.prev_direction and self.prev_direction != new:
@@ -202,7 +204,7 @@ class Move(Command):
                             key = 'up'
                         else:
                             key = 'down'
-                        # print(f"move down: {local_error} | {global_error}" )
+                        print(f"move down: {local_error} | {global_error}" )
                         self._new_direction(key)
                         step(key, point)
                         if settings.record_layout:
@@ -223,8 +225,10 @@ class MoveUp(Command):
         self.dy = abs(dy)
         
     def main(self):
-        if self.dy <= 12:
-            ShadowLeap(True if self.dy >= 11 else False).execute()
+        if self.dy <= 6:
+            press(Key.JUMP)
+        if self.dy <= 20:
+            ShadowLeap(True if self.dy > 15 else False).execute()
         else:
             RopeLift(self.dy).execute()
         
@@ -281,11 +285,11 @@ class RopeLift(Command):
         self.dy = abs(dy)
 
     def main(self):
-        if self.dy >= 30:
+        if self.dy > 32:
             press(Key.JUMP, up_time=0.12)
-        press_acc(self.__class__.key, up_time=self.dy * 0.1)
-        if self.dy >= 40:
-            time.sleep(self.dy * 0.05)
+        press_acc(self.__class__.key, up_time=self.dy * 0.07)
+        if self.dy >= 32:
+            time.sleep((self.dy - 32) * 0.05)
 
 
 #######################
@@ -316,7 +320,7 @@ class DarkFlare(Command):
                 press('left', 1, down_time=0.1, up_time=0.05)
             else:
                 press('right', 1, down_time=0.1, up_time=0.05)
-        press(Key.DARK_FLARE, 1, up_time=self.__class__.backswing)
+        press(Key.DARK_FLARE, 2, up_time=self.__class__.backswing)
 
 
 class ErdaShower(Command):

@@ -10,6 +10,7 @@ import sys
 import operator
 import win32gui
 import win32con
+import win32com.client as client
 
 from src.routine.components import Point
 from src.common import config, utils
@@ -146,7 +147,7 @@ class Notifier(Subject, Observer):
         # Check if window is forground
         if capture.hwnd and capture.hwnd != win32gui.GetForegroundWindow():
             try:
-                shell = win32com.client.Dispatch("WScript.Shell")
+                shell = client.Dispatch("WScript.Shell")
                 shell.SendKeys('%')
                 if win32gui.IsIconic(capture.hwnd):
                     win32gui.SendMessage(
@@ -215,9 +216,7 @@ class Notifier(Subject, Observer):
         if not config.rune_active:
             if matches and config.routine.sequence and len(rune_buff) == 0:
                 abs_rune_pos = (matches[0][0], matches[0][1])
-                config.rune_pos = utils.convert_to_relative(
-                    abs_rune_pos, minimap)
-                # config.rune_pos = abs_rune_pos
+                config.rune_pos = abs_rune_pos
                 distances = list(
                     map(distance_to_rune, config.routine.sequence))
                 index = np.argmin(distances)

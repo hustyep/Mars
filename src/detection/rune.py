@@ -391,7 +391,7 @@ def rune_liberate_result(frame):
     text = tess.image_to_string(image_rgb, lang="eng")
     content = text.replace("\f", "").split("\n")
     for c in content:
-        if len(c) > 0 and 'rune' in c.lower():
+        if len(c) > 0 and 'rune of' in c.lower():
             print(c)
             print('\n')
             list = c.split(":")
