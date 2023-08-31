@@ -24,14 +24,16 @@ class Bot(Configurable, Observer):
 
     DEFAULT_CONFIG = {
         'Interact': 'space',
-        'Feed pet': 'L'
+        'Feed pet': 'L',
+        'Change channel': 'page down',
+        'Attack': 'd'
     }
 
     def __init__(self):
         """Loads a user-defined routine on start up and initializes this Bot's main thread."""
 
         super().__init__('keybindings')
-        config.bot = self
+        config.global_keys = self.config
         notifier.attach(self)
 
         # self.rune_active = False
@@ -75,7 +77,7 @@ class Bot(Configurable, Observer):
                     press(self.config['Feed pet'], 1)
                     last_fed = now
 
-                # Buff 
+                # Buff
                 config.command_book.buff.main()
 
                 # Highlight the current Point
@@ -133,8 +135,9 @@ class Bot(Configurable, Observer):
                     inferences.append(solution)
             time.sleep(0.1)
         time.sleep(0.3)
-        threading.Timer(0.001, self.check_rune_solve_result, (used_frame, )).start()
-                
+        threading.Timer(0.001, self.check_rune_solve_result,
+                        (used_frame, )).start()
+
     def check_rune_solve_result(self, used_frame):
         for _ in range(4):
             rune_type = rune.rune_liberate_result(capture.frame)
@@ -144,12 +147,14 @@ class Bot(Configurable, Observer):
         if rune_type is None:
             notifier.notifyRuneResolveFailed()
             file_path = 'screenshot/rune_failed'
-            utils.save_screenshot(frame=used_frame, file_path=file_path, compress=False)
+            utils.save_screenshot(
+                frame=used_frame, file_path=file_path, compress=False)
         else:
             notifier.notifyRuneResolved(rune_type)
             file_path = 'screenshot/rune_solved'
-            utils.save_screenshot(frame=used_frame, file_path=file_path, compress=False)
-            
+            utils.save_screenshot(
+                frame=used_frame, file_path=file_path, compress=False)
+
             if rune_type == 'Rune of Might':
                 ActionSimulator.cancel_rune_buff()
 
@@ -179,7 +184,6 @@ class Bot(Configurable, Observer):
 
         releaseAll()
 
-    
     def bot_status(self, ext='') -> str:
         message = (
             f"bot status: {'running' if config.enabled  else 'pause'}\n"
@@ -217,10 +221,16 @@ class Bot(Configurable, Observer):
             case ChatBotCommand.SAY:
                 ActionSimulator.say_to_all(args[0])
                 filepath = utils.save_screenshot(capture.frame)
-                return f'"said "{args[0]}', filepath
+                return f'said: "{args[0]}"', filepath
             case ChatBotCommand.TP:
                 ActionSimulator.go_home()
-
+                return "tp...", None
+            case ChatBotCommand.CHANGE_CHANNEL:
+                channel_num = 0
+                if len(args) > 0:
+                    channel_num = int(args[0])
+                ActionSimulator.change_channel(channel_num)
+                return "changing channel...", None
 
     def update(self, subject: Subject, *args, **kwargs) -> None:
         event_type = args[0]
@@ -246,9 +256,9 @@ class Bot(Configurable, Observer):
                 case BotError.NO_MOVEMENT:
                     pass
                 case BotError.RUNE_ERROR:
-                    ActionSimulator.go_home()
+                    ActionSimulator.change_channel()
                 case BotError.OTHERS_STAY_OVER_120S:
-                    ActionSimulator.go_home()
+                    ActionSimulator.change_channel()
                 case (_):
                     pass
             # end match
@@ -262,13 +272,14 @@ class Bot(Configurable, Observer):
                     words = ['??', 'hello?', ' cc plz', 'bro?']
                     random_word = random.choice(words)
                     ActionSimulator.say_to_all(random_word)
+                case BotWarnning.OTHERS_COMMING:
+                    pass
         elif isinstance(event_type, BotInfo):
             match event_type:
                 case BotInfo.RUNE_ACTIVE:
                     pass
-                case BotInfo.OTHERS_COMMING:
-                    pass
         elif isinstance(event_type, BotDebug):
             pass
+
 
 bot = Bot()

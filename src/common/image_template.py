@@ -71,3 +71,23 @@ PT_HEIGHT, PT_WIDTH = PLAYER_TEMPLATE.shape
 PLAYER_TEMPLATE_L = cv2.imread('assets/player_template_l.png', 0)
 
 PLAYER_TEMPLATE_R = cv2.imread('assets/player_template_r.png', 0)
+
+GREEN_RANGES = (
+        ((50, 200, 46), (77, 255, 255)),
+)
+RED_RANGES = (
+    ((0, 43, 46), (10, 255, 255)),
+    ((156, 43, 46), (180, 255, 255)),
+)
+YELLOW_RANGES = (
+    ((26, 43, 46), (34, 255, 255)),
+)
+WHITE_RANGES = (
+    ((0, 0, 150), (180, 30, 255)),
+)
+BLUE_RANGES = (
+    ((100, 43, 46), (124, 255, 255)),
+)
+GRAY_RANGES = (
+    ((0, 0, 46), (180, 43, 220)),
+)

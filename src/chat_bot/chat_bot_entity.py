@@ -13,6 +13,7 @@ class ChatBotCommand(Enum):
     CLICK = 'click'
     SAY = 'say'
     TP = 'tp'
+    CHANGE_CHANNEL = 'cc'
 
 class ChatBotEntity(ABC):
     

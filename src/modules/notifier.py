@@ -20,7 +20,6 @@ from src.common.bot_notification import *
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
 
-import sys
 
 def exception_hook(exc_type, exc_value, tb):
     print('Traceback:')
@@ -32,11 +31,12 @@ def exception_hook(exc_type, exc_value, tb):
         f"{exc_type.__name__}, Message: {exc_value}\n"
     )
     notifier._notify(BotFatal.CRASH, info=info)
-    
+
     print(f"File {filename} line {line_no}, in {name}")
 
     # Exception type 和 value
     print(f"{exc_type.__name__}, Message: {exc_value}")
+
 
 sys.excepthook = exception_hook
 
@@ -90,11 +90,11 @@ class Notifier(Subject, Observer):
 
             self.check_exception(frame)
 
-            if config.enabled:
+            if config.enabled or config.change_channel:
                 self.check_others(minimap)
 
+            if config.enabled:
                 self.check_alert(frame)
-
                 self.check_rune_status(frame, minimap)
             time.sleep(0.05)
 
@@ -113,6 +113,8 @@ class Notifier(Subject, Observer):
         # Check for white room
         if config.started_time and np.count_nonzero(gray == 255) / height / width >= self.white_room_threshold:
             self._notify(BotFatal.WHITE_ROOM)
+        else:
+            self.notice_time_record[BotFatal.WHITE_ROOM] = 0
 
         # Check for no movement
         if config.enabled and operator.eq(config.player_pos, self.player_pos):
@@ -147,7 +149,8 @@ class Notifier(Subject, Observer):
                 shell = win32com.client.Dispatch("WScript.Shell")
                 shell.SendKeys('%')
                 if win32gui.IsIconic(capture.hwnd):
-                    win32gui.SendMessage(capture.hwnd, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
+                    win32gui.SendMessage(
+                        capture.hwnd, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
                 win32gui.SetForegroundWindow(capture.hwnd)
             except Exception as e:
                 print(e)
@@ -271,7 +274,7 @@ class Notifier(Subject, Observer):
                     return
                 text = f'🔎[{event.value}] {info}'
                 self.send_message(text=text)
-                
+
     def othersLongStayWarnning(self, num):
         duration = int(time.time() - self.others_comming_time)
         text_notice = f"TP...duration:{duration}s, count:{num}"
@@ -293,7 +296,7 @@ class Notifier(Subject, Observer):
     def notifyOtherComing(self, num):
         duration = int(time.time() - self.others_comming_time)
         text_notice = f"duration:{duration}s, count:{num}"
-        self._notify(BotInfo.OTHERS_COMMING, arg=duration, info=text_notice)
+        self._notify(BotWarnning.OTHERS_COMMING, arg=duration, info=text_notice)
 
     def notifyOtherLeaved(self, num):
         text_notice = f"count:{num}"

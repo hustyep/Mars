@@ -33,8 +33,8 @@ mail_password = 'KQJKXCWSVPGOWPEW'
 # 实际发给的收件人
 mail_to_addrs = '326143583@qq.com'
 
-telegram_apiToken = '6683915847:AAH1iOECS1y394jkvDCD2YhHLxIDIAmGGac'
-# telegram_apiToken = '6497654972:AAExWRJvmuswPb2MzbtHi8fIp140TdeDSQM'
+# telegram_apiToken = '6683915847:AAH1iOECS1y394jkvDCD2YhHLxIDIAmGGac'
+telegram_apiToken = '6497654972:AAExWRJvmuswPb2MzbtHi8fIp140TdeDSQM'
 
 telegram_chat_id = '805381440'
 
@@ -55,14 +55,17 @@ file_setting = None
 
 command_book = None
 
+# Rune status
 rune_active = False
 rune_pos = None
 rune_closest_pos = None
 
-minimap_ratio = 1
-
+# Bot status
 started_time = None
-
-default_notice_interval = 30
-
 notice_level = 1
+default_notice_interval = 30
+global_keys = None
+
+# change channel
+change_channel = False
+lost_minimap = True

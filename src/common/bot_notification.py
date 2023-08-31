@@ -16,13 +16,13 @@ class BotError(Enum):
         
 class BotWarnning(Enum):
     RUNE_FAILED = 'Rune Failed'
+    OTHERS_COMMING = 'Someone\'s comming'
     OTHERS_STAY_OVER_30S = 'Someone stay over 30s'
     OTHERS_STAY_OVER_60S = 'Someone stay over 60s'
 
 class BotInfo(Enum):
     RUNE_ACTIVE = 'Rune Active'
     RUNE_LIBERATED = 'Rune Liberated'
-    OTHERS_COMMING = 'Someone\'s comming'
     OTHERS_LEAVED = 'Someone\'s gone'
     
 class BotDebug(Enum):

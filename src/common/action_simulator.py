@@ -7,9 +7,11 @@ from src.common import utils, config
 from src.common.usb import USB
 from src.common.image_template import *
 from src.modules.capture import capture
+import threading
+
 
 class ActionSimulator:
-    
+
     @staticmethod
     def setText(text):
         wc.OpenClipboard()
@@ -42,7 +44,7 @@ class ActionSimulator:
             config.enabled = False
         ActionSimulator.click_key('H', 0.5)
         ActionSimulator.click_key('H', 5)
-            
+
     @staticmethod
     def stop_game():
         config.enabled = False
@@ -52,33 +54,34 @@ class ActionSimulator:
         ActionSimulator.release_key('alt', 0.5)
         ActionSimulator.click_key('enter', 10)
         USB().consumer_sleep()
-        
+
     @staticmethod
     def potion_buff():
         USB().key_press('0')
         time.sleep(0.5)
         USB().key_press('-')
-        
+
     @staticmethod
-    def click_key(key, delay = 0):
+    def click_key(key, delay=0):
         USB().key_press(key)
         time.sleep(delay * (1 + 0.2 * random()))
-    
+
     @staticmethod
-    def press_key(key, delay = 0.05):
+    def press_key(key, delay=0.05):
         USB().key_down(key)
         time.sleep(delay * (1 + 0.2 * random()))
-        
+
     @staticmethod
-    def release_key(key, delay = 0.05):
+    def release_key(key, delay=0.05):
         USB().key_up(key)
         time.sleep(delay * (1 + 0.2 * random()))
-    
+
     @staticmethod
     def cancel_rune_buff():
         rune_buff = None
         for _ in range(5):
-            rune_buff = utils.multi_match(capture.frame[:200, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+            rune_buff = utils.multi_match(
+                capture.frame[:200, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
             if len(rune_buff) > 1:
                 break
             time.sleep(0.5)
@@ -86,7 +89,7 @@ class ActionSimulator:
         if not rune_buff or len(rune_buff) < 2:
             return
         rune_buff_pos = min(rune_buff, key=lambda p: p[0])
-        x = round(rune_buff_pos[0] + capture.window['left']) - 35
+        x = round(rune_buff_pos[0] + capture.window['left']) + 15
         y = round(rune_buff_pos[1] + capture.window['top']) + 10
         USB().mouse_abs_move(x, y)
         time.sleep(0.1)
@@ -94,3 +97,81 @@ class ActionSimulator:
         time.sleep(0.3)
         USB().mouse_right_up()
         time.sleep(0.1)
+
+    @staticmethod
+    def go_to_msroom(num: int):
+        ActionSimulator.click_key('f8')
+
+        ActionSimulator.change_channel(num=num, enable=False)
+
+    @staticmethod
+    def change_channel(num: int = 0, enable=True):
+        config.enabled = False
+        config.change_channel = True
+        config.rune_active = False
+        config.rune_pos = None
+        config.rune_closest_pos = None
+        threading.Timer(5, ActionSimulator._change_channel, (num, enable, )).start()
+
+    @staticmethod
+    def _change_channel(num: int = 0, enable=True) -> None:
+        key_settings = config.global_keys
+        change_key = key_settings['Change channel']
+
+        ActionSimulator.click_key(change_key)
+
+        if num > 0:
+            item_width = 50
+            item_height = 40
+            channel_1 = (0, 0)
+
+            row = (num - 1) // 10
+            col = (num - 1) % 10
+
+            x = channel_1[0] + col * item_width
+            y = channel_1[1] + row * item_height
+            USB().mouse_abs_move(x, y)
+            USB().mouse_left_click()
+        else:
+            ActionSimulator.click_key('down')
+            ActionSimulator.click_key('right')
+            ActionSimulator.click_key('enter')
+
+        frame = capture.frame
+        x = (frame.shape[1] - 260) // 2
+        y = (frame.shape[0] - 220) // 2
+        ok_btn = utils.multi_match(
+            frame[y:y+220, x:x+260], BUTTON_OK_TEMPLATE, threshold=0.9)
+        if ok_btn:
+            ActionSimulator.click_key('esc')
+            ActionSimulator._change_channel()
+            return
+
+        time = 0
+        while not config.lost_minimap:
+            time += 0.1
+            if time > 5:
+                ActionSimulator._change_channel()
+                return
+            time.sleep(0.1)
+
+        while config.lost_minimap:
+            time.sleep(0.1)
+
+        if not enable:
+            return
+
+        config.enabled = True
+
+        others = False
+        for i in range(5):
+            if config.stage_fright:
+                others = True
+                break
+            time.sleep(1)
+
+        if others:
+            ActionSimulator.change_channel()
+        else:
+            config.change_channel = False
+            config.enabled = True

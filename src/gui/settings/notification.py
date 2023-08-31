@@ -15,7 +15,7 @@ class Notification(LabelFrame):
         config.notice_level = int(self.notice_level.get())
 
         channel_row = Frame(self)
-        channel_row.pack(side=tk.TOP, fill='x', expand=True, pady=5, padx=5)
+        channel_row.pack(side=tk.TOP, expand=True, pady=5, padx=5)
 
         index = 0
         self.check_boxes = []

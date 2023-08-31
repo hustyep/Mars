@@ -10,13 +10,14 @@ import threading
 import numpy as np
 from random import random
 from mss import mss
+import os
+import pytesseract as tess
 import win32gui
 import win32ui
 import win32con
 import win32api
 from datetime import datetime, timedelta
 from src.common import config, settings
-from src.common.dll_helper import dll_helper
 
 def run_if_enabled(function):
     """
@@ -321,12 +322,19 @@ def timeStr() -> str:
     return now.strftime('%y%m%d%H%M%S%f')[:-3]
     # return time.strftime("%y%m%d%H%M%S%f", time.localtime())[:-3] 
 
+def make_dir(path):
+    folder = os.path.exists(path)
+    if not folder:
+        os.makedirs(path)
+
 def save_screenshot(frame=None, file_path=None, compress=True):
     if frame is None:
         frame = screenshot()
     
     if file_path is None:
         file_path = 'screenshot/tmp'
+    
+    make_dir(file_path)
     
     filename = f'{file_path}/maple_{timeStr()}'    
     if compress:
@@ -356,6 +364,14 @@ def screenshot():
     with mss() as sct:
         frame = np.array(sct.grab(window))
     return frame
+
+def image_to_str(image, ranges=None) -> str:
+    if ranges:
+        image = filter_color(image, ranges)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    text = tess.image_to_string(image_rgb, lang="eng")
+    content = text.replace("\f", "").split("\n")
+    return content
 
 #########################
 #        Capture        #
