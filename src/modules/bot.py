@@ -25,7 +25,7 @@ class Bot(Configurable, Observer):
     DEFAULT_CONFIG = {
         'Interact': 'space',
         'Feed pet': 'L',
-        'Change channel': 'page down',
+        'Change channel': 'PageDn',
         'Attack': 'd'
     }
 
@@ -36,10 +36,6 @@ class Bot(Configurable, Observer):
         config.global_keys = self.config
         notifier.attach(self)
 
-        # self.rune_active = False
-        # self.rune_pos = (0, 0)
-        # Location of the Point closest to rune
-        # self.rune_closest_pos = (0, 0)
         self.submodules = []
 
         config.routine = Routine()
@@ -112,22 +108,21 @@ class Bot(Configurable, Observer):
         press(self.config['Interact'], 1, down_time=0.2,
               up_time=0.8)        # Inherited from Configurable
 
-        # if not rune.located_arrows(capture.frame):
-        #     press(self.config['Interact'], 1, down_time=0.2)
-
         print('\nSolving rune:')
         inferences = []
         used_frame = None
+        find_solution = False
         for i in range(10):
             if not config.rune_active:
                 return
             frame = capture.frame
-            used_frame = frame
             solution = rune.show_magic(frame)
             if solution is not None:
                 print(', '.join(solution))
                 if solution in inferences:
                     print('Solution found, entering result')
+                    used_frame = frame
+                    find_solution = True
                     for arrow in solution:
                         press(arrow, 1, down_time=0.1)
                     break
@@ -135,8 +130,15 @@ class Bot(Configurable, Observer):
                     inferences.append(solution)
             time.sleep(0.1)
         time.sleep(0.3)
-        threading.Timer(0.001, self.check_rune_solve_result,
-                        (used_frame, )).start()
+
+        if find_solution:
+            threading.Timer(0.001, self.check_rune_solve_result,
+                            (used_frame, )).start()
+        else:
+            notifier.notifyRuneResolveFailed()
+            file_path = 'screenshot/rune_failed'
+            utils.save_screenshot(
+                frame=used_frame, file_path=file_path, compress=False)
 
     def check_rune_solve_result(self, used_frame):
         for _ in range(4):
