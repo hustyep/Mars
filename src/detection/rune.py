@@ -13,13 +13,15 @@ mpl.rcParams['axes.unicode_minus'] = False
 
 
 ARROW_TL_TEMPLATE = cv2.imread('assets/rune_top_left.png', 0)
+ARROW_BR_TEMPLATE = cv2.imread('assets/rune_br_template.png', 0)
+
 ARROW_RANGES1 = (
     ((1, 100, 100), (75, 255, 255)),
     ((0, 100, 200), (75, 255, 255))
 )
 
 ARROW_RANGES2 = (
-    ((1, 100, 200), (180, 255, 255)),
+    ((1, 160, 100), (77, 255, 255)),
     ((0, 100, 200), (180, 255, 255))
 )
 
@@ -32,12 +34,13 @@ RUNE_FAILED_TEXT_RANGES = (
 )
 
 RUNE_LIBERATED_TEXT_RANGES = (
-        ((50, 200, 46), (77, 255, 255)),
+    ((50, 200, 46), (77, 255, 255)),
 )
 RUNE_FAILED_TEXT_RANGES = (
     ((0, 43, 46), (10, 255, 255)),
     ((156, 43, 46), (180, 255, 255)),
 )
+
 
 def single_match(frame, template):
     """
@@ -77,18 +80,8 @@ def multi_match(frame, template, threshold=0.95):
     result = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
     locations = np.where(result >= threshold)
     locations = list(zip(*locations[::-1]))
-    results = []
-    src_copy = frame.copy()
-    for p in locations:
-        x = int(round(p[0] + template.shape[1] / 2))
-        y = int(round(p[1] + template.shape[0] / 2))
-        results.append((x, y))
+    return locations
 
-        cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
-                      p[1]+template.shape[0]), (0, 0, 225), 2)
-    # cv2.imshow("result", src_copy)
-    # cv2.waitKey()
-    return results
 
 def crop_arrow_area(frame):
     height, width, channels = frame.shape
@@ -97,16 +90,33 @@ def crop_arrow_area(frame):
     else:
         cropped = frame[120:height//2, width//4:3*width//4]
     canned = canny(cropped)
-    tl, _ = single_match(canned, ARROW_TL_TEMPLATE)
-    x = tl[0] + 10
-    y = tl[1] + 5
+    # cv2.imshow("canned", canned)
+    # cv2.imwrite("rune_br_template.png", canned)
+    # cv2.waitKey()
+    tl_result = multi_match(canned, ARROW_TL_TEMPLATE, threshold=0.3)
+    br_result = multi_match(canned, ARROW_BR_TEMPLATE, threshold=0.3)
+    x = 0
+    y = 0
+    if tl_result:
+        tl = tl_result[0]
+        x = tl[0] + 10
+        y = tl[1] + 5
+    elif br_result:
+        br = br_result[0]
+        x = br[0] - 358
+        y = br[1] - 42
+    else:
+        return None
+
+    # tl, _ = single_match(canned, ARROW_TL_TEMPLATE)
+
     w = 385
     h = 75
     cropped = cropped[y:y+h, x:x+w]
     return cropped
 
 
-def filter_color(img, ranges, high_v_img = None):
+def filter_color(img, ranges, high_v_img=None):
     """
     Returns a filtered copy of IMG that only contains pixels within the given RANGES.
     on the HSV scale.
@@ -173,54 +183,66 @@ def pre_filter(img, type: int):
         filtered = filter_color(img, ARROW_RANGES2)
     return filtered
 
+
 def solve_all_in_one(image, filter_type, blur, arc_filter):
-        begin = time.time()
+    begin = time.time()
 
-        cropped = crop_arrow_area(image)
-        all_process_images = [(cropped, "裁剪")]
-        
-        filtered = pre_filter(cropped, filter_type)
-        all_process_images.append((filtered, f"filter({filter_type})"))
+    cropped = crop_arrow_area(image)
+    if cropped is None:
+        print("定位失败")
+        return
+    all_process_images = [(cropped, "裁剪")]
 
-        processed_img, process_images = process_image(filtered, blur)
+    filtered = pre_filter(cropped, filter_type)
+    all_process_images.append((filtered, f"filter({filter_type})"))
 
-        result, resolve_images = resolve_arrow(processed_img, arc_filter)
-        end = time.time()
-        print(f"solution: {result}")
-        print("cast :", end - begin)
-        # show_multi_images(all_process_images + process_images + resolve_images)
+    processed_img, process_images = process_image(filtered, blur)
+
+    result, resolve_images = resolve_arrow(
+        processed_img, arc_filter, filter_type, blur)
+    end = time.time()
+    print(f"solution: {result}")
+    print("cast :", end - begin)
+
+    show_multi_images(all_process_images + process_images + resolve_images)
 
 
-def show_magic(image):
+def show_magic(image, debug=False):
     # blur: 70,40
     # arc_filter: 0.015,0.02
 
     cropped = crop_arrow_area(image)
+    if cropped is None:
+        return None
 
     filter_types = [1, 2, 3]
     begin = time.time()
     for filter_type in filter_types:
-        
+
         all_process_images = [(cropped, "裁剪")]
-        
+
         filtered = pre_filter(cropped, filter_type)
         all_process_images.append((filtered, f"filter({filter_type})"))
-                
-        blurs = [70, 40]
+
+        blurs = [10, 70, 40] if filter_type != 1 else [70, 40]
         for blur in blurs:
             processed_img, process_images = process_image(filtered, blur)
 
-            arc_filters = [0.02, 0.015]
+            arc_filters = [0.05, 0.02,
+                           0.015] if filter_type != 1 else [0.02, 0.015]
             for arc_filter in arc_filters:
-                result, resolve_images = resolve_arrow(processed_img, arc_filter)
-                
-                if len(result) == 4:
+                result, resolve_images = resolve_arrow(
+                    processed_img, arc_filter, filter_type, blur)
+
+                if debug:
                     print(f"solution: {result}")
-                    end = time.time()
-                    print("cast :", end - begin)
-                    # show_multi_images(all_process_images + process_images + resolve_images)
+                if len(result) == 4:
+                    if debug:
+                        end = time.time()
+                        print("cast :", end - begin)
+                        show_multi_images(
+                            all_process_images + process_images + resolve_images)
                     return result
-    
 
 
 def process_image(filtered, blur: int = 70):
@@ -245,15 +267,15 @@ def process_image(filtered, blur: int = 70):
     return img_canny, process_images
 
 
-def resolve_arrow(img_canny, arc_filter=0.015):
+def resolve_arrow(img_canny, arc_filter=0.015, filter_type=2, blur=10):
     tmp_imgs = []
-    
+
     contours, _ = cv2.findContours(
         img_canny, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     filtered_contours = []
     for contour in contours:
-        if 280 <= cv2.contourArea(contour) <= 800 and cv2.arcLength(contour, True) > 50:
+        if 350 <= cv2.contourArea(contour) <= 800 and cv2.arcLength(contour, True) > 60:
             needAdd = True
             for filtered_contour in filtered_contours:
                 if abs(filtered_contour[0][0][0] - contour[0][0][0]) <= 1:
@@ -264,7 +286,7 @@ def resolve_arrow(img_canny, arc_filter=0.015):
 
     temp = np.ones(img_canny.shape, np.uint8) * 0
     cv2.drawContours(temp, filtered_contours, -1, (255, 255, 255), 1)
-    tmp_imgs.append((temp, "filtered_contours"))
+    tmp_imgs.append((temp, f"filtered_contours({arc_filter})"))
 
     polygons = []
     for contour in filtered_contours:
@@ -275,18 +297,18 @@ def resolve_arrow(img_canny, arc_filter=0.015):
     cv2.drawContours(temp, polygons, -1, (255, 255, 255), 1)
     tmp_imgs.append((temp, "polygons"))
 
-
     if len(polygons) == 0:
         return [], []
-    
+
     result = []
     show = []
     for polygon in polygons:
         sides = []
         n_points = len(polygon)
         for i, vertex in enumerate(polygon):
+            j = (i + 1) % n_points
             p1 = vertex[0]
-            p2 = polygon[(i + 1) % n_points][0]
+            p2 = polygon[j][0]
             d = (p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2
             sides.append((p1, p2, d))
         sides = sorted(sides, key=lambda side: side[2], reverse=True)
@@ -294,6 +316,16 @@ def resolve_arrow(img_canny, arc_filter=0.015):
         p2 = sides[0][1]
         p3 = sides[1][0]
         p4 = sides[1][1]
+        if filter_type != 1 and arc_filter == 0.05:
+            for i in range(1, len(sides)):
+                side = sides[i]
+                if (side[0][0] == p1[0] and side[0][1] == p1[1]) or \
+                    (side[0][0] == p2[0] and side[0][1] == p2[1]) or \
+                    (side[1][0] == p1[0] and side[1][1] == p1[1]) or \
+                        (side[1][0] == p2[0] and side[1][1] == p2[1]):
+                    p3 = side[0]
+                    p4 = side[1]
+                    break
         distances = [[distance(p1, p3), 1],
                      [distance(p1, p4), 2],
                      [distance(p2, p3), 3],
@@ -321,7 +353,10 @@ def resolve_arrow(img_canny, arc_filter=0.015):
         result = np.array(result)[:, 0].tolist()
 
     temp = np.ones(img_canny.shape, np.uint8) * 0
-    cv2.drawContours(temp, np.array(show), -1, (255, 255, 255), 1)
+    for item in show:
+        cv2.line(temp, item[0][0], item[1][0], (255, 255, 255), 1)
+        cv2.line(temp, item[1][0], item[2][0], (255, 255, 255), 1)
+    # cv2.drawContours(temp, np.array(show), -1, (255, 255, 255), 1)
     tmp_imgs.append((temp, "arrows"))
 
     return result, tmp_imgs
@@ -355,7 +390,7 @@ def distance(p1, p2) -> int:
 
 def show_multi_images(images):
     # mpl.rcParams['figure.facecolor'] = 'black'
-    subplots_adjust(bottom=0,top=1,hspace=0.2)
+    subplots_adjust(bottom=0, top=1, hspace=0.2)
 
     for i, item in enumerate(images):
         img = item[0]
@@ -368,7 +403,8 @@ def show_multi_images(images):
         plt.axis('off')  # 不显示坐标轴
 
     plt.show()
-    
+
+
 def located_arrows(frame):
     height, width, _ = frame.shape
     if width < 1000:
@@ -380,6 +416,7 @@ def located_arrows(frame):
     cv2.waitKey(0)
     result = multi_match(canned, ARROW_TL_TEMPLATE, 0.3)
     return len(result) > 0
+
 
 def rune_liberate_result(frame):
     image = frame[50:400, 50:-50]
@@ -396,7 +433,7 @@ def rune_liberate_result(frame):
             print('\n')
             list = c.split(":")
             return list[0]
-    
+
     # image_failed = filter_color(image, RUNE_FAILED_TEXT_RANGES)
     # image_rgb = cv2.cvtColor(image_failed, cv2.COLOR_BGR2RGB)
     # text = tess.image_to_string(image_rgb, lang="eng")
@@ -405,8 +442,8 @@ def rune_liberate_result(frame):
     #     if len(c) > 0:
     #         print(c)
     #         return None
-    return None         
-    
+    return None
+
 
 # def preprocess(img):
 #     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
