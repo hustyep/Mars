@@ -105,14 +105,13 @@ def crop_arrow_area(frame):
         br = br_result[0]
         x = br[0] - 358
         y = br[1] - 42
-    else:
-        return None
 
     # tl, _ = single_match(canned, ARROW_TL_TEMPLATE)
 
-    w = 385
-    h = 75
-    cropped = cropped[y:y+h, x:x+w]
+    if x > 0 and y > 0:
+        w = 385
+        h = 75
+        cropped = cropped[y:y+h, x:x+w]
     return cropped
 
 
@@ -215,6 +214,10 @@ def show_magic(image, debug=False):
     if cropped is None:
         return None
 
+    h, w, _ = cropped.shape
+    if h == 0 or w == 0:
+        return None
+
     filter_types = [1, 2, 3]
     begin = time.time()
     for filter_type in filter_types:
@@ -224,12 +227,12 @@ def show_magic(image, debug=False):
         filtered = pre_filter(cropped, filter_type)
         all_process_images.append((filtered, f"filter({filter_type})"))
 
-        blurs = [10, 70, 40] if filter_type != 1 else [70, 40]
+        blurs = [10, 40, 70] if filter_type != 1 else [70, 40]
         for blur in blurs:
             processed_img, process_images = process_image(filtered, blur)
 
-            arc_filters = [0.05, 0.02,
-                           0.015] if filter_type != 1 else [0.02, 0.015]
+            arc_filters = [0.04, 0.02,
+                           0.01] if filter_type != 1 else [0.01, 0.02]
             for arc_filter in arc_filters:
                 result, resolve_images = resolve_arrow(
                     processed_img, arc_filter, filter_type, blur)
@@ -316,7 +319,7 @@ def resolve_arrow(img_canny, arc_filter=0.015, filter_type=2, blur=10):
         p2 = sides[0][1]
         p3 = sides[1][0]
         p4 = sides[1][1]
-        if filter_type != 1 and arc_filter == 0.05:
+        if filter_type != 1 and arc_filter > 0.02:
             for i in range(1, len(sides)):
                 side = sides[i]
                 if (side[0][0] == p1[0] and side[0][1] == p1[1]) or \
