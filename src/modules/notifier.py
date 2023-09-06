@@ -117,11 +117,26 @@ class Notifier(Subject, Observer):
         else:
             self.notice_time_record[BotFatal.WHITE_ROOM] = 0
 
+        # Check for dead
+        x = (frame.shape[1] - 450) // 2
+        y = (frame.shape[0] - 200) // 2
+        image = frame[y:y+200, x:x+450]
+        tombstone = utils.multi_match(
+            image, DEAD_TOBBSTONE_TEMPLATE, threshold=0.9)
+        if tombstone:
+            self._notify(BotFatal.DEAD)
+            ok_btn = utils.multi_match(
+            image, DEAD_OK_TEMPLATE, threshold=0.9)
+            if ok_btn:
+                USB().mouse_abs_move(ok_btn[0][0], ok_btn[0][1])
+                time.sleep(0.08)
+                USB().mouse_left_click()
+
         # Check for no movement
         if config.enabled and operator.eq(config.player_pos, self.player_pos):
             interval = int(time.time() - self.player_pos_updated_time)
-            if interval >= 60 and self.player_pos_updated_time:
-                self._notify(BotFatal.DEAD, arg=interval,
+            if interval >= 30 and self.player_pos_updated_time:
+                self._notify(BotError.NO_MOVEMENT, arg=interval,
                              info=f'duration:{interval}s')
         else:
             self.player_pos = config.player_pos

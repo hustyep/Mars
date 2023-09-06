@@ -319,16 +319,7 @@ def resolve_arrow(img_canny, arc_filter=0.015, filter_type=2, blur=10):
         p2 = sides[0][1]
         p3 = sides[1][0]
         p4 = sides[1][1]
-        if filter_type != 1 and arc_filter > 0.02:
-            for i in range(1, len(sides)):
-                side = sides[i]
-                if (side[0][0] == p1[0] and side[0][1] == p1[1]) or \
-                    (side[0][0] == p2[0] and side[0][1] == p2[1]) or \
-                    (side[1][0] == p1[0] and side[1][1] == p1[1]) or \
-                        (side[1][0] == p2[0] and side[1][1] == p2[1]):
-                    p3 = side[0]
-                    p4 = side[1]
-                    break
+
         distances = [[distance(p1, p3), 1],
                      [distance(p1, p4), 2],
                      [distance(p2, p3), 3],

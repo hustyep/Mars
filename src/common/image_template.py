@@ -2,10 +2,16 @@ import cv2
 from src.common.dll_helper import dll_helper
 from src.common import utils
 
+ASSETS_PATH = 'assets/'
+
 # The rune's buff 
-RUNE_BUFF_TEMPLATE = cv2.imread('assets/rune_buff_template.jpg', 0)
-BUTTON_OK_TEMPLATE = cv2.imread('assets/btn_ok_template.png', 0)
-END_TALK_TEMPLATE = cv2.imread('assets/end_talk_template.png', 0)
+RUNE_BUFF_TEMPLATE = cv2.imread(f'{ASSETS_PATH}rune_buff_template.jpg', 0)
+# Alert button
+BUTTON_OK_TEMPLATE = cv2.imread(f'{ASSETS_PATH}btn_ok_template.png', 0)
+END_TALK_TEMPLATE = cv2.imread(f'{ASSETS_PATH}end_talk_template.png', 0)
+# dead alert
+DEAD_TOBBSTONE_TEMPLATE = cv2.imread(f'{ASSETS_PATH}dead_tombstone_template.png', 0)
+DEAD_OK_TEMPLATE = cv2.imread(f'{ASSETS_PATH}dead_ok_template.png', 0)
 
 BIG_MOUSE_RANGES = (
     ((0, 180, 119), (4, 255, 187)),
