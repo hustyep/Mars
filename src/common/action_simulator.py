@@ -146,20 +146,22 @@ class ActionSimulator:
             ActionSimulator.click_key('right')
             ActionSimulator.click_key('enter')
 
+        while capture.frame is None:
+            time.sleep(0.1)
         frame = capture.frame
         x = (frame.shape[1] - 260) // 2
         y = (frame.shape[0] - 220) // 2
         ok_btn = utils.multi_match(
             frame[y:y+220, x:x+260], BUTTON_OK_TEMPLATE, threshold=0.9)
         if ok_btn:
-            ActionSimulator.click_key('esc')
+            ActionSimulator.click_key('enter')
             ActionSimulator._change_channel()
             return
 
-        time = 0
+        delay = 0
         while not config.lost_minimap:
-            time += 0.1
-            if time > 5:
+            delay += 0.1
+            if delay > 5:
                 ActionSimulator._change_channel()
                 return
             time.sleep(0.1)
