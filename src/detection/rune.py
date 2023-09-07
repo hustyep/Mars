@@ -227,12 +227,12 @@ def show_magic(image, debug=False):
         filtered = pre_filter(cropped, filter_type)
         all_process_images.append((filtered, f"filter({filter_type})"))
 
-        blurs = [10, 40, 70] if filter_type != 1 else [70, 40]
+        blurs = [10, 40] if filter_type != 1 else [70]
         for blur in blurs:
             processed_img, process_images = process_image(filtered, blur)
 
             arc_filters = [0.04, 0.02,
-                           0.01] if filter_type != 1 else [0.01, 0.02]
+                           0.01] if filter_type != 1 else [0.01]
             for arc_filter in arc_filters:
                 result, resolve_images = resolve_arrow(
                     processed_img, arc_filter, filter_type, blur)
