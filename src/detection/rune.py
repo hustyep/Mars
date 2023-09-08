@@ -232,7 +232,7 @@ def show_magic(image, debug=False):
             processed_img, process_images = process_image(filtered, blur)
 
             arc_filters = [0.04, 0.02,
-                           0.01] if filter_type != 1 else [0.01]
+                           0.01] if filter_type != 1 else [0.04]
             for arc_filter in arc_filters:
                 result, resolve_images = resolve_arrow(
                     processed_img, arc_filter, filter_type, blur)
@@ -319,7 +319,13 @@ def resolve_arrow(img_canny, arc_filter=0.015, filter_type=2, blur=10):
         p2 = sides[0][1]
         p3 = sides[1][0]
         p4 = sides[1][1]
-
+        if arc_filter > 0.02:
+            direct = polygon_direction(polygon)
+                        
+            if direct:
+                result.append([direct, p1[0]])
+            continue
+        
         distances = [[distance(p1, p3), 1],
                      [distance(p1, p4), 2],
                      [distance(p2, p3), 3],
@@ -355,6 +361,52 @@ def resolve_arrow(img_canny, arc_filter=0.015, filter_type=2, blur=10):
 
     return result, tmp_imgs
 
+def polygon_direction(polygon):
+    n_points = len(polygon)
+    direct = None
+    for i, vertex in enumerate(polygon):
+        j = (i + 1) % n_points
+        p1 = vertex[0]
+        p2 = polygon[j][0]
+        d = (p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2
+
+        if abs(p1[0] - p2[0]) <= 1 and d >= 9:
+            direct = 'left'
+            p = p2 if p1[0] < p2[0] else p1
+            for i, vertex in enumerate(polygon):
+                if vertex[0][0] > p[0]:
+                    direct = None
+                    break
+            if direct:
+                break
+            direct = 'right'
+            p = p2 if p1[0] > p2[0] else p1
+            for i, vertex in enumerate(polygon):
+                if vertex[0][0] < p[0]:
+                    direct = None
+                    break
+            if direct:
+                break
+        elif abs(p1[1] - p2[1]) <= 1 and d >= 9:
+            direct = 'down'
+            p = p1 if p1[1] < p2[1] else p2
+            for i, vertex in enumerate(polygon):
+                if vertex[0][1] < p[1]:
+                    direct = None
+                    break
+            if direct:
+                break
+            direct = 'up'
+            p = p2 if p1[1] < p2[1] else p1
+            for i, vertex in enumerate(polygon):
+                if vertex[0][1] > p[1]:
+                    direct = None
+                    break
+            if direct:
+                break
+            
+    
+    return direct
 
 def arrow_direction(p1, p2, p3) -> str:
     x1 = p1[0]
