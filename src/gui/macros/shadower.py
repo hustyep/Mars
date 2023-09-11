@@ -54,13 +54,14 @@ class Shadower(LabelFrame):
 
         if hotkey:
             if value:
-                keyboard.add_hotkey(hotkey, target)
+                keyboard.on_press_key(hotkey, target)
+                # keyboard.add_hotkey(hotkey, target)
             else:
-                keyboard.remove_hotkey(hotkey)
+                # keyboard.remove_hotkey(hotkey)
+                keyboard.unhook_key(hotkey)
 
     def meso_explosion(self):
-        time.sleep(0.2)
-        sim.click_key('d')
+        threading.Timer(0.2, sim.click_key, ('d', )).start()
 
     @utils.run_if_disabled
     def trickblade(self) -> None:

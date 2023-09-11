@@ -83,7 +83,7 @@ class Capture(Subject):
         self.recalibrate(auto=True)
 
     def recalibrate(self, auto=False):
-        if not config.enabled:
+        if not config.enabled and not config.change_channel:
             return
         # Calibrate screen capture
         self.hwnd = win32gui.FindWindow(None, "MapleStory")

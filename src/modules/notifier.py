@@ -262,10 +262,6 @@ class Notifier(Subject, Observer):
                 text = f'‼️[{event.value}] {info}'
                 image_path = utils.save_screenshot(frame=capture.frame)
                 self.send_message(text=text, image_path=image_path)
-                # time.sleep(1)
-                # for _ in range(3):
-                #     self.send_message(text=text)
-                #     time.sleep(1)
             elif event_type == BotError:
                 if config.notice_level < 2:
                     return

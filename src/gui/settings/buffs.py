@@ -47,6 +47,8 @@ class BuffSettings(Configurable):
         'Wealthy Potion': False,
         'Gold Potion': False,
         'Candied Apple': False,
+        'Legion Wealthy': False,
+        'Exp Coupon': False
     }
 
     def get(self, key):

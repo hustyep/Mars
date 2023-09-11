@@ -19,11 +19,17 @@ class Key:
     EPIC_ADVENTURE = '2'
     SHADOW_PARTNER = '3' 
 
-    # SPEED_INFUSION = '8'
-    # HOLY_SYMBOL = '4'
-    # SHARP_EYE = '5'
-    # COMBAT_ORDERS = '6'
-    # ADVANCED_BLESSING = '7'
+    FOR_THE_GUILD = '7'
+    HARD_HITTER = '8'
+
+    # Potion
+    EXP_POTION = '0'
+    WEALTH_POTION = "-"
+    GOLD_POTION = "="
+    GUILD_POTION = "9"
+    CANDIED_APPLE = '6'
+    LEGION_WEALTHY = ''
+    EXP_COUPON = ''
 
     # Skills
     CRUEL_STAB = 'f' 
@@ -47,9 +53,6 @@ def step(direction, target):
     Should not press any arrow keys, as those are handled by Mars.
     """
 
-    num_presses = 2
-    if direction == 'up' or direction == 'down':
-        num_presses = 1
     if config.stage_fright and direction != 'up' and utils.bernoulli(0.75):
         time.sleep(utils.rand_float(0.1, 0.3))
     d_y = target[1] - config.player_pos[1]
@@ -61,13 +64,11 @@ def step(direction, target):
     if direction == "up":
         MoveUp(abs(d_y)).execute()
     elif direction == "down":
-        press(Key.JUMP, 3)
+        press(Key.JUMP, 1, down_time=0.2, up_time=0.05)
+        time.sleep(0.8)
     else:
-        press(Key.FLASH_JUMP, num_presses, down_time=0.04, up_time=0.05)
+        press(Key.FLASH_JUMP, 2, down_time=0.04, up_time=0.05)
         CruelStabRandomDirection().execute()
-        time.sleep(0.05)
-        MesoExplosion().execute()
-        time.sleep(0.28)
 
 class Adjust(Command):
     """Fine-tunes player position using small movements."""
@@ -247,13 +248,14 @@ class MesoExplosion(Command):
     """Uses 'MesoExplosion' once."""
 
     def main(self):
-        press(Key.MESO_EXPLOSION, 1, up_time=0.05)
+        press(Key.MESO_EXPLOSION, 1, up_time=0.3)
 		
 class CruelStabRandomDirection(Command):
     """Uses 'CruelStab' once."""
 
     def main(self):
-        press(Key.CRUEL_STAB, 1, up_time=0.05)	
+        press(Key.CRUEL_STAB, 1, up_time=0.1)	
+        MesoExplosion().execute()
         
 class DarkFlare(Command):
     """
@@ -381,3 +383,124 @@ class SonicBlow(Command):
 
     def main(self):
         press(Key.SONIC_BLOW, 3)
+        
+class FOR_THE_GUILD(Command):
+    key = Key.FOR_THE_GUILD
+    cooldown = 3610
+    backswing = 0.1
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Guild Buff')
+        if not enabled:
+            return False
+
+        if time.time() - HARD_HITTER.castedTime <= 1800 and HARD_HITTER.castedTime > 0:
+            return False
+
+        return super().canUse(next_t)
+
+
+class HARD_HITTER(Command):
+    key = Key.HARD_HITTER
+    cooldown = 3610
+    backswing = 0.1
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Guild Buff')
+        if not enabled:
+            return False
+
+        if time.time() - FOR_THE_GUILD.castedTime <= 1800:
+            return False
+
+        return super().canUse(next_t)
+
+
+class EXP_POTION(Command):
+    key = Key.EXP_POTION
+    cooldown = 7250
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
+        if not enabled:
+            return False
+
+        return super().canUse(next_t)
+
+
+class WEALTH_POTION(Command):
+    key = Key.WEALTH_POTION
+    cooldown = 7250
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Wealthy Potion')
+        if not enabled:
+            return False
+
+        return super().canUse(next_t)
+
+
+class GOLD_POTION(Command):
+    key = Key.GOLD_POTION
+    cooldown = 1800
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
+        if not enabled:
+            return False
+
+        return super().canUse(next_t)
+
+
+class GUILD_POTION(Command):
+    key = Key.GUILD_POTION
+    cooldown = 1800
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
+        if not enabled:
+            return False
+
+        return super().canUse(next_t)
+
+
+class CANDIED_APPLE(Command):
+    key = Key.CANDIED_APPLE
+    cooldown = 1800
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
+        if not enabled:
+            return False
+
+        return super().canUse(next_t)
+
+
+class LEGION_WEALTHY(Command):
+    key = Key.LEGION_WEALTHY
+    cooldown = 1800
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Legion Wealthy')
+        if not enabled:
+            return False
+
+        return super().canUse(next_t)
+    
+class EXP_COUPON(Command):
+    key = Key.EXP_COUPON
+    cooldown = 1800
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Exp Coupon')
+        if not enabled:
+            return False
+
+        return super().canUse(next_t)
