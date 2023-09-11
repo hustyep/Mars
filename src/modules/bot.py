@@ -157,8 +157,8 @@ class Bot(Configurable, Observer):
             utils.save_screenshot(
                 frame=used_frame, file_path=file_path, compress=False)
 
-            if rune_type == 'Rune of Might':
-                ActionSimulator.cancel_rune_buff()
+            # if rune_type == 'Rune of Might':
+            #     ActionSimulator.cancel_rune_buff()
 
     def load_commands(self, file):
         try:
@@ -259,9 +259,9 @@ class Bot(Configurable, Observer):
                 case BotError.NO_MOVEMENT:
                     pass
                 case BotError.RUNE_ERROR:
-                    ActionSimulator.change_channel()
+                    ActionSimulator.go_home()
                 case BotError.OTHERS_STAY_OVER_120S:
-                    ActionSimulator.change_channel()
+                    ActionSimulator.go_home()
                 case (_):
                     pass
             # end match

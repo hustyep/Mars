@@ -8,7 +8,7 @@ from src.modules.notifier import notifier
 from src.modules.listener import listener
 from src.modules.gui import GUI
 from src.modules.chat_bot import chat_bot
-from src.modules.chat_capture import chat_capture
+# from src.modules.chat_capture import chat_capture
 
 print(platform.architecture())
 
@@ -24,9 +24,9 @@ capture.start()
 while not capture.ready:
     time.sleep(0.01)
     
-chat_capture.start()
-while not chat_capture.ready:
-    time.sleep(0.01)
+# chat_capture.start()
+# while not chat_capture.ready:
+#     time.sleep(0.01)
 
 notifier.start()
 while not notifier.ready:

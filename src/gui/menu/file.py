@@ -75,7 +75,7 @@ class File(MenuBarItem):
 
         for file in get_routines(command_name):
             self.load_routine_menu.add_command(label=file,
-                                               command=lambda: File._load_command_by_name(file))
+                                               command=lambda name=file: File._load_routine_by_name(name))
 
     @staticmethod
     @utils.run_if_disabled('\n[!] Cannot create a new routine while Mars is enabled')
@@ -141,6 +141,15 @@ class File(MenuBarItem):
         target = os.path.join(config.RESOURCES_DIR,
                               'command_books', name + '.py')
         File._load_command(target)
+        
+    def _load_routine_by_name(name):
+        command_path = config.file_setting.get('command_book_path')
+        command_name = os.path.basename(command_path)[:-3]
+        target = os.path.join(config.RESOURCES_DIR,
+                              'routines', command_name, name + '.csv')
+        config.file_setting.set('routine_path', target)
+        config.file_setting.save_config()
+        config.routine.load(target)
 
 
 def get_command_books_dir() -> str:

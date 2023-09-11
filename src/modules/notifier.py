@@ -11,6 +11,7 @@ import operator
 import win32gui
 import win32con
 import win32com.client as client
+import keyboard as kb
 
 from src.routine.components import Point
 from src.common import config, utils
@@ -201,7 +202,7 @@ class Notifier(Subject, Observer):
                 self.notifyOtherLeaved(others)
             self.others_detect_count = 0
             self.others_comming_time = 0
-        elif self.others_detect_count == 2400:
+        elif self.others_detect_count == 1500:
             self.others_detect_count += 1
             self.othersLongStayWarnning(others)
         elif self.others_detect_count == 700:
@@ -257,6 +258,7 @@ class Notifier(Subject, Observer):
 
             event_type = type(event)
             if event_type == BotFatal:
+                self._alert('siren')
                 time.sleep(20)
                 chat_bot.voice_call()
                 text = f'‼️[{event.value}] {info}'
@@ -335,17 +337,16 @@ class Notifier(Subject, Observer):
         Plays an alert to notify user of a dangerous event. Stops the alert
         once the key bound to 'Start/stop' is pressed.
         """
-        pass
-        # config.enabled = False
-        # config.listener.enabled = False
-        # self.mixer.load(get_alert_path(name))
-        # self.mixer.set_volume(volume)
-        # self.mixer.play(-1)
-        # while not kb.is_pressed(config.listener.config['Start/stop']):
-        #     time.sleep(0.1)
-        # self.mixer.stop()
-        # time.sleep(2)
-        # config.listener.enabled = True
+        config.enabled = False
+        config.listener.enabled = False
+        self.mixer.load(get_alert_path(name))
+        self.mixer.set_volume(volume)
+        self.mixer.play(-1)
+        while not kb.is_pressed(config.listener.config['Start/stop']):
+            time.sleep(0.1)
+        self.mixer.stop()
+        time.sleep(2)
+        config.listener.enabled = True
 
     def _ping(self, name, volume=0.5):
         """A quick notification for non-dangerous events."""

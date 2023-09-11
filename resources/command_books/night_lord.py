@@ -73,7 +73,7 @@ def step(direction, target):
         if d_y > settings.move_tolerance:
             print(f"step_down: {d_y}")
             key_down('down')
-            press_acc(Key.JUMP, 1, down_time=0.1,up_time=0.1)
+            press_acc(Key.JUMP, 1, down_time=0.2,up_time=0.08)
             key_up('down')
             time.sleep(0.6)
         return
@@ -227,7 +227,7 @@ class MoveUp(Command):
     def main(self):
         if self.dy <= 6:
             press(Key.JUMP)
-        if self.dy <= 20:
+        if self.dy <= 18:
             ShadowLeap(True if self.dy > 15 else False).execute()
         else:
             RopeLift(self.dy).execute()
@@ -263,7 +263,7 @@ class ShadowLeap(Command):
     def main(self):
         time.sleep(self.__class__.precast)
         if self.jump:
-            press_acc(Key.JUMP, down_time=0.05, up_time=0.03)
+            press_acc(Key.JUMP, down_time=0.05, up_time=0.06)
 
         press_acc(self.__class__.key, up_time=self.__class__.backswing)
 
@@ -273,7 +273,7 @@ class ShadowSurge(Command):
     key = Key.SHADOW_SURGE
     cooldown = 5
     precast = 0
-    backswing = 0
+    backswing = 0.2
 
 # 绳索
 class RopeLift(Command):
@@ -285,8 +285,10 @@ class RopeLift(Command):
         self.dy = abs(dy)
 
     def main(self):
-        if self.dy > 32:
-            press(Key.JUMP, up_time=0.12)
+        if self.dy >= 45:
+            press(Key.JUMP, up_time=0.2)
+        elif self.dy >= 32:
+            press(Key.JUMP, up_time=0.1)
         press_acc(self.__class__.key, up_time=self.dy * 0.07)
         if self.dy >= 32:
             time.sleep((self.dy - 32) * 0.05)
@@ -303,7 +305,7 @@ class DarkFlare(Command):
     no direction is specified.
     """
     cooldown = 120
-    backswing = 0.75
+    backswing = 0.4
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -412,7 +414,6 @@ class Buff(Command):
                       EPIC_ADVENTURE(),
                       MEMORIES(),
                       MAPLE_WARRIOR(),
-                      SHADOW_WALKER(),
                       THROW_BLASTING(),
                       FOR_THE_GUILD(),
                       HARD_HITTER(),
@@ -420,7 +421,8 @@ class Buff(Command):
                       WEALTH_POTION(),
                       GOLD_POTION(),
                       GUILD_POTION(),
-                      CANDIED_APPLE()]
+                      CANDIED_APPLE(),
+                      SHADOW_WALKER(),]
 
     def main(self):
         for buff in self.buffs:
@@ -509,7 +511,8 @@ class EXP_POTION(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
         if not enabled:
             return False
-        
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 33:
+            return False
         return super().canUse(next_t)  
         
 class WEALTH_POTION(Command):
@@ -533,7 +536,8 @@ class GOLD_POTION(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
         if not enabled:
             return False
-        
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 33:
+            return False
         return super().canUse(next_t)  
     
 class GUILD_POTION(Command):
@@ -545,7 +549,9 @@ class GUILD_POTION(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
         if not enabled:
             return False
-        
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 33:
+            return False
+
         return super().canUse(next_t)
 
 class CANDIED_APPLE(Command):
@@ -557,5 +563,6 @@ class CANDIED_APPLE(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
         if not enabled:
             return False
-        
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 33:
+            return False
         return super().canUse(next_t)    

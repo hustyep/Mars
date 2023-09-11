@@ -72,6 +72,8 @@ def multi_match(frame, template, threshold=0.95):
     :return:            An array of matches that exceed THRESHOLD.
     """
 
+    if template is None or frame is None:
+        return []
     if template.shape[0] > frame.shape[0] or template.shape[1] > frame.shape[1]:
         return []
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
