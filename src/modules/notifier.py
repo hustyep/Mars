@@ -69,6 +69,8 @@ class Notifier(Subject, Observer):
         self.rune_active_time = 0
         self.rune_alert_delay = 300         # 5 minutes
 
+        self.mining_time = 0
+
         self.black_screen_threshold = 0.9
         self.white_room_threshold = 0.2
 
@@ -127,7 +129,7 @@ class Notifier(Subject, Observer):
         if tombstone:
             self._notify(BotFatal.DEAD)
             ok_btn = utils.multi_match(
-            image, DEAD_OK_TEMPLATE, threshold=0.9)
+                image, DEAD_OK_TEMPLATE, threshold=0.9)
             if ok_btn:
                 USB().mouse_abs_move(ok_btn[0][0], ok_btn[0][1])
                 time.sleep(0.08)
@@ -248,6 +250,41 @@ class Notifier(Subject, Observer):
         elif len(rune_buff) == 0 and now - self.rune_active_time > self.rune_alert_delay and self.rune_active_time != 0:
             self.notifyRuneError(now - self.rune_active_time)
 
+    def check_minal(self, frame, minimap):
+        if frame is None or minimap is None:
+            config.minal_active = False
+            self.mining_time = 0
+            return
+
+        if config.player_pos is None:
+            return
+
+        if config.minal_active:
+            return
+
+        matches = utils.multi_match(
+            frame, MINAL_HEART_TEMPLATE)
+        if len(matches) == 0:
+            matches = utils.multi_match(frame, HERB_YELLOW_TEMPLATE)
+        if len(matches) == 0:
+            matches = utils.multi_match(frame, HERB_PURPLE_TEMPLATE)
+        if len(matches) > 0:
+            player = utils.multi_match(
+                frame, PLAYER_FULL_TEMPLATE, threshold=0.9)
+            if len(player) > 0:
+                player_full_pos = player[0]
+                minal_full_pos = matches[0]
+                dx_full = minal_full_pos[0] - player_full_pos[0]
+                dy_full = minal_full_pos[1] - player_full_pos[1] - 50
+                minal_pos = (
+                    config.player_pos[0] + round(dx_full / 15), config.player_pos[1] + round(dy_full / 15))
+                config.minal_pos = minal_pos
+                distances = list(
+                    map(distance_to_minal, config.routine.sequence))
+                index = np.argmin(distances)
+                config.minal_closest_pos = config.routine[index].location
+                config.minal_active = True
+                
     def _notify(self, event: Enum, arg=None, info: str = '') -> None:
         now = time.time()
         noticed_time = self.notice_time_record.get(event, 0)
@@ -308,7 +345,8 @@ class Notifier(Subject, Observer):
     def notifyOtherComing(self, num):
         duration = int(time.time() - self.others_comming_time)
         text_notice = f"duration:{duration}s, count:{num}"
-        self._notify(BotWarnning.OTHERS_COMMING, arg=duration, info=text_notice)
+        self._notify(BotWarnning.OTHERS_COMMING,
+                     arg=duration, info=text_notice)
 
     def notifyOtherLeaved(self, num):
         text_notice = f"count:{num}"
@@ -381,4 +419,16 @@ def distance_to_rune(point):
 
     if isinstance(point, Point):
         return utils.distance(config.rune_pos, point.location)
+    return float('inf')
+
+
+def distance_to_minal(point):
+    """
+    Calculates the distance from POINT to the minal.
+    :param point:   The position to check.
+    :return:        The distance from POINT to the minal, infinity if it is not a Point object.
+    """
+
+    if isinstance(point, Point):
+        return utils.distance(config.minal_pos, point.location)
     return float('inf')

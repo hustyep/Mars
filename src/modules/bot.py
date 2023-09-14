@@ -85,6 +85,10 @@ class Bot(Configurable, Observer):
                 if config.rune_active and isinstance(element, Point) \
                         and element.location == config.rune_closest_pos:
                     self._solve_rune()
+                elif config.minal_active and isinstance(element, Point) \
+                        and element.location == config.minal_closest_pos:
+                    self._mining()
+
                 element.execute()
                 config.routine.step()
             else:
@@ -159,6 +163,35 @@ class Bot(Configurable, Observer):
 
             # if rune_type == 'Rune of Might':
             #     ActionSimulator.cancel_rune_buff()
+
+    @utils.run_if_enabled
+    def _mining(self):
+        """
+        Moves to the position of the rune and solves the arrow-key puzzle.
+        :param sct:     The mss instance object with which to take screenshots.
+        :return:        None
+        """
+
+        move = config.command_book['move']
+        move(*config.rune_pos).execute()
+        adjust = config.command_book['adjust']
+        adjust(*config.minal_pos).execute()
+        time.sleep(0.5)
+        if not config.minal_active:
+            return
+        press(self.config['Interact'], 1, down_time=0.2,
+              up_time=0.8)        # Inherited from Configurable
+
+        print('\n mining:')
+        frame = capture.frame
+        solution = rune.show_magic(frame)
+        if solution is not None:
+            print(', '.join(solution))
+            print('Solution found, entering result')
+            for arrow in solution:
+                press(arrow, 1, down_time=0.1)
+        time.sleep(5)
+        config.minal_active = False
 
     def load_commands(self, file):
         try:

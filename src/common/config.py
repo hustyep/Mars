@@ -69,3 +69,8 @@ global_keys = None
 # change channel
 change_channel = False
 lost_minimap = True
+
+# Minal status
+minal_active = False
+minal_pos = None
+minal_closest_pos = None

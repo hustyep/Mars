@@ -97,3 +97,8 @@ BLUE_RANGES = (
 GRAY_RANGES = (
     ((0, 0, 46), (180, 43, 220)),
 )
+
+MINAL_HEART_TEMPLATE = cv2.imread('assets/minal_heart_template.png', 0)
+HERB_YELLOW_TEMPLATE = cv2.imread('assets/herb_yellow_template.png', 0)
+HERB_PURPLE_TEMPLATE = cv2.imread('assets/herb_purple_template.png', 0)
+PLAYER_FULL_TEMPLATE = cv2.imread('assets/player_sllee_template.png', 0)
