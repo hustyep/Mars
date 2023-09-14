@@ -48,7 +48,14 @@ class Minimap(LabelFrame):
                            utils.trans_point(rune_pos, ratio),
                            3,
                            (128, 0, 128),
-                           -1)
+                           1)
+
+            if config.minal_active:
+                cv2.circle(img,
+                           utils.trans_point(config.minal_pos, ratio),
+                           3,
+                           (255, 0, 0),
+                           1)
 
             # Draw the current path that the program is taking
             if config.enabled and len(path) > 1:

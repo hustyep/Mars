@@ -72,7 +72,7 @@ class Notifier(Subject, Observer):
         self.mining_time = 0
 
         self.black_screen_threshold = 0.9
-        self.white_room_threshold = 0.2
+        self.white_room_threshold = 0.25
 
         self.notice_time_record = {}
 
@@ -132,7 +132,7 @@ class Notifier(Subject, Observer):
             ok_btn = utils.multi_match(
                 image, DEAD_OK_TEMPLATE, threshold=0.9)
             if ok_btn:
-                USB().mouse_abs_move(ok_btn[0][0], ok_btn[0][1])
+                USB().mouse_abs_move(ok_btn[0][0] + x, ok_btn[0][1] + y)
                 time.sleep(0.08)
                 USB().mouse_left_click()
 
@@ -205,7 +205,7 @@ class Notifier(Subject, Observer):
                 self.notifyOtherLeaved(others)
             self.others_detect_count = 0
             self.others_comming_time = 0
-        elif self.others_detect_count == 1500:
+        elif self.others_detect_count == 1200:
             self.others_detect_count += 1
             self.othersLongStayWarnning(others)
         elif self.others_detect_count == 700:
@@ -271,14 +271,17 @@ class Notifier(Subject, Observer):
             matches = utils.multi_match(frame, HERB_YELLOW_TEMPLATE)
         if len(matches) == 0:
             matches = utils.multi_match(frame, HERB_PURPLE_TEMPLATE)
+        if len(matches) == 0:
+            matches = utils.multi_match(frame, MINAL_CRYSTAL_TEMPLATE)
         if len(matches) > 0:
+            self._notify(BotInfo.MINE_ACTIVE)
             player = utils.multi_match(
                 frame, PLAYER_FULL_TEMPLATE, threshold=0.9)
             if len(player) > 0:
                 player_full_pos = player[0]
                 minal_full_pos = matches[0]
                 dx_full = minal_full_pos[0] - player_full_pos[0]
-                dy_full = minal_full_pos[1] - player_full_pos[1] - 25
+                dy_full = minal_full_pos[1] - player_full_pos[1] + 20
                 minal_pos = (
                     player_pos[0] + round(dx_full / 15.0), player_pos[1] + round(dy_full / 15.0))
                 config.minal_pos = minal_pos

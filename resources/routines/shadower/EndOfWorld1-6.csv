@@ -1,0 +1,18 @@
+
+@, label=Summoning
+*, x=6, y=80, frequency=6, skip=False, adjust=False
+*, x=23, y=80, frequency=6, skip=False, adjust=True
+*, x=25, y=49, frequency=6, skip=False, adjust=True
+    DarkFlare, direction=right
+*, x=79, y=79, frequency=6, skip=False, adjust=True
+    ShadowVeil, direction=right
+*, x=131, y=79, frequency=6, skip=False, adjust=True
+*, x=131, y=39, frequency=6, skip=False, adjust=True
+    MesoExplosion
+    Wait, duration=0.1
+    ErdaShower, direction=left
+
+@, label=Bottom mobbing
+*, x=6, y=80, frequency=1, skip=False, adjust=False
+*, x=79, y=79, frequency=1, skip=False, adjust=False
+*, x=151, y=80, frequency=1, skip=False, adjust=False

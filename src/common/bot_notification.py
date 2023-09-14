@@ -24,6 +24,7 @@ class BotInfo(Enum):
     RUNE_ACTIVE = 'Rune Active'
     RUNE_LIBERATED = 'Rune Liberated'
     OTHERS_LEAVED = 'Someone\'s gone'
+    MINE_ACTIVE = 'Mine Active'
     
 class BotDebug(Enum):
     SCREENSHOT_FAILED = 'Screenshot Failed'

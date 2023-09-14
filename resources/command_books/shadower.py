@@ -11,14 +11,15 @@ from src.common.vkeys import press, key_down, key_up
 class Key:
     # Movement
     JUMP = 's'
-    FLASH_JUMP = 's'
+    FLASH_JUMP = ';'
     SHADOW_ASSAULT = 'g'
+    ROPE_LIFT = 'b'
 
     # Buffs
     GODDESS_BLESSING = '1'
-    EPIC_ADVENTURE = '2'
-    LAST_RESORT = '3'
-    MAPLE_WARRIOR = '4'
+    EPIC_ADVENTURE = ''
+    LAST_RESORT = '2'
+    MAPLE_WARRIOR = '3'
     SHADOW_WALKER = 'shift'
     THROW_BLASTING = 'v'
     FOR_THE_GUILD = '7'
@@ -39,7 +40,7 @@ class Key:
     SUDDEN_RAID = 'r'
     DARK_FLARE = 'w'
     SHADOW_VEIL = 'x'
-    # ARACHNID = 'h'
+    ARACHNID = 'h'
     ERDA_SHOWER = '`'
     TRICKBLADE = 'a'
     SLASH_SHADOW_FORMATION = 'c'
@@ -60,14 +61,16 @@ def step(direction, target):
     d_x = abs(target[0] - config.player_pos[0])
     d_y = target[1] - config.player_pos[1]
     if direction == "up":
-        MoveUp(abs(d_y)).execute()
+        MoveUp(dy=abs(d_y)).execute()
     elif direction == "down":
-        MoveDown(abs(d_y)).execute()
-    elif d_x > 10:
-        FlashJump(dx=d_x)
+        MoveDown(dy=abs(d_y)).execute()
+    elif d_x >= 26:
+        # FlashJump(dx=d_x)
+        press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
+        press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.04)
         CruelStabRandomDirection().execute()
     else:
-        time.sleep(0.02)
+        time.sleep(0.01)
 
 
 class Move(Command):
@@ -90,21 +93,20 @@ class Move(Command):
     def main(self):
         counter = self.max_steps
         path = config.layout.shortest_path(config.player_pos, self.target)
+        threshold = settings.move_tolerance / math.sqrt(2)
+
         for i, point in enumerate(path):
             toggle = True
             self.prev_direction = ''
             local_error = utils.distance(config.player_pos, point)
             global_error = utils.distance(config.player_pos, self.target)
 
-            if global_error <= settings.move_tolerance:
-                break
-
             while config.enabled and counter > 0 and \
                     local_error > settings.move_tolerance and \
                     global_error > settings.move_tolerance:
                 if toggle:
                     d_x = point[0] - config.player_pos[0]
-                    if abs(d_x) > settings.move_tolerance / math.sqrt(2):
+                    if abs(d_x) > threshold:
                         if d_x < 0:
                             key = 'left'
                         else:
@@ -119,8 +121,8 @@ class Move(Command):
                 else:
                     global_d_y = self.target[1] - config.player_pos[1]
                     d_y = point[1] - config.player_pos[1]
-                    if abs(global_d_y) > settings.move_tolerance / math.sqrt(2) and \
-                            abs(d_y) > settings.move_tolerance / math.sqrt(2):
+                    if abs(global_d_y) > threshold and \
+                            abs(d_y) > threshold:
                         if d_y < 0:
                             key = 'up'
                         else:
@@ -133,9 +135,11 @@ class Move(Command):
                         counter -= 1
                         if i < len(path) - 1:
                             time.sleep(0.05)
+                        if threshold > settings.adjust_tolerance:
+                            threshold -= 1
                 local_error = utils.distance(config.player_pos, point)
                 global_error = utils.distance(config.player_pos, self.target)
-                toggle = not toggle
+                toggle = abs(point[0] - config.player_pos[0]) > threshold
             if self.prev_direction:
                 key_up(self.prev_direction)
 
@@ -152,10 +156,10 @@ class Adjust(Command):
         counter = self.max_steps
         toggle = True
         error = utils.distance(config.player_pos, self.target)
+        threshold = settings.adjust_tolerance / math.sqrt(2)
         while config.enabled and counter > 0 and error > settings.adjust_tolerance:
             if toggle:
                 d_x = self.target[0] - config.player_pos[0]
-                threshold = settings.adjust_tolerance / math.sqrt(2)
                 if abs(d_x) > threshold:
                     walk_counter = 0
                     if d_x < 0:
@@ -175,11 +179,11 @@ class Adjust(Command):
                     counter -= 1
             else:
                 d_y = self.target[1] - config.player_pos[1]
-                if abs(d_y) > settings.adjust_tolerance / math.sqrt(2):
+                if abs(d_y) > threshold:
                     if d_y < 0:
-                        MoveUp(abs(d_y)).execute()
+                        MoveUp(dy=abs(d_y)).execute()
                     else:
-                        MoveDown(abs(d_y)).execute()
+                        MoveDown(dy=abs(d_y)).execute()
                     counter -= 1
             error = utils.distance(config.player_pos, self.target)
             toggle = not toggle
@@ -196,12 +200,17 @@ class MoveUp(Command):
         if self.dy <= 6:
             press(Key.JUMP)
         elif self.dy <= 24:
-            JumpUp(self.dy).execute()
-        else:
+            JumpUp(dy=self.dy).execute()
+        elif self.dy <= 40 and ShadowAssault().canUse():
             ShadowAssault('up', jump='True', distance=self.dy).execute()
-
+        else:
+            RopeLift(dy=self.dy).execute()
 
 class MoveDown(Command):
+    def __init__(self, dy: int = 20):
+        super().__init__(locals())
+        self.dy = abs(dy)
+            
     def main(self):
         key_down('down')
         press(Key.JUMP, 1, down_time=0.2, up_time=0.08)
@@ -238,10 +247,10 @@ class FlashJump(Command):
     def main(self):
         time.sleep(0.5)
         press(Key.JUMP, 1)
-        key_down(self.direction)
+        # key_down(self.direction)
         time.sleep(0.08)
         press(Key.FLASH_JUMP, self.time)
-        key_up(self.direction)
+        # key_up(self.direction)
         time.sleep(1.2)
 
 
@@ -251,13 +260,29 @@ class ShadowAssault(Command):
     to the current Layout if necessary.
     """
 
-    def __init__(self, direction, jump='False', distance=80):
+    backswing = 0.85
+    usable_times = 4
+    cooldown = 60
+
+    def __init__(self, direction='up', jump='False', distance=80):
         super().__init__(locals())
         self.direction = settings.validate_arrows(direction)
         self.jump = settings.validate_boolean(jump)
         self.distance = distance
+        
+    def canUse(self, next_t: float = 0) -> bool:
+
+        if self.__class__.usable_times > 0:
+            return True
+
+        cur_time = time.time()
+        if (cur_time + next_t - self.__class__.castedTime) > self.__class__.cooldown + self.__class__.backswing:
+            return True
+
+        return False
 
     def main(self):
+        time.sleep(0.1)
         if self.direction != 'up':
             key_down(self.direction)
             time.sleep(0.05)
@@ -268,12 +293,40 @@ class ShadowAssault(Command):
                 press(Key.JUMP, 1)
         if self.direction == 'up':
             key_down(self.direction)
-            time.sleep(0.05 if self.distance > 80 else 0.1)
+            time.sleep(0.2 if self.distance > 32 else 0.4)
+            
+        cur_time = time.time()
+        if (cur_time - self.__class__.castedTime) > self.__class__.cooldown + self.__class__.backswing:
+            self.__class__.castedTime = cur_time
+            self.__class__.usable_times = 3
+        else:
+            self.__class__.usable_times -= 1
         press(Key.SHADOW_ASSAULT)
         key_up(self.direction)
+        time.sleep(self.backswing)
+
+        
         if settings.record_layout:
             config.layout.add(*config.player_pos)
 
+
+# 绳索
+class RopeLift(Command):
+    key = Key.ROPE_LIFT
+    cooldown = 3
+
+    def __init__(self, dy: int = 20):
+        super().__init__(locals())
+        self.dy = abs(dy)
+
+    def main(self):
+        if self.dy >= 45:
+            press(Key.JUMP, up_time=0.2)
+        elif self.dy >= 32:
+            press(Key.JUMP, up_time=0.1)
+        press(self.__class__.key, up_time=self.dy * 0.07)
+        if self.dy >= 32:
+            time.sleep((self.dy - 32) * 0.05)
 
 class CruelStab(Command):
     """Attacks using 'CruelStab' in a given direction."""
@@ -303,15 +356,17 @@ class MesoExplosion(Command):
     """Uses 'MesoExplosion' once."""
 
     def main(self):
-        press(Key.MESO_EXPLOSION, 1, up_time=0.3)
+        press(Key.MESO_EXPLOSION, 1)
 
 
 class CruelStabRandomDirection(Command):
     """Uses 'CruelStab' once."""
+    backswing = 0.3
 
     def main(self):
-        press(Key.CRUEL_STAB, 1, up_time=0.1)
+        press(Key.CRUEL_STAB, 1, up_time=0.2)
         MesoExplosion().execute()
+        time.sleep(self.backswing)
 
 
 class DarkFlare(Command):
@@ -319,6 +374,8 @@ class DarkFlare(Command):
     Uses 'DarkFlare' in a given direction, or towards the center of the map if
     no direction is specified.
     """
+    cooldown = 120
+    backswing = 0.4
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -328,14 +385,14 @@ class DarkFlare(Command):
             self.direction = settings.validate_horizontal_arrows(direction)
 
     def main(self):
-        if self.direction:
-            press(self.direction, 1, down_time=0.1, up_time=0.05)
-        else:
-            if config.player_pos[0] > 0.5:
-                press('left', 1, down_time=0.1, up_time=0.05)
+        if self.direction is None:
+            if config.player_pos[0] > 75:
+                self.direction = 'left'
             else:
-                press('right', 1, down_time=0.1, up_time=0.05)
-        press(Key.DARK_FLARE, 3)
+                self.direction = 'right'
+                
+        press(self.direction)
+        press(Key.DARK_FLARE, 2, up_time=self.backswing)
 
 
 class ShadowVeil(Command):
@@ -343,6 +400,33 @@ class ShadowVeil(Command):
     Uses 'ShadowVeil' in a given direction, or towards the center of the map if
     no direction is specified.
     """
+    backswing = 0.8
+    
+    def __init__(self, direction=None):
+        super().__init__(locals())
+        if direction is None:
+            self.direction = direction
+        else:
+            self.direction = settings.validate_horizontal_arrows(direction)
+
+    def main(self):
+        if self.direction is None:
+            if config.player_pos[0] > 75:
+                self.direction = 'left'
+            else:
+                self.direction = 'right'
+                
+        press(self.direction)
+        press(Key.SHADOW_VEIL, 1, up_time=self.backswing)
+
+
+class ErdaShower(Command):
+    """
+    Use ErdaShower in a given direction, Placing ErdaFountain if specified. Adds the player's position
+    to the current Layout if necessary.
+    """
+    cooldown = 120
+    backswing = 0.8
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -353,60 +437,23 @@ class ShadowVeil(Command):
 
     def main(self):
         if self.direction:
-            press(self.direction, 1, down_time=0.1, up_time=0.05)
-        else:
-            if config.player_pos[0] > 0.5:
-                press('left', 1, down_time=0.1, up_time=0.05)
-            else:
-                press('right', 1, down_time=0.1, up_time=0.05)
-        press(Key.SHADOW_VEIL, 3)
-
-
-class ErdaShower(Command):
-    """
-    Use ErdaShower in a given direction, Placing ErdaFountain if specified. Adds the player's position
-    to the current Layout if necessary.
-    """
-
-    def __init__(self, direction, jump='False'):
-        super().__init__(locals())
-        self.direction = settings.validate_arrows(direction)
-        self.jump = settings.validate_boolean(jump)
-
-    def main(self):
-        num_presses = 3
-        time.sleep(0.05)
-        if self.direction in ['up', 'down']:
-            num_presses = 2
-        if self.direction != 'up':
-            key_down(self.direction)
-            time.sleep(0.05)
-        if self.jump:
-            if self.direction == 'down':
-                press(Key.JUMP, 3, down_time=0.1)
-            else:
-                press(Key.JUMP, 1)
-        if self.direction == 'up':
-            key_down(self.direction)
-            time.sleep(0.05)
-        press(Key.ERDA_SHOWER, num_presses)
-        key_up(self.direction)
-        if settings.record_layout:
-            config.layout.add(*config.player_pos)
+            press(self.direction)
+        key_down('down')
+        press(Key.ERDA_SHOWER)
+        key_up('down')
+        time.sleep(self.backswing)
 
 
 class SuddenRaid(Command):
-    """Uses 'SuddenRaid' once."""
-
-    def main(self):
-        press(Key.SUDDEN_RAID, 3)
+    key = Key.SUDDEN_RAID
+    cooldown = 30
+    backswing = 0.7
 
 
 class Arachnid(Command):
-    """Uses 'True Arachnid Reflection' once."""
-
-    def main(self):
-        press(Key.ARACHNID, 3)
+    key = Key.ARACHNID
+    cooldown = 250
+    backswing = 0.9
 
 
 class TrickBlade(Command):
@@ -458,7 +505,7 @@ class Buff(Command):
         super().__init__(locals())
         self.buffs = [GODDESS_BLESSING(),
                       LAST_RESORT(),
-                      EPIC_ADVENTURE(),
+                    #   EPIC_ADVENTURE(),
                       MAPLE_WARRIOR(),
                       FOR_THE_GUILD(),
                       HARD_HITTER(),

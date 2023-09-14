@@ -161,8 +161,8 @@ class Bot(Configurable, Observer):
             utils.save_screenshot(
                 frame=used_frame, file_path=file_path, compress=False)
 
-            # if rune_type == 'Rune of Might':
-            #     ActionSimulator.cancel_rune_buff()
+            if rune_type == 'Rune of Might':
+                ActionSimulator.cancel_rune_buff()
 
     @utils.run_if_enabled
     def _mining(self):
@@ -177,8 +177,11 @@ class Bot(Configurable, Observer):
         adjust = config.command_book['adjust']
         adjust(*config.minal_pos).execute()
         time.sleep(0.5)
-        if not config.minal_active:
-            return
+        if config.minal_pos[0] > config.player_pos[0]:
+            press('right')
+        elif config.minal_pos[0] < config.player_pos[0]:
+            press('left')
+
         press(self.config['Interact'], 1, down_time=0.2,
               up_time=0.8)        # Inherited from Configurable
 
