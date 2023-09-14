@@ -173,7 +173,7 @@ class Bot(Configurable, Observer):
         """
 
         move = config.command_book['move']
-        move(*config.rune_pos).execute()
+        move(*config.minal_pos).execute()
         adjust = config.command_book['adjust']
         adjust(*config.minal_pos).execute()
         time.sleep(0.5)

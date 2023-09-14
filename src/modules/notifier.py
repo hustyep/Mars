@@ -100,6 +100,7 @@ class Notifier(Subject, Observer):
             if config.enabled:
                 self.check_alert(frame)
                 self.check_rune_status(frame, minimap)
+                self.check_minal(frame, minimap)
             time.sleep(0.05)
 
     def check_exception(self, frame):
@@ -256,11 +257,13 @@ class Notifier(Subject, Observer):
             self.mining_time = 0
             return
 
-        if config.player_pos is None:
-            return
-
         if config.minal_active:
             return
+
+        player_min = utils.multi_match(minimap, PLAYER_TEMPLATE, threshold=0.8)
+        if len(player_min) == 0:
+            return
+        player_pos = player_min[0]
 
         matches = utils.multi_match(
             frame, MINAL_HEART_TEMPLATE)
@@ -275,9 +278,9 @@ class Notifier(Subject, Observer):
                 player_full_pos = player[0]
                 minal_full_pos = matches[0]
                 dx_full = minal_full_pos[0] - player_full_pos[0]
-                dy_full = minal_full_pos[1] - player_full_pos[1] - 50
+                dy_full = minal_full_pos[1] - player_full_pos[1] - 25
                 minal_pos = (
-                    config.player_pos[0] + round(dx_full / 15), config.player_pos[1] + round(dy_full / 15))
+                    player_pos[0] + round(dx_full / 15.0), player_pos[1] + round(dy_full / 15.0))
                 config.minal_pos = minal_pos
                 distances = list(
                     map(distance_to_minal, config.routine.sequence))
