@@ -12,6 +12,7 @@ import win32gui
 import win32con
 import win32com.client as client
 import keyboard as kb
+from enum import Enum
 
 from src.routine.components import Point
 from src.common import config, utils
@@ -22,7 +23,12 @@ from src.common.bot_notification import *
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
 
-
+class MineralType(Enum):
+    HEART = 'heart mineral'
+    CRYSTAL = 'crystal mineral'
+    HERB_YELLOW = 'yellow herb'
+    HERB_PURPLE = 'purple herb'
+    
 def exception_hook(exc_type, exc_value, tb):
     print('Traceback:')
     filename = tb.tb_frame.f_code.co_filename
@@ -265,23 +271,26 @@ class Notifier(Subject, Observer):
             return
         player_pos = player_min[0]
 
-        matches = utils.multi_match(
-            frame, MINAL_HEART_TEMPLATE)
+        matches = utils.multi_match(frame, MINAL_HEART_TEMPLATE)
+        mineral_type = MineralType.HEART
         if len(matches) == 0:
             matches = utils.multi_match(frame, HERB_YELLOW_TEMPLATE)
+            mineral_type = MineralType.HERB_YELLOW
         if len(matches) == 0:
             matches = utils.multi_match(frame, HERB_PURPLE_TEMPLATE)
+            mineral_type = MineralType.HERB_PURPLE
         if len(matches) == 0:
             matches = utils.multi_match(frame, MINAL_CRYSTAL_TEMPLATE)
+            mineral_type = MineralType.CRYSTAL
         if len(matches) > 0:
-            self._notify(BotInfo.MINE_ACTIVE)
+            self._notify(BotInfo.MINE_ACTIVE, info=mineral_type.value)
             player = utils.multi_match(
                 frame, PLAYER_FULL_TEMPLATE, threshold=0.9)
             if len(player) > 0:
                 player_full_pos = player[0]
                 minal_full_pos = matches[0]
                 dx_full = minal_full_pos[0] - player_full_pos[0]
-                dy_full = minal_full_pos[1] - player_full_pos[1] + 20
+                dy_full = minal_full_pos[1] - player_full_pos[1] + (30 if mineral_type == MineralType.HEART else 25)
                 minal_pos = (
                     player_pos[0] + round(dx_full / 15.0), player_pos[1] + round(dy_full / 15.0))
                 config.minal_pos = minal_pos
