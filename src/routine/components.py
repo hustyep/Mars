@@ -67,8 +67,8 @@ class Point(Component):
         self.x = int(x)
         self.y = int(y)
         self.location = (self.x, self.y)
-        self.frequency = settings.validate_nonnegative_int(frequency)
-        self.counter = int(settings.validate_boolean(skip))
+        self.frequency = settings.validate_nonnegative_float(frequency)
+        self.counter = (time.time() + 14) if settings.validate_boolean(skip) else 0
         self.adjust = settings.validate_boolean(adjust)
         if not hasattr(self, 'commands'):       # Updating Point should not clear commands
             self.commands = []
@@ -76,7 +76,7 @@ class Point(Component):
     def main(self):
         """Executes the set of actions associated with this Point."""
 
-        if self.counter == 0:
+        if self.counter == 0 or time.time() - self.counter >= self.frequency:
             move = config.command_book['move']
             move(*self.location).execute()
             if self.adjust:
@@ -84,7 +84,8 @@ class Point(Component):
                 adjust(*self.location).execute()
             for command in self.commands:
                 command.execute()
-        self._increment_counter()
+            self.counter = time.time()
+        # self._increment_counter()
 
     @utils.run_if_enabled
     def _increment_counter(self):

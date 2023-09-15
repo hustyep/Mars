@@ -267,6 +267,8 @@ class Routine:
                 if isinstance(obj, Label):
                     obj.set_index(len(self))
                     self.labels[obj.label] = obj
+                if isinstance(obj, Setting):
+                    obj.main()
                 return obj
             except (ValueError, TypeError) as e:
                 print(line_error + f"Found invalid arguments for '{c.__name__}':")

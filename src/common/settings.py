@@ -18,6 +18,16 @@ def validate_nonnegative_int(value):
         return int(value)
     raise ValueError(f"'{value}' is not a valid non-negative integer.")
 
+def validate_nonnegative_float(value):
+    """
+    Checks whether VALUE can be a valid non-negative integer.
+    :param value:   The string to check.
+    :return:        VALUE as an integer.
+    """
+
+    if float(value) > 0:
+        return float(value)
+    raise ValueError(f"'{value}' is not a valid non-negative float.")
 
 def validate_boolean(value):
     """

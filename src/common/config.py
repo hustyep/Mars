@@ -33,8 +33,8 @@ mail_password = 'KQJKXCWSVPGOWPEW'
 # 实际发给的收件人
 mail_to_addrs = '326143583@qq.com'
 
-telegram_apiToken = '6683915847:AAH1iOECS1y394jkvDCD2YhHLxIDIAmGGac'
-# telegram_apiToken = '6497654972:AAExWRJvmuswPb2MzbtHi8fIp140TdeDSQM'
+# telegram_apiToken = '6683915847:AAH1iOECS1y394jkvDCD2YhHLxIDIAmGGac'
+telegram_apiToken = '6497654972:AAExWRJvmuswPb2MzbtHi8fIp140TdeDSQM'
 
 telegram_chat_id = '805381440'
 
