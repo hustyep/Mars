@@ -1,13 +1,14 @@
 import tkinter as tk
 from src.gui.interfaces import LabelFrame, Frame
 from src.common.interfaces import Configurable
-
+from src.common import config
 
 class Auto(LabelFrame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, 'Auto', **kwargs)
 
         self.settings = AutoSettings('auto')
+        config.mining_enable = bool(self.settings.get("Mining"))
 
         row = Frame(self)
         row.pack(side=tk.TOP, expand=True, pady=5, padx=5)
@@ -26,8 +27,7 @@ class Auto(LabelFrame):
                 text=k,
                 command=self._on_change
             )
-            check.grid(row=index // 2, column=index %
-                       2, sticky=tk.W, padx=(index % 2) * 5)
+            check.grid(row=0, column=index, sticky=tk.W, padx=10)
             index += 1
             self.check_boxes.append(check)
             self.check_values.append(value)
@@ -38,12 +38,13 @@ class Auto(LabelFrame):
             value = self.check_values[i]
             self.settings.set(check.cget('text'), value.get())
         self.settings.save_config()
-
+        config.mining_enable = bool(self.settings.get("Mining"))
 
 class AutoSettings(Configurable):
     DEFAULT_CONFIG = {
         'MVP': False,
         'Ask': False,
+        'Mining': False,
     }
 
     def get(self, key):

@@ -258,6 +258,9 @@ class Notifier(Subject, Observer):
             self.notifyRuneError(now - self.rune_active_time)
 
     def check_minal(self, frame, minimap):
+        if not config.mining_enable:
+            return
+        
         if frame is None or minimap is None:
             config.minal_active = False
             self.mining_time = 0
@@ -284,8 +287,9 @@ class Notifier(Subject, Observer):
             mineral_type = MineralType.CRYSTAL
         if len(matches) > 0:
             self._notify(BotInfo.MINE_ACTIVE, info=mineral_type.value)
+            player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
             player = utils.multi_match(
-                frame, PLAYER_FULL_TEMPLATE, threshold=0.9)
+                frame, player_template, threshold=0.9)
             if len(player) > 0:
                 player_full_pos = player[0]
                 minal_full_pos = matches[0]
