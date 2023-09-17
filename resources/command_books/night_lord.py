@@ -95,6 +95,48 @@ def step(direction, target):
         
     # if direction == "left" or direction == "right":
 
+class AdjustX(Command):
+    def __init__(self, x, y, max_steps=10):
+        super().__init__(locals())
+        self.target = (int(x), int(y))
+        self.max_steps = settings.validate_nonnegative_int(max_steps)
+
+    def main(self):
+        counter = self.max_steps
+        d_x = self.target[0] - config.player_pos[0]
+        d_y = self.target[1] - config.player_pos[1]
+        threshold_x = 2
+        threshold_y = 5
+        while config.enabled and counter > 0 and (abs(d_x) > threshold_x or abs(d_y) > threshold_y):
+            if abs(d_x) > threshold_x:
+                walk_counter = 0
+                if d_x < 0:
+                    key_down('left')
+                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('left')
+                else:
+                    key_down('right')
+                    while config.enabled and d_x > threshold_x and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('right')
+                counter -= 1
+            if abs(d_y) > threshold_y:
+                if d_y < 0:
+                    MoveUp(dy=abs(d_y)).execute()
+                else:
+                    key_down('down')
+                    time.sleep(0.05)
+                    press(Key.JUMP, 1, down_time=0.1, up_time=0.1)
+                    key_up('down')
+                    time.sleep(1)                
+                    counter -= 1
+            d_x = self.target[0] - config.player_pos[0]
+            d_y = self.target[1] - config.player_pos[1]
 
 class Adjust(Command):
     """Fine-tunes player position using small movements."""

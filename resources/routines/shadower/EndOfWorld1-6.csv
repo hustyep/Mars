@@ -1,12 +1,8 @@
 $, target=move_tolerance, value=10
 
 @, label=Summoning
-*, x=6, y=80, frequency=60, skip=False, adjust=False
-*, x=23, y=80, frequency=60, skip=False, adjust=True
 *, x=25, y=49, frequency=60, skip=False, adjust=True
     DarkFlare, direction=right
-*, x=79, y=79, frequency=60, skip=False, adjust=True
-    ShadowVeil, direction=right
 *, x=131, y=79, frequency=60, skip=False, adjust=True
 *, x=131, y=39, frequency=60, skip=False, adjust=True
     MesoExplosion

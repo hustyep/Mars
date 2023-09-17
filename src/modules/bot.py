@@ -174,13 +174,17 @@ class Bot(Configurable, Observer):
 
         move = config.command_book['move']
         move(*config.minal_pos).execute()
-        adjust = config.command_book['adjust']
+        adjust = config.command_book['adjustx']
         adjust(*config.minal_pos).execute()
         time.sleep(0.5)
-        # if config.minal_pos[0] > config.player_pos[0]:
-        #     press('right')
-        # elif config.minal_pos[0] < config.player_pos[0]:
-        #     press('left')
+        if config.minal_pos[0] > config.player_pos[0]:
+            if config.player_direction == 'left':
+                press('left')
+                press('right')
+        elif config.minal_pos[0] < config.player_pos[0]:
+            if config.player_direction == 'right':
+                press('right')
+                press('left')
 
         press(self.config['Interact'], 1, down_time=0.2,
               up_time=0.8)        # Inherited from Configurable

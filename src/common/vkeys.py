@@ -2,7 +2,7 @@
 
 import time
 from random import random
-from src.common import utils
+from src.common import utils, config
 from src.common.usb import USB
 
 
@@ -122,6 +122,9 @@ def key_down(key):
         print(f"Invalid keyboard input: '{key}'.")
     else:
         USB().key_down(key)
+        
+    if key == 'left' or key == "right":
+        config.player_direction = key
 
 
 def key_up(key):
@@ -153,6 +156,9 @@ def press(key, n: int=1, down_time=0.05, up_time=0.05):
     :return:            None
     """
 
+    if key == 'left' or key == "right":
+        config.player_direction = key
+
     for _ in range(n):
         key_down(key)
         time.sleep(down_time * (1 + 0.2 * random()))
@@ -161,6 +167,9 @@ def press(key, n: int=1, down_time=0.05, up_time=0.05):
         
 @utils.run_if_enabled
 def press_acc(key, n: int=1, down_time=0.05, up_time=0.05):
+    if key == 'left' or key == "right":
+        config.player_direction = key
+    
     for _ in range(n):
         key_down(key)
         time.sleep(down_time)

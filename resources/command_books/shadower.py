@@ -136,7 +136,7 @@ class Move(Command):
                         if i < len(path) - 1:
                             time.sleep(0.05)
                         if threshold > settings.adjust_tolerance:
-                            threshold -= 1
+                            threshold -= 2
                 local_error = utils.distance(config.player_pos, point)
                 global_error = utils.distance(config.player_pos, self.target)
                 toggle = abs(point[0] - config.player_pos[0]) > threshold
@@ -144,49 +144,127 @@ class Move(Command):
                 key_up(self.prev_direction)
 
 
-class Adjust(Command):
-    """Fine-tunes player position using small movements."""
-
-    def __init__(self, x, y, max_steps=5):
+class AdjustX(Command):
+    def __init__(self, x, y, max_steps=10):
         super().__init__(locals())
         self.target = (int(x), int(y))
         self.max_steps = settings.validate_nonnegative_int(max_steps)
 
     def main(self):
         counter = self.max_steps
-        toggle = True
-        error = utils.distance(config.player_pos, self.target)
-        threshold = settings.adjust_tolerance / math.sqrt(2)
-        while config.enabled and counter > 0 and error > settings.adjust_tolerance:
-            if toggle:
-                d_x = self.target[0] - config.player_pos[0]
-                if abs(d_x) > threshold:
-                    walk_counter = 0
-                    if d_x < 0:
-                        key_down('left')
-                        while config.enabled and d_x < -1 * threshold and walk_counter < 60:
-                            time.sleep(0.05)
-                            walk_counter += 1
-                            d_x = self.target[0] - config.player_pos[0]
-                        key_up('left')
-                    else:
-                        key_down('right')
-                        while config.enabled and d_x > threshold and walk_counter < 60:
-                            time.sleep(0.05)
-                            walk_counter += 1
-                            d_x = self.target[0] - config.player_pos[0]
-                        key_up('right')
-                    counter -= 1
-            else:
-                d_y = self.target[1] - config.player_pos[1]
-                if abs(d_y) > threshold:
-                    if d_y < 0:
-                        MoveUp(dy=abs(d_y)).execute()
-                    else:
-                        MoveDown(dy=abs(d_y)).execute()
-                    counter -= 1
-            error = utils.distance(config.player_pos, self.target)
-            toggle = not toggle
+        d_x = self.target[0] - config.player_pos[0]
+        d_y = self.target[1] - config.player_pos[1]
+        threshold_x = 2
+        threshold_y = 5
+        while config.enabled and counter > 0 and (abs(d_x) > threshold_x or abs(d_y) > threshold_y):
+            if abs(d_x) > threshold_x:
+                walk_counter = 0
+                if d_x < 0:
+                    key_down('left')
+                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('left')
+                else:
+                    key_down('right')
+                    while config.enabled and d_x > threshold_x and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('right')
+                counter -= 1
+            if abs(d_y) > threshold_y:
+                if d_y < 0:
+                    MoveUp(dy=abs(d_y)).execute()
+                else:
+                    MoveDown(dy=abs(d_y)).execute()
+                counter -= 1
+            d_x = self.target[0] - config.player_pos[0]
+            d_y = self.target[1] - config.player_pos[1]
+
+class Adjust(Command):
+    def __init__(self, x, y, max_steps=6):
+        super().__init__(locals())
+        self.target = (int(x), int(y))
+        self.max_steps = settings.validate_nonnegative_int(max_steps)
+
+    def main(self):
+        counter = self.max_steps
+        d_x = self.target[0] - config.player_pos[0]
+        d_y = self.target[1] - config.player_pos[1]
+        threshold = 2
+        while config.enabled and counter > 0 and (abs(d_x) > threshold or abs(d_y) > threshold):
+            if abs(d_x) > threshold:
+                walk_counter = 0
+                if d_x < 0:
+                    key_down('left')
+                    while config.enabled and d_x < -1 * threshold and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('left')
+                else:
+                    key_down('right')
+                    while config.enabled and d_x > threshold and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('right')
+                counter -= 1
+            if abs(d_y) > threshold:
+                if d_y < 0:
+                    MoveUp(dy=abs(d_y)).execute()
+                else:
+                    MoveDown(dy=abs(d_y)).execute()
+                counter -= 1
+            d_x = self.target[0] - config.player_pos[0]
+            d_y = self.target[1] - config.player_pos[1]
+
+            
+# class Adjust(Command):
+#     """Fine-tunes player position using small movements."""
+
+#     def __init__(self, x, y, max_steps=5):
+#         super().__init__(locals())
+#         self.target = (int(x), int(y))
+#         self.max_steps = settings.validate_nonnegative_int(max_steps)
+
+#     def main(self):
+#         counter = self.max_steps
+#         toggle = True
+#         error = utils.distance(config.player_pos, self.target)
+#         threshold = settings.adjust_tolerance / math.sqrt(2)
+#         while config.enabled and counter > 0 and error > settings.adjust_tolerance:
+#             if toggle:
+#                 d_x = self.target[0] - config.player_pos[0]
+#                 if abs(d_x) > threshold:
+#                     walk_counter = 0
+#                     if d_x < 0:
+#                         key_down('left')
+#                         while config.enabled and d_x < -1 * threshold and walk_counter < 60:
+#                             time.sleep(0.05)
+#                             walk_counter += 1
+#                             d_x = self.target[0] - config.player_pos[0]
+#                         key_up('left')
+#                     else:
+#                         key_down('right')
+#                         while config.enabled and d_x > threshold and walk_counter < 60:
+#                             time.sleep(0.05)
+#                             walk_counter += 1
+#                             d_x = self.target[0] - config.player_pos[0]
+#                         key_up('right')
+#                     counter -= 1
+#             else:
+#                 d_y = self.target[1] - config.player_pos[1]
+#                 if abs(d_y) > threshold:
+#                     if d_y < 0:
+#                         MoveUp(dy=abs(d_y)).execute()
+#                     else:
+#                         MoveDown(dy=abs(d_y)).execute()
+#                     counter -= 1
+#             error = utils.distance(config.player_pos, self.target)
+#             toggle = not toggle
 
 # y轴移动
 
@@ -198,7 +276,7 @@ class MoveUp(Command):
 
     def main(self):
         if self.dy <= 6:
-            press(Key.JUMP)
+            press(Key.JUMP, up_time=1)
         elif self.dy <= 24:
             JumpUp(dy=self.dy).execute()
         elif self.dy <= 40 and ShadowAssault().canUse():
@@ -230,7 +308,7 @@ class JumpUp(Command):
         time.sleep(0.06 if self.dy >= 20 else 0.1)
         press(Key.FLASH_JUMP, 1)
         key_up('up')
-        time.sleep(1.2)
+        time.sleep(1.5)
 
 
 class FlashJump(Command):
@@ -326,7 +404,7 @@ class RopeLift(Command):
             press(Key.JUMP, up_time=0.1)
         press(self.__class__.key, up_time=self.dy * 0.07)
         if self.dy >= 32:
-            time.sleep((self.dy - 32) * 0.05)
+            time.sleep((self.dy - 32) * 0.03)
 
 class CruelStab(Command):
     """Attacks using 'CruelStab' in a given direction."""
