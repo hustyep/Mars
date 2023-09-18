@@ -78,7 +78,7 @@ class CommandBook(Configurable):
 
         # Check if required commands have been implemented and overridden
         required_found = True
-        for command in (components.Buff,):
+        for command in (components.Buff, components.Potion, components.MoveUp, components.MoveDown):
             name = command.__name__.lower()
             if name not in new_cb:
                 required_found = False
@@ -87,7 +87,7 @@ class CommandBook(Configurable):
 
         # Look for overridden movement commands
         movement_found = True
-        for command in (components.Move, components.Adjust):
+        for command in (components.Move, components.Adjust, components.AdjustX):
             name = command.__name__.lower()
             if name not in new_cb:
                 movement_found = False
