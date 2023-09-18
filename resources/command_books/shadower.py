@@ -28,11 +28,11 @@ class Key:
     # Potion
     EXP_POTION = '0'
     WEALTH_POTION = "-"
-    GOLD_POTION = "="
+    GOLD_POTION = ''
     GUILD_POTION = "9"
-    CANDIED_APPLE = '6'
-    LEGION_WEALTHY = ''
-    EXP_COUPON = ''
+    CANDIED_APPLE = '5'
+    LEGION_WEALTHY = '='
+    EXP_COUPON = '6'
 
     # Skills
     CRUEL_STAB = 'f'
@@ -430,12 +430,12 @@ class MesoExplosion(Command):
     """Uses 'MesoExplosion' once."""
 
     def main(self):
-        press(Key.MESO_EXPLOSION, 1)
+        press(Key.MESO_EXPLOSION)
 
 
 class CruelStabRandomDirection(Command):
     """Uses 'CruelStab' once."""
-    backswing = 0.3
+    backswing = 0.25
 
     def main(self):
         press(Key.CRUEL_STAB, 1, up_time=0.2)
@@ -579,16 +579,16 @@ class Buff(Command):
         super().__init__(locals())
         self.buffs = [GODDESS_BLESSING(),
                       LAST_RESORT(),
-                    #   EPIC_ADVENTURE(),
                       MAPLE_WARRIOR(),
                       FOR_THE_GUILD(),
                       HARD_HITTER(),
                       EXP_POTION(),
-                      CANDIED_APPLE(),
                       WEALTH_POTION(),
                       GOLD_POTION(),
                       GUILD_POTION(),
-                      SHADOW_WALKER(),]
+                      CANDIED_APPLE(),
+                      SHADOW_WALKER(),
+                      ]
 
     def main(self):
         for buff in self.buffs:
@@ -668,7 +668,7 @@ class EXP_POTION(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
         if not enabled:
             return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 33:
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
             return False
         return super().canUse(next_t)
 
@@ -695,7 +695,7 @@ class GOLD_POTION(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
         if not enabled:
             return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 33:
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
             return False
         return super().canUse(next_t)
 
@@ -709,7 +709,7 @@ class GUILD_POTION(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
         if not enabled:
             return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 33:
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
             return False
 
         return super().canUse(next_t)
@@ -724,6 +724,32 @@ class CANDIED_APPLE(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
         if not enabled:
             return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 33:
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
+            return False
+        return super().canUse(next_t)
+
+class LEGION_WEALTHY(Command):
+    key = Key.LEGION_WEALTHY
+    cooldown = 1800
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Legion Wealthy')
+        if not enabled:
+            return False
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
+            return False
+        return super().canUse(next_t)
+    
+class EXP_COUPON(Command):
+    key = Key.EXP_COUPON
+    cooldown = 1800
+    backswing = 0
+
+    def canUse(self, next_t: float = 0) -> bool:
+        enabled = config.gui.settings.buffs.buff_settings.get('Exp Coupon')
+        if not enabled:
+            return False
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
             return False
         return super().canUse(next_t)
