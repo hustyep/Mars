@@ -379,7 +379,7 @@ class AdjustX(Command):
         d_x = self.target[0] - config.player_pos[0]
         d_y = self.target[1] - config.player_pos[1]
         threshold_x = 2
-        threshold_y = 6
+        threshold_y = 5
         while config.enabled and counter > 0 and (abs(d_x) > threshold_x or abs(d_y) > threshold_y):
             if abs(d_x) > threshold_x:
                 walk_counter = 0

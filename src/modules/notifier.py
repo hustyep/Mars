@@ -291,10 +291,19 @@ class Notifier(Subject, Observer):
             player = utils.multi_match(
                 frame, player_template, threshold=0.9)
             if len(player) > 0:
-                player_full_pos = player[0]
                 minal_full_pos = matches[0]
+                if mineral_type == HERB_YELLOW_TEMPLATE:
+                    minal_full_pos = (minal_full_pos[0] - 18, minal_full_pos[1] - 40)
+                elif mineral_type == HERB_PURPLE_TEMPLATE:
+                    minal_full_pos = (minal_full_pos[0] - 18, minal_full_pos[1] - 10)
+                elif mineral_type == MINAL_CRYSTAL_TEMPLATE:
+                    minal_full_pos = (minal_full_pos[0] - 16, minal_full_pos[1] - 50)
+                elif mineral_type == MINAL_HEART_TEMPLATE:
+                    minal_full_pos = (minal_full_pos[0], minal_full_pos[1])
+
+                player_full_pos = player[0]
                 dx_full = minal_full_pos[0] - player_full_pos[0]
-                dy_full = minal_full_pos[1] - player_full_pos[1] + (55 if mineral_type == MineralType.HEART else 30)
+                dy_full = minal_full_pos[1] - (player_full_pos[1] - 100)
                 minal_pos = (
                     player_pos[0] + round(dx_full / 15.0), player_pos[1] + round(dy_full / 15.0))
                 config.minal_pos = minal_pos
