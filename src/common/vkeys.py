@@ -109,6 +109,8 @@ KEY_MAP = {
 #################################
 #           Functions           #
 #################################
+
+
 @utils.run_if_enabled
 def key_down(key):
     """
@@ -122,7 +124,7 @@ def key_down(key):
         print(f"Invalid keyboard input: '{key}'.")
     else:
         USB().key_down(key)
-        
+
     if key == 'left' or key == "right":
         config.player_direction = key
 
@@ -141,12 +143,13 @@ def key_up(key):
     else:
         USB().key_up(key)
 
+
 def releaseAll():
     USB().key_release()
 
 
 @utils.run_if_enabled
-def press(key, n: int=1, down_time=0.05, up_time=0.05):
+def press(key, n: int = 1, down_time=0.05, up_time=0.05):
     """
     Presses KEY N times, holding it for DOWN_TIME seconds, and releasing for UP_TIME seconds.
     :param key:         The keyboard input to press.
@@ -156,6 +159,11 @@ def press(key, n: int=1, down_time=0.05, up_time=0.05):
     :return:            None
     """
 
+    key = key.lower()
+    if key not in KEY_MAP.keys():
+        print(f"Invalid keyboard input: '{key}'.")
+        return
+
     if key == 'left' or key == "right":
         config.player_direction = key
 
@@ -164,12 +172,18 @@ def press(key, n: int=1, down_time=0.05, up_time=0.05):
         time.sleep(down_time * (1 + 0.2 * random()))
         key_up(key)
         time.sleep(up_time * (1 + 0.2 * random()))
-        
+
+
 @utils.run_if_enabled
-def press_acc(key, n: int=1, down_time=0.05, up_time=0.05):
+def press_acc(key, n: int = 1, down_time=0.05, up_time=0.05):
+    key = key.lower()
+    if key not in KEY_MAP.keys():
+        print(f"Invalid keyboard input: '{key}'.")
+        return
+
     if key == 'left' or key == "right":
         config.player_direction = key
-    
+
     for _ in range(n):
         key_down(key)
         time.sleep(down_time)
@@ -177,6 +191,8 @@ def press_acc(key, n: int=1, down_time=0.05, up_time=0.05):
         time.sleep(up_time)
 
 # @utils.run_if_enabled
+
+
 def click(position, button='left'):
     """
     Simulate a mouse click with BUTTON at POSITION.
@@ -193,4 +209,3 @@ def click(position, button='left'):
             USB().mouse_left_click()
         else:
             USB().mouse_right_click()
-
