@@ -2,10 +2,10 @@ from enum import Enum, auto
 
 class BotFatal(Enum):
     WHITE_ROOM = 'White Room'
-    DEAD = 'Dead'
     CRASH = 'Crash'
     
 class BotError(Enum):
+    DEAD = 'Dead'
     LOST_WINDOW = 'Lost Window'
     LOST_MINI_MAP = 'Lost Minimap'
     LOST_PLAYER = 'Lost Player'

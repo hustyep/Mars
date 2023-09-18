@@ -134,7 +134,7 @@ class Notifier(Subject, Observer):
         tombstone = utils.multi_match(
             image, DEAD_TOBBSTONE_TEMPLATE, threshold=0.9)
         if tombstone:
-            self._notify(BotFatal.DEAD)
+            self._notify(BotError.DEAD)
             ok_btn = utils.multi_match(
                 image, DEAD_OK_TEMPLATE, threshold=0.9)
             if ok_btn:
@@ -294,7 +294,7 @@ class Notifier(Subject, Observer):
                 player_full_pos = player[0]
                 minal_full_pos = matches[0]
                 dx_full = minal_full_pos[0] - player_full_pos[0]
-                dy_full = minal_full_pos[1] - player_full_pos[1] + (55 if mineral_type == MineralType.HEART else 50)
+                dy_full = minal_full_pos[1] - player_full_pos[1] + (55 if mineral_type == MineralType.HEART else 30)
                 minal_pos = (
                     player_pos[0] + round(dx_full / 15.0), player_pos[1] + round(dy_full / 15.0))
                 config.minal_pos = minal_pos
