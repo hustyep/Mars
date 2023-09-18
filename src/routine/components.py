@@ -8,19 +8,24 @@ from src.common.vkeys import key_down, key_up, press, releaseAll, press_acc
 #################################
 #       Routine Components      #
 #################################
+
+
 class Component:
     id = 'Routine Component'
     PRIMITIVES = {int, str, bool, float}
 
     def __init__(self, *args, **kwargs):
         if len(args) > 1:
-            raise TypeError('Component superclass __init__ only accepts 1 (optional) argument: LOCALS')
+            raise TypeError(
+                'Component superclass __init__ only accepts 1 (optional) argument: LOCALS')
         if len(kwargs) != 0:
-            raise TypeError('Component superclass __init__ does not accept any keyword arguments')
+            raise TypeError(
+                'Component superclass __init__ does not accept any keyword arguments')
         if len(args) == 0:
             self.kwargs = {}
         elif type(args[0]) != dict:
-            raise TypeError("Component superclass __init__ only accepts arguments of type 'dict'.")
+            raise TypeError(
+                "Component superclass __init__ only accepts arguments of type 'dict'.")
         else:
             self.kwargs = args[0].copy()
             self.kwargs.pop('__class__')
@@ -36,7 +41,8 @@ class Component:
     def update(self, *args, **kwargs):
         """Updates this Component's constructor arguments with new arguments."""
 
-        self.__class__(*args, **kwargs)     # Validate arguments before actually updating values
+        # Validate arguments before actually updating values
+        self.__class__(*args, **kwargs)
         self.__init__(*args, **kwargs)
 
     def info(self):
@@ -68,7 +74,8 @@ class Point(Component):
         self.y = int(y)
         self.location = (self.x, self.y)
         self.frequency = settings.validate_nonnegative_float(frequency)
-        self.counter = (time.time() + 14) if settings.validate_boolean(skip) else 0
+        self.counter = (
+            time.time() + 14) if settings.validate_boolean(skip) else 0
         self.adjust = settings.validate_boolean(adjust)
         if not hasattr(self, 'commands'):       # Updating Point should not clear commands
             self.commands = []
@@ -80,7 +87,8 @@ class Point(Component):
             move = config.command_book['move']
             move(*self.location).execute()
             if self.adjust:
-                adjust = config.command_book['adjust']      # TODO: adjust using step('up')?
+                # TODO: adjust using step('up')?
+                adjust = config.command_book['adjust']
                 adjust(*self.location).execute()
             for command in self.commands:
                 command.execute()
@@ -229,7 +237,7 @@ class Command(Component):
             if key != 'id':
                 result += f'\n        {key}={value}'
         return result
-    
+
     def canUse(self, next_t: float = 0) -> bool:
         if self.__class__.cooldown is None:
             return True
@@ -239,14 +247,14 @@ class Command(Component):
             return True
 
         return False
-    
+
     def main(self):
         if not self.canUse():
             return False
-        
+
         if self.__class__.key is None:
             return False
-        
+
         # print(f"cast skill: {self.key}")
         time.sleep(self.__class__.precast)
         self.__class__.castedTime = time.time()
@@ -264,7 +272,7 @@ class Move(Command):
         self.prev_direction = ''
 
     def _new_direction(self, new):
-        if new != 'up':
+        if new != 'up' and new != 'down':
             # 谨慎按上方向键
             key_down(new)
         if self.prev_direction and self.prev_direction != new:
@@ -274,62 +282,148 @@ class Move(Command):
     def main(self):
         counter = self.max_steps
         path = config.layout.shortest_path(config.player_pos, self.target)
+        threshold = settings.move_tolerance / math.sqrt(2)
+
         for i, point in enumerate(path):
-            toggle = True
             self.prev_direction = ''
             local_error = utils.distance(config.player_pos, point)
             global_error = utils.distance(config.player_pos, self.target)
-            
-            if global_error <= settings.move_tolerance:
-                break
+
             while config.enabled and counter > 0 and \
                     local_error > settings.move_tolerance and \
                     global_error > settings.move_tolerance:
-                if toggle:
-                    d_x = point[0] - config.player_pos[0]
-                    if abs(d_x) > settings.move_tolerance / math.sqrt(2):
-                        if d_x < 0:
-                            key = 'left'
-                        else:
-                            key = 'right'
-                        self._new_direction(key)
-                        step(key, point)
-                        if settings.record_layout:
-                            config.layout.add(*config.player_pos)
-                        counter -= 1
-                        if i < len(path) - 1:
-                            time.sleep(0.15)
+                d_x = point[0] - config.player_pos[0]
+                if abs(d_x) > threshold:
+                    if d_x < 0:
+                        key = 'left'
+                    else:
+                        key = 'right'
+                    self._new_direction(key)
+                    step(key, point)
+                    if settings.record_layout:
+                        config.layout.add(*config.player_pos)
+                    if i < len(path) - 1:
+                        time.sleep(0.15)
                 else:
                     global_d_y = self.target[1] - config.player_pos[1]
                     d_y = point[1] - config.player_pos[1]
-                    if abs(global_d_y) > settings.move_tolerance / math.sqrt(2) and \
-                        abs(d_y) > settings.move_tolerance / math.sqrt(2):
+                    if abs(global_d_y) > threshold and \
+                            abs(d_y) > threshold:
                         if d_y < 0:
                             key = 'up'
                         else:
                             key = 'down'
-                        print(f"move down: {local_error} | {global_error}" )
+                        print(f"move down: {local_error} | {global_error}")
                         self._new_direction(key)
                         step(key, point)
                         if settings.record_layout:
                             config.layout.add(*config.player_pos)
-                        counter -= 1
                         if i < len(path) - 1:
                             time.sleep(0.05)
+                counter -= 1
+                if threshold > settings.adjust_tolerance:
+                    threshold -= 1
                 local_error = utils.distance(config.player_pos, point)
                 global_error = utils.distance(config.player_pos, self.target)
-                toggle = not toggle
             if self.prev_direction:
                 key_up(self.prev_direction)
 
 
 class Adjust(Command):
-    """Fine-tunes player position using small movements."""
-
-    def __init__(self, x, y, max_steps=5):
+    def __init__(self, x, y, max_steps=6):
         super().__init__(locals())
         self.target = (int(x), int(y))
         self.max_steps = settings.validate_nonnegative_int(max_steps)
+
+    def main(self):
+        counter = self.max_steps
+        d_x = self.target[0] - config.player_pos[0]
+        d_y = self.target[1] - config.player_pos[1]
+        threshold = 2
+        while config.enabled and counter > 0 and (abs(d_x) > threshold or abs(d_y) > threshold):
+            if abs(d_x) > threshold:
+                walk_counter = 0
+                if d_x < 0:
+                    key_down('left')
+                    while config.enabled and d_x < -1 * threshold and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('left')
+                else:
+                    key_down('right')
+                    while config.enabled and d_x > threshold and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('right')
+                counter -= 1
+            elif abs(d_y) > threshold:
+                if d_y < 0:
+                    MoveUp(dy=abs(d_y)).execute()
+                else:
+                    MoveDown(dy=abs(d_y)).execute()
+                counter -= 1
+            d_x = self.target[0] - config.player_pos[0]
+            d_y = self.target[1] - config.player_pos[1]
+
+
+class AdjustX(Command):
+    def __init__(self, x, y, max_steps=10):
+        super().__init__(locals())
+        self.target = (int(x), int(y))
+        self.max_steps = settings.validate_nonnegative_int(max_steps)
+
+    def main(self):
+        counter = self.max_steps
+        d_x = self.target[0] - config.player_pos[0]
+        d_y = self.target[1] - config.player_pos[1]
+        threshold_x = 2
+        threshold_y = 6
+        while config.enabled and counter > 0 and (abs(d_x) > threshold_x or abs(d_y) > threshold_y):
+            if abs(d_x) > threshold_x:
+                walk_counter = 0
+                if d_x < 0:
+                    key_down('left')
+                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('left')
+                else:
+                    key_down('right')
+                    while config.enabled and d_x > threshold_x and walk_counter < 60:
+                        time.sleep(0.01)
+                        walk_counter += 1
+                        d_x = self.target[0] - config.player_pos[0]
+                    key_up('right')
+                counter -= 1
+            elif abs(d_y) > threshold_y:
+                if d_y < 0:
+                    MoveUp(dy=abs(d_y)).execute()
+                else:
+                    MoveDown(dy=abs(d_y)).execute()
+                counter -= 1
+            d_x = self.target[0] - config.player_pos[0]
+            d_y = self.target[1] - config.player_pos[1]
+
+
+class MoveUp(Command):
+    """Undefined 'moveup' command for the default command book."""
+
+    def main(self):
+        print(
+            "\n[!] 'MoveUp' command not implemented in current command book, aborting process.")
+        config.enabled = False
+
+
+class MoveDown(Command):
+    """Undefined 'movedown' command for the default command book."""
+
+    def main(self):
+        print(
+            "\n[!] 'MoveDown' command not implemented in current command book, aborting process.")
+        config.enabled = False
 
 
 def step(direction, target):
@@ -402,5 +496,15 @@ class Buff(Command):
     """Undefined 'buff' command for the default command book."""
 
     def main(self):
-        print("\n[!] 'Buff' command not implemented in current command book, aborting process.")
+        print(
+            "\n[!] 'Buff' command not implemented in current command book, aborting process.")
+        config.enabled = False
+
+
+class Potion(Command):
+    """Undefined 'potion' command for the default command book."""
+
+    def main(self):
+        print(
+            "\n[!] 'potion' command not implemented in current command book, aborting process.")
         config.enabled = False

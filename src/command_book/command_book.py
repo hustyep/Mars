@@ -15,6 +15,7 @@ class CommandBook(Configurable):
     def __init__(self, file):
         self.name = splitext(basename(file))[0]
         self.buff = components.Buff()
+        self.potion = components.Potion()
         self.DEFAULT_CONFIG = {}
         result = self.load_commands(file)
         if result is None:

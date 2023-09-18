@@ -73,197 +73,9 @@ def step(direction, target):
         time.sleep(0.01)
 
 
-class Move(Command):
-    """Moves to a given position using the shortest path based on the current Layout."""
-
-    def __init__(self, x, y, max_steps=15):
-        super().__init__(locals())
-        self.target = (int(x), int(y))
-        self.max_steps = settings.validate_nonnegative_int(max_steps)
-        self.prev_direction = ''
-
-    def _new_direction(self, new):
-        if new != 'up' and new != 'down':
-            # 谨慎按上方向键
-            key_down(new)
-        if self.prev_direction and self.prev_direction != new:
-            key_up(self.prev_direction)
-        self.prev_direction = new
-
-    def main(self):
-        counter = self.max_steps
-        path = config.layout.shortest_path(config.player_pos, self.target)
-        threshold = settings.move_tolerance / math.sqrt(2)
-
-        for i, point in enumerate(path):
-            self.prev_direction = ''
-            local_error = utils.distance(config.player_pos, point)
-            global_error = utils.distance(config.player_pos, self.target)
-
-            while config.enabled and counter > 0 and \
-                    local_error > settings.move_tolerance and \
-                    global_error > settings.move_tolerance:
-                d_x = point[0] - config.player_pos[0]
-                if abs(d_x) > threshold:
-                    if d_x < 0:
-                        key = 'left'
-                    else:
-                        key = 'right'
-                    self._new_direction(key)
-                    step(key, point)
-                    if settings.record_layout:
-                        config.layout.add(*config.player_pos)
-                    if i < len(path) - 1:
-                        time.sleep(0.15)
-                else:
-                    global_d_y = self.target[1] - config.player_pos[1]
-                    d_y = point[1] - config.player_pos[1]
-                    if abs(global_d_y) > threshold and \
-                            abs(d_y) > threshold:
-                        if d_y < 0:
-                            key = 'up'
-                        else:
-                            key = 'down'
-                        print(f"move down: {local_error} | {global_error}")
-                        self._new_direction(key)
-                        step(key, point)
-                        if settings.record_layout:
-                            config.layout.add(*config.player_pos)
-                        if i < len(path) - 1:
-                            time.sleep(0.05)
-                        if threshold > settings.adjust_tolerance:
-                            threshold -= 1
-                counter -= 1
-                local_error = utils.distance(config.player_pos, point)
-                global_error = utils.distance(config.player_pos, self.target)
-            if self.prev_direction:
-                key_up(self.prev_direction)
-
-
-class AdjustX(Command):
-    def __init__(self, x, y, max_steps=10):
-        super().__init__(locals())
-        self.target = (int(x), int(y))
-        self.max_steps = settings.validate_nonnegative_int(max_steps)
-
-    def main(self):
-        counter = self.max_steps
-        d_x = self.target[0] - config.player_pos[0]
-        d_y = self.target[1] - config.player_pos[1]
-        threshold_x = 2
-        threshold_y = 5
-        while config.enabled and counter > 0 and (abs(d_x) > threshold_x or abs(d_y) > threshold_y):
-            if abs(d_x) > threshold_x:
-                walk_counter = 0
-                if d_x < 0:
-                    key_down('left')
-                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 60:
-                        time.sleep(0.01)
-                        walk_counter += 1
-                        d_x = self.target[0] - config.player_pos[0]
-                    key_up('left')
-                else:
-                    key_down('right')
-                    while config.enabled and d_x > threshold_x and walk_counter < 60:
-                        time.sleep(0.01)
-                        walk_counter += 1
-                        d_x = self.target[0] - config.player_pos[0]
-                    key_up('right')
-                counter -= 1
-            if abs(d_y) > threshold_y:
-                if d_y < 0:
-                    MoveUp(dy=abs(d_y)).execute()
-                else:
-                    MoveDown(dy=abs(d_y)).execute()
-                counter -= 1
-            d_x = self.target[0] - config.player_pos[0]
-            d_y = self.target[1] - config.player_pos[1]
-
-class Adjust(Command):
-    def __init__(self, x, y, max_steps=6):
-        super().__init__(locals())
-        self.target = (int(x), int(y))
-        self.max_steps = settings.validate_nonnegative_int(max_steps)
-
-    def main(self):
-        counter = self.max_steps
-        d_x = self.target[0] - config.player_pos[0]
-        d_y = self.target[1] - config.player_pos[1]
-        threshold = 2
-        while config.enabled and counter > 0 and (abs(d_x) > threshold or abs(d_y) > threshold):
-            if abs(d_x) > threshold:
-                walk_counter = 0
-                if d_x < 0:
-                    key_down('left')
-                    while config.enabled and d_x < -1 * threshold and walk_counter < 60:
-                        time.sleep(0.01)
-                        walk_counter += 1
-                        d_x = self.target[0] - config.player_pos[0]
-                    key_up('left')
-                else:
-                    key_down('right')
-                    while config.enabled and d_x > threshold and walk_counter < 60:
-                        time.sleep(0.01)
-                        walk_counter += 1
-                        d_x = self.target[0] - config.player_pos[0]
-                    key_up('right')
-                counter -= 1
-            if abs(d_y) > threshold:
-                if d_y < 0:
-                    MoveUp(dy=abs(d_y)).execute()
-                else:
-                    MoveDown(dy=abs(d_y)).execute()
-                counter -= 1
-            d_x = self.target[0] - config.player_pos[0]
-            d_y = self.target[1] - config.player_pos[1]
-
-            
-# class Adjust(Command):
-#     """Fine-tunes player position using small movements."""
-
-#     def __init__(self, x, y, max_steps=5):
-#         super().__init__(locals())
-#         self.target = (int(x), int(y))
-#         self.max_steps = settings.validate_nonnegative_int(max_steps)
-
-#     def main(self):
-#         counter = self.max_steps
-#         toggle = True
-#         error = utils.distance(config.player_pos, self.target)
-#         threshold = settings.adjust_tolerance / math.sqrt(2)
-#         while config.enabled and counter > 0 and error > settings.adjust_tolerance:
-#             if toggle:
-#                 d_x = self.target[0] - config.player_pos[0]
-#                 if abs(d_x) > threshold:
-#                     walk_counter = 0
-#                     if d_x < 0:
-#                         key_down('left')
-#                         while config.enabled and d_x < -1 * threshold and walk_counter < 60:
-#                             time.sleep(0.05)
-#                             walk_counter += 1
-#                             d_x = self.target[0] - config.player_pos[0]
-#                         key_up('left')
-#                     else:
-#                         key_down('right')
-#                         while config.enabled and d_x > threshold and walk_counter < 60:
-#                             time.sleep(0.05)
-#                             walk_counter += 1
-#                             d_x = self.target[0] - config.player_pos[0]
-#                         key_up('right')
-#                     counter -= 1
-#             else:
-#                 d_y = self.target[1] - config.player_pos[1]
-#                 if abs(d_y) > threshold:
-#                     if d_y < 0:
-#                         MoveUp(dy=abs(d_y)).execute()
-#                     else:
-#                         MoveDown(dy=abs(d_y)).execute()
-#                     counter -= 1
-#             error = utils.distance(config.player_pos, self.target)
-#             toggle = not toggle
-
-# y轴移动
-
+#########################
+#        Y轴移动         #
+#########################
 
 class MoveUp(Command):
     def __init__(self, dy: int = 20):
@@ -280,16 +92,21 @@ class MoveUp(Command):
         else:
             RopeLift(dy=self.dy).execute()
 
+
 class MoveDown(Command):
     def __init__(self, dy: int = 20):
         super().__init__(locals())
         self.dy = abs(dy)
-            
+
     def main(self):
-        key_down('down')
-        press(Key.JUMP, 1, down_time=0.2, up_time=0.1)
-        key_up('down')
-        time.sleep(1)
+        if self.dy >= 25 and ShadowAssault.usable_count() >= 3:
+            ShadowAssault(direction='down', jump='True',
+                          distance=self.dy).execute()
+        else:
+            key_down('down')
+            press(Key.JUMP, 2, down_time=0.1, up_time=0.1)
+            key_up('down')
+            time.sleep(1 if self.dy >= 15 else 0.7)
 
 
 class JumpUp(Command):
@@ -310,9 +127,9 @@ class JumpUp(Command):
 class FlashJump(Command):
     """Performs a flash jump in the given direction."""
 
-    def __init__(self, time = 1, dx = None):
+    def __init__(self, time=1, dx=None):
         super().__init__(locals())
-        
+
         if dx is not None:
             self.time = 1 if dx <= 40 else 2
         else:
@@ -343,7 +160,14 @@ class ShadowAssault(Command):
         self.direction = settings.validate_arrows(direction)
         self.jump = settings.validate_boolean(jump)
         self.distance = distance
-        
+
+    @staticmethod
+    def usable_count():
+        if (time.time() - ShadowAssault.castedTime) > ShadowAssault.cooldown + ShadowAssault.backswing:
+            return 4
+        else:
+            return ShadowAssault.usable_times
+
     def canUse(self, next_t: float = 0) -> bool:
 
         if self.__class__.usable_times > 0:
@@ -357,7 +181,7 @@ class ShadowAssault(Command):
 
     def main(self):
         time.sleep(0.1)
-        if self.direction != 'up':
+        if self.direction != 'up' and self.direction != 'down':
             key_down(self.direction)
             time.sleep(0.05)
         if self.jump:
@@ -365,10 +189,10 @@ class ShadowAssault(Command):
                 press(Key.JUMP, 3, down_time=0.1)
             else:
                 press(Key.JUMP, 1)
-        if self.direction == 'up':
+        if self.direction == 'up' or self.direction == 'down':
             key_down(self.direction)
             time.sleep(0.2 if self.distance > 32 else 0.4)
-            
+
         cur_time = time.time()
         if (cur_time - self.__class__.castedTime) > self.__class__.cooldown + self.__class__.backswing:
             self.__class__.castedTime = cur_time
@@ -379,7 +203,6 @@ class ShadowAssault(Command):
         key_up(self.direction)
         time.sleep(self.backswing)
 
-        
         if settings.record_layout:
             config.layout.add(*config.player_pos)
 
@@ -401,6 +224,7 @@ class RopeLift(Command):
         press(self.__class__.key, up_time=self.dy * 0.07)
         if self.dy >= 32:
             time.sleep((self.dy - 32) * 0.03)
+
 
 class CruelStab(Command):
     """Attacks using 'CruelStab' in a given direction."""
@@ -425,6 +249,10 @@ class CruelStab(Command):
         else:
             time.sleep(0.2)
 
+
+#########################
+#         Skills        #
+#########################
 
 class MesoExplosion(Command):
     """Uses 'MesoExplosion' once."""
@@ -464,7 +292,7 @@ class DarkFlare(Command):
                 self.direction = 'left'
             else:
                 self.direction = 'right'
-                
+
         press(self.direction)
         press(Key.DARK_FLARE, 2, up_time=self.backswing)
 
@@ -475,7 +303,7 @@ class ShadowVeil(Command):
     no direction is specified.
     """
     backswing = 0.8
-    
+
     def __init__(self, direction=None):
         super().__init__(locals())
         if direction is None:
@@ -489,7 +317,7 @@ class ShadowVeil(Command):
                 self.direction = 'left'
             else:
                 self.direction = 'right'
-                
+
         press(self.direction)
         press(Key.SHADOW_VEIL, 1, up_time=self.backswing)
 
@@ -577,18 +405,14 @@ class Buff(Command):
 
     def __init__(self):
         super().__init__(locals())
-        self.buffs = [GODDESS_BLESSING(),
-                      LAST_RESORT(),
-                      MAPLE_WARRIOR(),
-                      FOR_THE_GUILD(),
-                      HARD_HITTER(),
-                      EXP_POTION(),
-                      WEALTH_POTION(),
-                      GOLD_POTION(),
-                      GUILD_POTION(),
-                      CANDIED_APPLE(),
-                      SHADOW_WALKER(),
-                      ]
+        self.buffs = [
+            GODDESS_BLESSING(),
+            LAST_RESORT(),
+            MAPLE_WARRIOR(),
+            FOR_THE_GUILD(),
+            HARD_HITTER(),
+            SHADOW_WALKER(),
+        ]
 
     def main(self):
         for buff in self.buffs:
@@ -659,6 +483,34 @@ class HARD_HITTER(Command):
         return super().canUse(next_t)
 
 
+###################
+#      Potion     #
+###################
+
+class Potion(Command):
+    """Uses each of Shadowers's potion once."""
+
+    def __init__(self):
+        super().__init__(locals())
+        self.potions = [
+            EXP_POTION(),
+            WEALTH_POTION(),
+            GOLD_POTION(),
+            GUILD_POTION(),
+            CANDIED_APPLE(),
+            LEGION_WEALTHY(),
+            EXP_COUPON(),
+        ]
+
+    def main(self):
+        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
+            return
+        for potion in self.potions:
+            if potion.canUse():
+                potion.main()
+                break
+
+
 class EXP_POTION(Command):
     key = Key.EXP_POTION
     cooldown = 7250
@@ -667,8 +519,6 @@ class EXP_POTION(Command):
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
         if not enabled:
-            return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
             return False
         return super().canUse(next_t)
 
@@ -682,7 +532,6 @@ class WEALTH_POTION(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Wealthy Potion')
         if not enabled:
             return False
-
         return super().canUse(next_t)
 
 
@@ -694,8 +543,6 @@ class GOLD_POTION(Command):
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
         if not enabled:
-            return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
             return False
         return super().canUse(next_t)
 
@@ -709,9 +556,6 @@ class GUILD_POTION(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
         if not enabled:
             return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
-            return False
-
         return super().canUse(next_t)
 
 
@@ -724,9 +568,8 @@ class CANDIED_APPLE(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
         if not enabled:
             return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
-            return False
         return super().canUse(next_t)
+
 
 class LEGION_WEALTHY(Command):
     key = Key.LEGION_WEALTHY
@@ -737,10 +580,9 @@ class LEGION_WEALTHY(Command):
         enabled = config.gui.settings.buffs.buff_settings.get('Legion Wealthy')
         if not enabled:
             return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
-            return False
         return super().canUse(next_t)
-    
+
+
 class EXP_COUPON(Command):
     key = Key.EXP_COUPON
     cooldown = 1800
@@ -749,7 +591,5 @@ class EXP_COUPON(Command):
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Coupon')
         if not enabled:
-            return False
-        if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
             return False
         return super().canUse(next_t)
