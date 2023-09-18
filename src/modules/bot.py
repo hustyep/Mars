@@ -178,14 +178,19 @@ class Bot(Configurable, Observer):
         adjust(*config.minal_pos).execute()
         time.sleep(0.5)
         if config.minal_pos[0] > config.player_pos[0]:
-            if config.player_direction == 'left':
-                press('left')
-                press('right')
+            press('left', 2)
+            press('right')
         elif config.minal_pos[0] < config.player_pos[0]:
+            press('right', 2)
+            press('left')
+        else:
             if config.player_direction == 'right':
-                press('right')
+                press('right', 2)
                 press('left')
-
+            else:
+                press('left', 2)
+                press('right')
+                
         press(self.config['Interact'], 1, down_time=0.2,
               up_time=0.8)        # Inherited from Configurable
 

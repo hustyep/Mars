@@ -291,9 +291,9 @@ class MoveDown(Command):
             
     def main(self):
         key_down('down')
-        press(Key.JUMP, 1, down_time=0.2, up_time=0.08)
+        press(Key.JUMP, 1, down_time=0.2, up_time=0.1)
         key_up('down')
-        time.sleep(0.6)
+        time.sleep(1)
 
 
 class JumpUp(Command):
@@ -588,10 +588,10 @@ class Buff(Command):
                       FOR_THE_GUILD(),
                       HARD_HITTER(),
                       EXP_POTION(),
+                      CANDIED_APPLE(),
                       WEALTH_POTION(),
                       GOLD_POTION(),
                       GUILD_POTION(),
-                      CANDIED_APPLE(),
                       SHADOW_WALKER(),]
 
     def main(self):
