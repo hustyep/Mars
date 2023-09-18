@@ -292,18 +292,18 @@ class Notifier(Subject, Observer):
                 frame, player_template, threshold=0.9)
             if len(player) > 0:
                 minal_full_pos = matches[0]
-                if mineral_type == HERB_YELLOW_TEMPLATE:
+                if mineral_type == MineralType.HERB_YELLOW:
+                    minal_full_pos = (minal_full_pos[0] - 16, minal_full_pos[1] - 70)
+                elif mineral_type == MineralType.HERB_PURPLE:
                     minal_full_pos = (minal_full_pos[0] - 18, minal_full_pos[1] - 40)
-                elif mineral_type == HERB_PURPLE_TEMPLATE:
-                    minal_full_pos = (minal_full_pos[0] - 18, minal_full_pos[1] - 10)
-                elif mineral_type == MINAL_CRYSTAL_TEMPLATE:
-                    minal_full_pos = (minal_full_pos[0] - 16, minal_full_pos[1] - 50)
-                elif mineral_type == MINAL_HEART_TEMPLATE:
-                    minal_full_pos = (minal_full_pos[0], minal_full_pos[1])
+                elif mineral_type == MineralType.CRYSTAL:
+                    minal_full_pos = (minal_full_pos[0], minal_full_pos[1] - 50)
+                elif mineral_type == MineralType.HEART:
+                    minal_full_pos = (minal_full_pos[0], minal_full_pos[1] - 80)
 
                 player_full_pos = player[0]
                 dx_full = minal_full_pos[0] - player_full_pos[0]
-                dy_full = minal_full_pos[1] - (player_full_pos[1] - 100)
+                dy_full = minal_full_pos[1] - (player_full_pos[1] - 130)
                 minal_pos = (
                     player_pos[0] + round(dx_full / 15.0), player_pos[1] + round(dy_full / 15.0))
                 config.minal_pos = minal_pos

@@ -31,9 +31,11 @@ class Key:
     EXP_POTION = '0'
     WEALTH_POTION = "-"
     GOLD_POTION = "="
-    GUILD_POTION = "9"
+    GUILD_POTION = ""
     CANDIED_APPLE = '6'
-
+    LEGION_WEALTHY = '='
+    EXP_COUPON = ''
+    
     # SHADOW_PARTNER = '3'
     # SPEED_INFUSION = '8'
     # HOLY_SYMBOL = '4'

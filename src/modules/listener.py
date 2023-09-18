@@ -12,9 +12,9 @@ from src.modules.notifier import notifier
 
 class Listener(Configurable):
     DEFAULT_CONFIG = {
-        'Start/stop': 'pause',
-        'Reload routine': 'f6',
-        'Record position': 'f7'
+        'Start/stop': 'tab',
+        'Reload routine': 'page up',
+        'Record position': 'f12'
     }
     BLOCK_DELAY = 1         # Delay after blocking restricted button press
 
