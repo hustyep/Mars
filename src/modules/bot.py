@@ -75,6 +75,9 @@ class Bot(Configurable, Observer):
 
                 # Buff
                 config.command_book.buff.main()
+                
+                # Potion
+                config.command_book.potion.main()
 
                 # Highlight the current Point
                 config.gui.view.routine.select(config.routine.index)
@@ -95,7 +98,7 @@ class Bot(Configurable, Observer):
                 time.sleep(0.01)
 
     @utils.run_if_enabled
-    def _solve_rune(self):
+    def _solve_rune(self, retry=True):
         """
         Moves to the position of the rune and solves the arrow-key puzzle.
         :param sct:     The mss instance object with which to take screenshots.
@@ -106,6 +109,8 @@ class Bot(Configurable, Observer):
         move(*config.rune_pos).execute()
         adjust = config.command_book['adjust']
         adjust(*config.rune_pos).execute()
+        adjustx = config.command_book['adjustx']
+        adjustx(*config.rune_pos).execute()
         time.sleep(0.5)
         if not config.rune_active:
             return
@@ -113,7 +118,6 @@ class Bot(Configurable, Observer):
               up_time=0.8)        # Inherited from Configurable
 
         print('\nSolving rune:')
-        inferences = []
         used_frame = None
         find_solution = False
         for i in range(10):
@@ -121,17 +125,18 @@ class Bot(Configurable, Observer):
                 return
             frame = capture.frame
             solution = rune.show_magic(frame)
-            if solution is not None:
+            if solution is None and retry:
+                self._solve_rune(retry=False)
+                return
+            else:
                 print(', '.join(solution))
-                if solution in inferences:
+                if len(solution) == 4:
                     print('Solution found, entering result')
                     used_frame = frame
                     find_solution = True
                     for arrow in solution:
                         press(arrow, 1, down_time=0.1)
                     break
-                elif len(solution) == 4:
-                    inferences.append(solution)
             time.sleep(0.1)
         time.sleep(0.3)
 

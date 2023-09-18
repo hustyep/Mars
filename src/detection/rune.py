@@ -248,6 +248,7 @@ def show_magic(image, debug=False):
                         show_multi_images(
                             all_process_images + process_images + resolve_images)
                     return result
+    return []
 
 
 def process_image(filtered, blur: int = 70):
