@@ -98,6 +98,7 @@ class CommandBook(Configurable):
                   f"or the function 'step'")
         if required_found and (step_found or movement_found):
             self.buff = new_cb['buff']()
+            self.potion = new_cb["potion"]()
             components.step = new_step
             config.gui.menu.file.enable_routine_state()
             config.gui.view.status.set_cb(basename(file))
