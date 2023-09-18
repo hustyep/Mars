@@ -411,6 +411,10 @@ class AdjustX(Command):
 class MoveUp(Command):
     """Undefined 'moveup' command for the default command book."""
 
+    def __init__(self, dy: int = 20):
+        super().__init__(locals())
+        self.dy = abs(dy)
+
     def main(self):
         print(
             "\n[!] 'MoveUp' command not implemented in current command book, aborting process.")
@@ -419,6 +423,10 @@ class MoveUp(Command):
 
 class MoveDown(Command):
     """Undefined 'movedown' command for the default command book."""
+
+    def __init__(self, dy: int = 20):
+        super().__init__(locals())
+        self.dy = abs(dy)
 
     def main(self):
         print(
