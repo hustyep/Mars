@@ -106,7 +106,7 @@ class MoveDown(Command):
             key_down('down')
             press(Key.JUMP, 2, down_time=0.1, up_time=0.1)
             key_up('down')
-            time.sleep(1 if self.dy >= 15 else 0.7)
+            time.sleep(0.8 if self.dy >= 15 else 0.7)
 
 
 class JumpUp(Command):
