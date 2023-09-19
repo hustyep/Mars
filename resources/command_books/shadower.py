@@ -40,7 +40,7 @@ class Key:
     SUDDEN_RAID = 'r'
     DARK_FLARE = 'w'
     SHADOW_VEIL = 'x'
-    ARACHNID = 'h'
+    ARACHNID = 'j'
     ERDA_SHOWER = '`'
     TRICKBLADE = 'a'
     SLASH_SHADOW_FORMATION = 'c'
