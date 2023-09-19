@@ -138,7 +138,7 @@ class Notifier(Subject, Observer):
             ok_btn = utils.multi_match(
                 image, DEAD_OK_TEMPLATE, threshold=0.9)
             if ok_btn:
-                USB().mouse_abs_move(ok_btn[0][0] + x, ok_btn[0][1] + y)
+                USB().mouse_abs_move(capture.window['left'] + ok_btn[0][0] + x, capture.window['top'] + ok_btn[0][1] + y)
                 time.sleep(0.08)
                 USB().mouse_left_click()
 

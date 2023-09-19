@@ -1,10 +1,12 @@
 import cv2
 import cv2.typing
 import typing
+import threading
 
 import numpy as np
 import time
 from dll_helper import dll_helper
+from usb import usb
 
 def image_equal(image, template):
     height, width, channel = image.shape
@@ -65,8 +67,8 @@ def multi_match(frame, template, threshold=0.95):
 
         cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
                       p[1]+template.shape[0]), (0, 0, 225), 2)
-    # cv2.imshow("result", src_copy)
-    # cv2.waitKey()
+    cv2.imshow("result", src_copy)
+    cv2.waitKey()
     return results
 
 def filter_color(img: cv2.typing.MatLike, ranges) -> cv2.typing.MatLike:
@@ -91,57 +93,19 @@ def filter_color(img: cv2.typing.MatLike, ranges) -> cv2.typing.MatLike:
     result[color_mask] = img[color_mask]
     return result
 
+def run():
+    while True:
+        usb.key_press('s')
+        time.sleep(0.5)
+
+
 if __name__ == "__main__":
-    # frame = cv2.imread(".test/Maple_A_230716_155822.png")
-    # template = cv2.imread("assets/minimap_me.png")
-    # # result = image_search(frame, template)
-    # # result = multi_match(frame, template)
-    # mm_tl = dll_helper.loadImage('assets/minimap_tl.bmp')
-    # mm_br = dll_helper.loadImage('assets/minimap_br.bmp')
-    # frame = dll_helper.loadImage(".test/Maple_A_230716_155822.png")
-    # start = time.time()
-    # tl_x, tl_y = dll_helper.screenSearch(mm_tl, 0, 0, 1000, 800)
-    # end = time.time()
-    # print(f'cast time: {end - start}')
-    # print(tl_x, tl_y)
-    # if tl_x > 0 and tl_y > 0:
-    #     br_x, br_y = dll_helper.screenSearch(mm_br, tl_x + 20, tl_y + 20, tl_x + 300, tl_y+200)
-    #     print(f'cast time: {time.time() - end}')
-    #     print(br_x, br_y)
-    
-    import cv2
-    import numpy as np
-    import pytesseract as tess
-
-    RUNE_LIBERATED_TEXT_RANGES = (
-        ((50, 200, 46), (77, 255, 255)),
-    )
-    RUNE_FAILED_TEXT_RANGES = (
-        ((0, 43, 46), (10, 255, 255)),
-        ((156, 43, 46), (180, 255, 255)),
-    )
-    image = cv2.imread('.test/Maple_A_230805_034045.png')
-    image = image[50:400,50:-50]
-    image = filter_color(image, RUNE_LIBERATED_TEXT_RANGES)
-    # cv2.imshow("", image)
-    # cv2.waitKey()
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    start = time.time()
-    text = tess.image_to_string(image_rgb, lang="eng")
-    print(time.time() - start)
-    content = text.replace("\f", "").split("\n")
-    for c in content:
-        if len(c) > 0 and 'rune' in c.lower():
-            print(c)
-            list = c.split(":")
-            print(list[0])
-    # h, w, c = image.shape
-    # boxes = tess.image_to_boxes(image)
-    # for b in boxes.splitlines():
-    #     b = b.split(' ')
-    #     image = cv2.rectangle(image, (int(b[1]), h - int(b[2])), (int(b[3]), h - int(b[4])), (0, 255, 0), 2)
-
-    # cv2.imshow('text detect', image)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    # dll_helper.start()
+    # time.sleep(1)
+    # for i in range(3):
+    #     threading.Thread(target=run).start()
+    # while True:
+    #     time.sleep(1)
+    img = cv2.imread(".test/Maple_230919_051849.png")
+    DEAD_OK_TEMPLATE = cv2.imread('assets/dead_ok_template.png', 0)
+    res = multi_match(img, DEAD_OK_TEMPLATE)

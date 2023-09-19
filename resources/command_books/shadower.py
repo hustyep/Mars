@@ -411,7 +411,7 @@ class Buff(Command):
             MAPLE_WARRIOR(),
             FOR_THE_GUILD(),
             HARD_HITTER(),
-            SHADOW_WALKER(),
+            # SHADOW_WALKER(),
         ]
 
     def main(self):

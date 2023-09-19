@@ -208,7 +208,7 @@ class Bot(Configurable, Observer):
             print('Solution found, entering result')
             for arrow in solution:
                 press(arrow, 1, down_time=0.1)
-        time.sleep(5)
+        time.sleep(3.5)
         config.minal_active = False
 
     def load_commands(self, file):

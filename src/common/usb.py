@@ -1,6 +1,7 @@
 import ctypes
 from ctypes import *
 from src.common.common import singleton
+from threading import Lock
 
 # 字符串命令接口
 # https://note.youdao.com/s/Gyrcngxs
@@ -30,6 +31,7 @@ CMD_CONSUMER_SLEEP = "consumer:powersleep"
 class USB:
     dll = None
     usbopen = False
+    lock = Lock()
 
     def load(self):
         self.dll = cdll.LoadLibrary('./hiddll.dll')
@@ -54,7 +56,8 @@ class USB:
             self.dll.close_hiddev()
 
     def sendCMD(self, cmd):
-        self.dll.hid007_cmd(cmd)
+        with self.lock:
+            self.dll.hid007_cmd(cmd)
 
     def buildCMD(self, action, value1 = None, value2 = None):
         str_cmd = action
