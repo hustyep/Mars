@@ -87,7 +87,6 @@ class ActionSimulator:
         
     @staticmethod
     def cancel_rune_buff():
-        config.enabled = False
         for _ in range(5):
             rune_buff = utils.multi_match(
                 capture.frame[:200, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
@@ -103,7 +102,6 @@ class ActionSimulator:
             time.sleep(0.2)
             USB().mouse_right_up()
             time.sleep(0.2)
-        config.enabled = True
 
     @staticmethod
     def go_to_msroom(num: int):

@@ -75,7 +75,7 @@ class Bot(Configurable, Observer):
 
                 # Buff
                 config.command_book.buff.main()
-                
+
                 # Potion
                 config.command_book.potion.main()
 
@@ -141,13 +141,11 @@ class Bot(Configurable, Observer):
         time.sleep(0.3)
 
         if find_solution:
-            threading.Timer(0.001, self.check_rune_solve_result,
-                            (used_frame, )).start()
+            self.check_rune_solve_result(used_frame)
+            # threading.Timer(0.001, self.check_rune_solve_result,
+            #                 (used_frame, )).start()
         else:
-            notifier.notifyRuneResolveFailed()
-            file_path = 'screenshot/rune_failed'
-            utils.save_screenshot(
-                frame=used_frame, file_path=file_path, compress=False)
+            self.on_rune_solve_failed(used_frame)
 
     def check_rune_solve_result(self, used_frame):
         for _ in range(4):
@@ -156,18 +154,21 @@ class Bot(Configurable, Observer):
                 break
             time.sleep(0.1)
         if rune_type is None:
-            notifier.notifyRuneResolveFailed()
-            file_path = 'screenshot/rune_failed'
-            utils.save_screenshot(
-                frame=used_frame, file_path=file_path, compress=False)
+            self.on_rune_solve_failed(used_frame)
         else:
-            notifier.notifyRuneResolved(rune_type)
-            file_path = 'screenshot/rune_solved'
-            utils.save_screenshot(
-                frame=used_frame, file_path=file_path, compress=False)
+            # notifier.notifyRuneResolved(rune_type)
+            # file_path = 'screenshot/rune_solved'
+            # utils.save_screenshot(
+            #     frame=used_frame, file_path=file_path, compress=False)
 
             if rune_type == 'Rune of Might':
                 ActionSimulator.cancel_rune_buff()
+
+    def on_rune_solve_failed(self, used_frame):
+        notifier.notifyRuneResolveFailed()
+        file_path = 'screenshot/rune_failed'
+        utils.save_screenshot(
+            frame=used_frame, file_path=file_path, compress=False)
 
     @utils.run_if_enabled
     def _mining(self):
@@ -195,7 +196,7 @@ class Bot(Configurable, Observer):
             else:
                 press('left', 3)
                 press('right')
-                
+
         press(self.config['Interact'], 1, down_time=0.2,
               up_time=0.8)        # Inherited from Configurable
 

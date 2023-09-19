@@ -68,14 +68,18 @@ class Point(Component):
 
     id = '*'
 
-    def __init__(self, x, y, frequency=1, skip='False', adjust='False'):
+    def __init__(self, x, y, frequency=1, interval=0, skip='False', adjust='False'):
         super().__init__(locals())
         self.x = int(x)
         self.y = int(y)
         self.location = (self.x, self.y)
         self.frequency = settings.validate_nonnegative_float(frequency)
-        self.counter = (
-            time.time() + 14) if settings.validate_boolean(skip) else 0
+        self.interval = settings.validate_nonnegative_int(interval)
+        if self.interval > 0:
+            self.counter = (
+                time.time() + 14) if settings.validate_boolean(skip) else 0
+        else:
+            self.counter = int(settings.validate_boolean(skip))
         self.adjust = settings.validate_boolean(adjust)
         if not hasattr(self, 'commands'):       # Updating Point should not clear commands
             self.commands = []
@@ -83,18 +87,26 @@ class Point(Component):
     def main(self):
         """Executes the set of actions associated with this Point."""
 
-        if self.counter == 0 or time.time() - self.counter >= self.frequency:
-            move = config.command_book['move']
-            move(*self.location).execute()
-            if self.adjust:
-                # TODO: adjust using step('up')?
-                adjust = config.command_book['adjust']
-                adjust(*self.location).execute()
-            for command in self.commands:
-                command.execute()
-            self.counter = time.time()
-        # self._increment_counter()
-
+        if self.interval > 0:
+            if self.counter == 0 or time.time() - self.counter >= self.interval:
+                self._main()
+                self.counter = time.time()
+        else:
+            if self.counter == 0:
+                self._main()
+            self._increment_counter()
+            
+            
+    def _main(self):
+        move = config.command_book['move']
+        move(*self.location).execute()
+        if self.adjust:
+            # TODO: adjust using step('up')?
+            adjust = config.command_book['adjust']
+            adjust(*self.location).execute()
+        for command in self.commands:
+            command.execute()
+            
     @utils.run_if_enabled
     def _increment_counter(self):
         """Increments this Point's counter, wrapping back to 0 at the upper bound."""
