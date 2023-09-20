@@ -58,13 +58,24 @@ def step(direction, target):
 
     if config.stage_fright and direction != 'up' and utils.bernoulli(0.75):
         time.sleep(utils.rand_float(0.1, 0.3))
-    d_x = abs(target[0] - config.player_pos[0])
+    d_x = target[0] - config.player_pos[0]
     d_y = target[1] - config.player_pos[1]
     if direction == "up":
         MoveUp(dy=abs(d_y)).execute()
     elif direction == "down":
         MoveDown(dy=abs(d_y)).execute()
-    elif d_x >= 26:
+    elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 1:
+        if d_y < 0 and d_x < 0:
+            ShadowAssault(direction='upleft')
+        elif d_y < 0 and d_x > 0:
+            ShadowAssault(direction='upright')
+        elif d_y > 0 and d_x < 0:
+            ShadowAssault(direction='downleft')           
+        elif d_y > 0 and d_x > 0:
+            ShadowAssault(direction='downright')
+        else:
+            ShadowAssault(direction=direction)   
+    elif abs(d_x) >= 26:
         # FlashJump(dx=d_x)
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
         press(Key.FLASH_JUMP, 2, down_time=0.03, up_time=0.03)
