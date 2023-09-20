@@ -64,17 +64,17 @@ def step(direction, target):
         MoveUp(dy=abs(d_y)).execute()
     elif direction == "down":
         MoveDown(dy=abs(d_y)).execute()
-    elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 1:
-        if d_y < 0 and d_x < 0:
-            ShadowAssault(direction='upleft')
-        elif d_y < 0 and d_x > 0:
-            ShadowAssault(direction='upright')
-        elif d_y > 0 and d_x < 0:
-            ShadowAssault(direction='downleft')           
-        elif d_y > 0 and d_x > 0:
-            ShadowAssault(direction='downright')
-        else:
-            ShadowAssault(direction=direction)   
+    # elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 1:
+    #     if d_y < 0 and d_x < 0:
+    #         ShadowAssault(direction='upleft')
+    #     elif d_y < 0 and d_x > 0:
+    #         ShadowAssault(direction='upright')
+    #     elif d_y > 0 and d_x < 0:
+    #         ShadowAssault(direction='downleft')           
+    #     elif d_y > 0 and d_x > 0:
+    #         ShadowAssault(direction='downright')
+    #     else:
+    #         ShadowAssault(direction=direction)   
     elif abs(d_x) >= 26:
         # FlashJump(dx=d_x)
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
@@ -170,7 +170,7 @@ class ShadowAssault(Command):
         super().__init__(locals())
         self.direction = direction
         self.jump = settings.validate_boolean(jump)
-        self.distance = distance
+        self.distance = settings.validate_nonnegative_int(distance)
 
     @staticmethod
     def usable_count():
@@ -192,25 +192,22 @@ class ShadowAssault(Command):
 
     def main(self):
         time.sleep(0.2)
-        if self.jump:
-            press(Key.JUMP)
-            time.sleep(0.2 if self.distance > 32 else 0.4)
 
-        if self.direction == 'upleft':
-            key_down('up')
-            key_down("left")
-        elif self.direction == "upright":
-            key_down('up')
-            key_down("right")
-        elif self.direction == "downleft":
-            key_down('down')
-            key_down("left")
-        elif self.direction == "downright":
-            key_down('down')
-            key_down("right")            
-        else:
-            key_down(self.direction) 
-        time.sleep(0.05)
+        if self.direction.endswith('left'):
+            press('left', down_time=0.1)
+        elif self.direction.endswith("right"):
+            press("right", down_time=0.1)
+        if self.jump:
+            if self.direction == 'down':
+                key_down('down')
+                press(Key.JUMP, 3)
+                key_up("down")
+            else:
+                press(Key.JUMP)
+                time.sleep(0.2 if self.distance > 32 else 0.4)
+
+        key_down(self.direction) 
+        time.sleep(0.05)        
 
         cur_time = time.time()
         if (cur_time - self.__class__.castedTime) > self.__class__.cooldown + self.__class__.backswing:
@@ -219,7 +216,7 @@ class ShadowAssault(Command):
         else:
             self.__class__.usable_times -= 1
         press(Key.SHADOW_ASSAULT)
-        key_up(self.direction)
+        key_up(self.direction) 
         time.sleep(self.backswing)
 
         if settings.record_layout:
@@ -331,13 +328,8 @@ class ShadowVeil(Command):
             self.direction = settings.validate_horizontal_arrows(direction)
 
     def main(self):
-        # if self.direction is None:
-        #     if config.player_pos[0] > 75:
-        #         self.direction = 'left'
-        #     else:
-        #         self.direction = 'right'
-
-        press(self.direction)
+        if self.direction is not None:
+            press(self.direction)
         press(Key.SHADOW_VEIL, 1, up_time=self.backswing)
 
 
