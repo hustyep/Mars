@@ -457,6 +457,9 @@ class SHADOW_WALKER(Command):
     cooldown = 190
     backswing = 0.8
 
+    def main(self):
+        super().main()
+        config.hide_start = time.time()
 
 class EPIC_ADVENTURE(Command):
     key = Key.EPIC_ADVENTURE

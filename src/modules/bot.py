@@ -177,6 +177,9 @@ class Bot(Configurable, Observer):
         :return:        None
         """
 
+        if config.hide_start > 0 and time.time() - config.hide_start <= 35:
+            return
+
         move = config.command_book['move']
         move(*config.minal_pos).execute()
         adjust = config.command_book['adjustx']
