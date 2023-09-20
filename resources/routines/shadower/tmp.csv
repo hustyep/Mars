@@ -1,25 +1,19 @@
 
 @, label=Bottom mobbing
 *, x=46, y=70, frequency=1, interval=0, skip=False, adjust=False
-    SlashShadowFormation
 *, x=118, y=70, frequency=1, interval=0, skip=False, adjust=False
     Arachnid
-*, x=118, y=70, frequency=2, interval=0, skip=False, adjust=False
-    Wait, duration=0.2
+*, x=118, y=70, frequency=7, interval=0, skip=False, adjust=False
     ShadowVeil
-    Wait, duration=0.2
 *, x=191, y=70, frequency=1, interval=0, skip=False, adjust=False
-    SlashShadowFormation
 
 @, label=Summoning
-*, x=191, y=70, frequency=6, interval=0, skip=False, adjust=False
+*, x=191, y=70, frequency=7, interval=0, skip=False, adjust=False
     ShadowAssault, direction=upleft, jump=True, distance=80
-*, x=157, y=34, frequency=6, interval=0, skip=False, adjust=True
-    Wait, duration=0.2
+*, x=157, y=34, frequency=7, interval=0, skip=False, adjust=True
     ErdaShower, direction=left
-    Wait, duration=0.2
-*, x=115, y=34, frequency=6, interval=0, skip=False, adjust=False
+*, x=115, y=34, frequency=7, interval=0, skip=False, adjust=False
     SuddenRaid
-*, x=76, y=33, frequency=6, interval=0, skip=False, adjust=True
+*, x=76, y=33, frequency=7, interval=0, skip=False, adjust=True
     DarkFlare, direction=left
-    ShadowAssault, direction=down, jump=True, distance=80
+    ShadowAssault, direction=downleft, jump=True, distance=80

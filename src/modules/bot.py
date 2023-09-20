@@ -186,10 +186,10 @@ class Bot(Configurable, Observer):
         adjust(*config.minal_pos).execute()
         time.sleep(0.5)
         if config.minal_pos[0] > config.player_pos[0]:
-            press('left', 3)
+            press('left', 2)
             press('right')
         elif config.minal_pos[0] < config.player_pos[0]:
-            press('right', 3)
+            press('right', 2)
             press('left')
         else:
             if config.player_direction == 'right':
@@ -316,7 +316,7 @@ class Bot(Configurable, Observer):
                 case BotError.OTHERS_STAY_OVER_120S:
                     ActionSimulator.go_home()
                 case (_):
-                    pass
+                    self.toggle(False, event_type.value)
             # end match
         elif isinstance(event_type, BotWarnning):
             match event_type:

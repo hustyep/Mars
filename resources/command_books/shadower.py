@@ -198,7 +198,7 @@ class ShadowAssault(Command):
         elif self.direction.endswith("right"):
             press("right", down_time=0.1)
         if self.jump:
-            if self.direction == 'down':
+            if self.direction.startswith('down'):
                 key_down('down')
                 press(Key.JUMP, 3)
                 key_up("down")
@@ -293,7 +293,7 @@ class DarkFlare(Command):
     no direction is specified.
     """
     cooldown = 120
-    backswing = 0.4
+    backswing = 0.3
 
     def __init__(self, direction=None):
         super().__init__(locals())

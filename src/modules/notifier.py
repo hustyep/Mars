@@ -80,7 +80,7 @@ class Notifier(Subject, Observer):
         self.mining_time = 0
 
         self.black_screen_threshold = 0.9
-        self.white_room_threshold = 0.25
+        self.white_room_threshold = 0.3
 
         self.notice_time_record = {}
 
