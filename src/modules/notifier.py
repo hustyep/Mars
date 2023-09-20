@@ -63,6 +63,8 @@ class Notifier(Subject, Observer):
         # sys.excepthook = exception_hook
 
         capture.attach(self)
+        
+        self.mineral_detect_time = 0
 
         self.player_pos_updated_time = 0
         self.player_pos = (0, 0)
@@ -139,9 +141,11 @@ class Notifier(Subject, Observer):
                 image, DEAD_OK_TEMPLATE, threshold=0.9)
             if ok_btn:
                 USB().mouse_abs_move(capture.window['left'] + ok_btn[0][0] + x, capture.window['top'] + ok_btn[0][1] + y)
-                time.sleep(0.08)
+                time.sleep(1)
                 USB().mouse_left_click()
-
+                time.sleep(1)
+                USB().mouse_left_click()
+                
         # Check for no movement
         if config.enabled and operator.eq(config.player_pos, self.player_pos):
             interval = int(time.time() - self.player_pos_updated_time)
@@ -269,6 +273,10 @@ class Notifier(Subject, Observer):
         if config.minal_active:
             return
 
+        if self.mineral_detect_time > 0 and time.time() - self.mineral_detect_time < 3:
+            return
+        
+        self.mineral_detect_time = time.time()
         player_min = utils.multi_match(minimap, PLAYER_TEMPLATE, threshold=0.8)
         if len(player_min) == 0:
             return
