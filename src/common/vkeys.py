@@ -120,6 +120,22 @@ def key_down(key):
     """
 
     key = key.lower()
+    if key in ['upleft', 'upright', 'downleft', 'downright']:
+        if key == 'upleft':
+            USB().key_down('up')
+            USB().key_down("left")
+        elif key == "upright":
+            USB().key_down('up')
+            USB().key_down("right")
+        elif key == "downleft":
+            USB().key_down('down')
+            USB().key_down("left")
+        elif key == "downright":
+            USB().key_down('down')
+            USB().key_down("right")            
+        else:
+           pass
+        return
     if key not in KEY_MAP.keys():
         print(f"Invalid keyboard input: '{key}'.")
     else:
@@ -138,6 +154,22 @@ def key_up(key):
     """
 
     key = key.lower()
+    if key in ['upleft', 'upright', 'downleft', 'downright']:
+        if key == 'upleft':
+            USB().key_up('up')
+            USB().key_up("left")
+        elif key == "upright":
+            USB().key_up('up')
+            USB().key_up("right")
+        elif key == "downleft":
+            USB().key_up('down')
+            USB().key_up("left")
+        elif key == "downright":
+            USB().key_up('down')
+            USB().key_up("right")            
+        else:
+           pass
+        return
     if key not in KEY_MAP.keys():
         print(f"Invalid keyboard input: '{key}'.")
     else:
