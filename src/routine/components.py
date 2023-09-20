@@ -305,6 +305,7 @@ class Move(Command):
                     local_error > settings.move_tolerance and \
                     global_error > settings.move_tolerance:
                 d_x = point[0] - config.player_pos[0]
+                player_x = config.player_pos[0]
                 if abs(d_x) > threshold:
                     if d_x < 0:
                         key = 'left'
@@ -312,6 +313,9 @@ class Move(Command):
                         key = 'right'
                     self._new_direction(key)
                     step(key, point)
+                    # 判断是否上了绳子
+                    if config.player_pos[0] == player_x:
+                        press('s')
                     if settings.record_layout:
                         config.layout.add(*config.player_pos)
                     if i < len(path) - 1:

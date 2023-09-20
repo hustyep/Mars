@@ -67,7 +67,7 @@ def step(direction, target):
     elif d_x >= 26:
         # FlashJump(dx=d_x)
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
-        press(Key.FLASH_JUMP, 2, down_time=0.04, up_time=0.04)
+        press(Key.FLASH_JUMP, 2, down_time=0.03, up_time=0.03)
         CruelStabRandomDirection().execute()
     else:
         time.sleep(0.01)
@@ -320,11 +320,11 @@ class ShadowVeil(Command):
             self.direction = settings.validate_horizontal_arrows(direction)
 
     def main(self):
-        if self.direction is None:
-            if config.player_pos[0] > 75:
-                self.direction = 'left'
-            else:
-                self.direction = 'right'
+        # if self.direction is None:
+        #     if config.player_pos[0] > 75:
+        #         self.direction = 'left'
+        #     else:
+        #         self.direction = 'right'
 
         press(self.direction)
         press(Key.SHADOW_VEIL, 1, up_time=self.backswing)
