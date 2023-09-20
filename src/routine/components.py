@@ -267,6 +267,7 @@ class Command(Component):
         if self.__class__.key is None:
             return False
 
+        print(self.__class__.__name__)
         # print(f"cast skill: {self.key}")
         time.sleep(self.__class__.precast)
         self.__class__.castedTime = time.time()
@@ -314,8 +315,8 @@ class Move(Command):
                     self._new_direction(key)
                     step(key, point)
                     # 判断是否上了绳子
-                    if config.player_pos[0] == player_x:
-                        press('s')
+                    # if config.player_pos[0] == player_x:
+                    #     press('s')
                     if settings.record_layout:
                         config.layout.add(*config.player_pos)
                     if i < len(path) - 1:
