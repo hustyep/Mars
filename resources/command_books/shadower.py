@@ -4,7 +4,7 @@ from src.common import config, settings, utils
 import time
 import math
 from src.routine.components import Command
-from src.common.vkeys import press, key_down, key_up
+from src.common.vkeys import press, key_down, key_up, releaseAll
 
 
 # List of key mappings
@@ -40,7 +40,7 @@ class Key:
     SUDDEN_RAID = 'r'
     DARK_FLARE = 'w'
     SHADOW_VEIL = 'x'
-    ARACHNID = 'h'
+    ARACHNID = 'j'
     ERDA_SHOWER = '`'
     TRICKBLADE = 'a'
     SLASH_SHADOW_FORMATION = 'c'
@@ -67,7 +67,7 @@ def step(direction, target):
     elif d_x >= 26:
         # FlashJump(dx=d_x)
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
-        press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.04)
+        press(Key.FLASH_JUMP, 2, down_time=0.04, up_time=0.04)
         CruelStabRandomDirection().execute()
     else:
         time.sleep(0.01)
@@ -157,7 +157,7 @@ class ShadowAssault(Command):
 
     def __init__(self, direction='up', jump='False', distance=80):
         super().__init__(locals())
-        self.direction = settings.validate_arrows(direction)
+        self.direction = direction
         self.jump = settings.validate_boolean(jump)
         self.distance = distance
 
@@ -180,18 +180,26 @@ class ShadowAssault(Command):
         return False
 
     def main(self):
-        time.sleep(0.1)
-        if self.direction != 'up' and self.direction != 'down':
-            key_down(self.direction)
-            time.sleep(0.05)
+        time.sleep(0.2)
         if self.jump:
-            if self.direction == 'down':
-                press(Key.JUMP, 3, down_time=0.1)
-            else:
-                press(Key.JUMP, 1)
-        if self.direction == 'up' or self.direction == 'down':
-            key_down(self.direction)
+            press(Key.JUMP)
             time.sleep(0.2 if self.distance > 32 else 0.4)
+
+        if self.direction == 'upleft':
+            key_down('up')
+            key_down("left")
+        elif self.direction == "upright":
+            key_down('up')
+            key_down("right")
+        elif self.direction == "downleft":
+            key_down('down')
+            key_down("left")
+        elif self.direction == "downright":
+            key_down('down')
+            key_down("right")            
+        else:
+            key_down(self.direction) 
+        time.sleep(0.05)
 
         cur_time = time.time()
         if (cur_time - self.__class__.castedTime) > self.__class__.cooldown + self.__class__.backswing:
@@ -411,7 +419,7 @@ class Buff(Command):
             MAPLE_WARRIOR(),
             FOR_THE_GUILD(),
             HARD_HITTER(),
-            # SHADOW_WALKER(),
+            SHADOW_WALKER(),
         ]
 
     def main(self):

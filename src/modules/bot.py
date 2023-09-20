@@ -155,7 +155,7 @@ class Bot(Configurable, Observer):
         if rune_type is None:
             self.on_rune_solve_failed(used_frame)
         else:
-            # notifier.notifyRuneResolved(rune_type)
+            notifier.notifyRuneResolved(rune_type)
             # file_path = 'screenshot/rune_solved'
             # utils.save_screenshot(
             #     frame=used_frame, file_path=file_path, compress=False)

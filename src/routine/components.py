@@ -73,8 +73,8 @@ class Point(Component):
         self.x = int(x)
         self.y = int(y)
         self.location = (self.x, self.y)
-        self.frequency = settings.validate_nonnegative_float(frequency)
-        self.interval = settings.validate_nonnegative_int(interval)
+        self.frequency = settings.validate_nonnegative_int(frequency)
+        self.interval = settings.validate_nonnegative_float(interval)
         if self.interval > 0:
             self.counter = (
                 time.time() + 14) if settings.validate_boolean(skip) else 0

@@ -25,7 +25,7 @@ def validate_nonnegative_float(value):
     :return:        VALUE as an integer.
     """
 
-    if float(value) > 0:
+    if float(value) >= 0:
         return float(value)
     raise ValueError(f"'{value}' is not a valid non-negative float.")
 
