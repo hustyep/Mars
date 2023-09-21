@@ -1,12 +1,12 @@
 import cv2
-import cv2.typing
+# import cv2.typing
 import typing
 import threading
 
 import numpy as np
 import time
-from dll_helper import dll_helper
-from usb import usb
+# from dll_helper import dll_helper
+# from usb import usb
 
 def image_equal(image, template):
     height, width, channel = image.shape
@@ -67,11 +67,11 @@ def multi_match(frame, template, threshold=0.95):
 
         cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
                       p[1]+template.shape[0]), (0, 0, 225), 2)
-    cv2.imshow("result", src_copy)
-    cv2.waitKey()
+    # cv2.imshow("result", src_copy)
+    # cv2.waitKey()
     return results
 
-def filter_color(img: cv2.typing.MatLike, ranges) -> cv2.typing.MatLike:
+def filter_color(img, ranges):
     """
     Returns a filtered copy of IMG that only contains pixels within the given RANGES.
     on the HSV scale.
@@ -93,11 +93,6 @@ def filter_color(img: cv2.typing.MatLike, ranges) -> cv2.typing.MatLike:
     result[color_mask] = img[color_mask]
     return result
 
-def run():
-    while True:
-        usb.key_press('s')
-        time.sleep(0.5)
-
 
 if __name__ == "__main__":
     # dll_helper.start()
@@ -106,6 +101,15 @@ if __name__ == "__main__":
     #     threading.Thread(target=run).start()
     # while True:
     #     time.sleep(1)
-    img = cv2.imread(".test/Maple_230919_051849.png")
-    DEAD_OK_TEMPLATE = cv2.imread('assets/dead_ok_template.png', 0)
-    res = multi_match(img, DEAD_OK_TEMPLATE)
+    start = time.time()
+    img = cv2.imread(".test/Maple_230919_153412.png")
+    PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/player_sllee_template.png', 0)
+    DEAD_OK_TEMPLATE = cv2.imread('assets/skull_template.png', 0)
+    player = multi_match(
+                img, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
+    player_pos = player[0]
+    crop = img[player_pos[1]-140:player_pos[1]-100, player_pos[0]+25:player_pos[0]+65]
+    res = multi_match(crop, DEAD_OK_TEMPLATE)
+    print(f'{time.time() - start}')
+    # cv2.imshow("123", crop)
+    # cv2.waitKey()

@@ -94,6 +94,8 @@ class MoveUp(Command):
         self.dy = abs(dy)
 
     def main(self):
+        self.print_debug_info()
+        
         if self.dy <= 6:
             press(Key.JUMP, up_time=1)
         elif self.dy <= 24:
@@ -110,6 +112,8 @@ class MoveDown(Command):
         self.dy = abs(dy)
 
     def main(self):
+        self.print_debug_info()
+        
         if self.dy >= 25 and ShadowAssault.usable_count() >= 3:
             ShadowAssault(direction='down', jump='True',
                           distance=self.dy).execute()
@@ -126,6 +130,8 @@ class JumpUp(Command):
         self.dy = abs(dy)
 
     def main(self):
+        self.print_debug_info()
+        
         time.sleep(0.5)
         press(Key.JUMP)
         key_down('up')
@@ -147,6 +153,8 @@ class FlashJump(Command):
             self.time = time
 
     def main(self):
+        self.print_debug_info()
+
         time.sleep(0.5)
         press(Key.JUMP, 1)
         # key_down(self.direction)
@@ -191,6 +199,8 @@ class ShadowAssault(Command):
         return False
 
     def main(self):
+        self.print_debug_info()
+
         time.sleep(0.2)
 
         if self.direction.endswith('left'):
@@ -233,6 +243,8 @@ class RopeLift(Command):
         self.dy = abs(dy)
 
     def main(self):
+        self.print_debug_info()
+
         if self.dy >= 45:
             press(Key.JUMP, up_time=0.2)
         elif self.dy >= 32:
@@ -252,6 +264,8 @@ class CruelStab(Command):
         self.repetitions = int(repetitions)
 
     def main(self):
+        self.print_debug_info()
+        
         time.sleep(0.05)
         key_down(self.direction)
         time.sleep(0.05)
@@ -274,6 +288,7 @@ class MesoExplosion(Command):
     """Uses 'MesoExplosion' once."""
 
     def main(self):
+        self.print_debug_info()
         press(Key.MESO_EXPLOSION)
 
 
@@ -282,6 +297,7 @@ class CruelStabRandomDirection(Command):
     backswing = 0.25
 
     def main(self):
+        self.print_debug_info()
         press(Key.CRUEL_STAB, 1, up_time=0.2)
         MesoExplosion().execute()
         time.sleep(self.backswing)
@@ -303,6 +319,7 @@ class DarkFlare(Command):
             self.direction = settings.validate_horizontal_arrows(direction)
 
     def main(self):
+        self.print_debug_info()
         if self.direction is None:
             if config.player_pos[0] > 75:
                 self.direction = 'left'
@@ -328,6 +345,7 @@ class ShadowVeil(Command):
             self.direction = settings.validate_horizontal_arrows(direction)
 
     def main(self):
+        self.print_debug_info()
         if self.direction is not None:
             press(self.direction)
         press(Key.SHADOW_VEIL, 1, up_time=self.backswing)
@@ -349,6 +367,7 @@ class ErdaShower(Command):
             self.direction = settings.validate_horizontal_arrows(direction)
 
     def main(self):
+        self.print_debug_info()
         if self.direction:
             press(self.direction)
         key_down('down')

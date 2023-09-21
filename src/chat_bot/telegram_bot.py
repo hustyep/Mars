@@ -12,7 +12,7 @@ from src.chat_bot.chat_bot_entity import ChatBotEntity, ChatBotCommand
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    level=logging.FATAL
 )
 
 def retry_on_error(func, wait=0.1, retry=0, *args, **kwargs):

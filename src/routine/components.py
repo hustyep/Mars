@@ -36,7 +36,7 @@ class Component:
         self.main()
 
     def main(self):
-        pass
+        self.print_debug_info()
 
     def update(self, *args, **kwargs):
         """Updates this Component's constructor arguments with new arguments."""
@@ -61,6 +61,10 @@ class Component:
             if key != 'id' and type(self.kwargs[key]) in Component.PRIMITIVES:
                 arr.append(f'{key}={value}')
         return ', '.join(arr)
+    
+    def print_debug_info(self):
+        if config.notice_level == 5:
+            print(self.info())
 
 
 class Point(Component):
@@ -86,6 +90,7 @@ class Point(Component):
 
     def main(self):
         """Executes the set of actions associated with this Point."""
+        self.print_debug_info()
 
         if self.interval > 0:
             if self.counter == 0 or time.time() - self.counter >= self.interval:
@@ -267,8 +272,7 @@ class Command(Component):
         if self.__class__.key is None:
             return False
 
-        print(self.__class__.__name__)
-        # print(f"cast skill: {self.key}")
+        super().main()
         time.sleep(self.__class__.precast)
         self.__class__.castedTime = time.time()
         press_acc(self.__class__.key, up_time=self.__class__.backswing)
@@ -293,6 +297,8 @@ class Move(Command):
         self.prev_direction = new
 
     def main(self):
+        self.print_debug_info()
+        
         counter = self.max_steps
         path = config.layout.shortest_path(config.player_pos, self.target)
         threshold = settings.move_tolerance / math.sqrt(2)
@@ -353,6 +359,8 @@ class Adjust(Command):
         self.max_steps = settings.validate_nonnegative_int(max_steps)
 
     def main(self):
+        self.print_debug_info()
+        
         counter = self.max_steps
         d_x = self.target[0] - config.player_pos[0]
         d_y = self.target[1] - config.player_pos[1]
@@ -392,6 +400,8 @@ class AdjustX(Command):
         self.max_steps = settings.validate_nonnegative_int(max_steps)
 
     def main(self):
+        self.print_debug_info()
+        
         counter = self.max_steps
         d_x = self.target[0] - config.player_pos[0]
         d_y = self.target[1] - config.player_pos[1]
@@ -471,6 +481,8 @@ class Wait(Command):
         self.duration = float(duration)
 
     def main(self):
+        self.print_debug_info()
+
         releaseAll()
         time.sleep(self.duration)
 
@@ -521,6 +533,8 @@ class Buff(Command):
     """Undefined 'buff' command for the default command book."""
 
     def main(self):
+        self.print_debug_info()
+
         print(
             "\n[!] 'Buff' command not implemented in current command book, aborting process.")
         config.enabled = False
@@ -530,6 +544,8 @@ class Potion(Command):
     """Undefined 'potion' command for the default command book."""
 
     def main(self):
+        self.print_debug_info()
+
         print(
             "\n[!] 'potion' command not implemented in current command book, aborting process.")
         config.enabled = False
