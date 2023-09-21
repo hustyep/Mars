@@ -339,6 +339,9 @@ class Notifier(Subject, Observer):
                 for _ in range(4):
                     USB().key_press('left')
                     USB().key_press("right")
+                if capture.frame is None:
+                    break
+                crop = capture.frame[player_pos[1]-140:player_pos[1]-100, player_pos[0]+25:player_pos[0]+65]
                 res = utils.multi_match(crop, SKULL_TEMPLATE)
             config.enabled = True
             

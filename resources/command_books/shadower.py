@@ -294,7 +294,7 @@ class MesoExplosion(Command):
 
 class CruelStabRandomDirection(Command):
     """Uses 'CruelStab' once."""
-    backswing = 0.25
+    backswing = 0.2
 
     def main(self):
         self.print_debug_info()
