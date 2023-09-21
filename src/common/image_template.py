@@ -13,6 +13,8 @@ END_TALK_TEMPLATE = cv2.imread(f'{ASSETS_PATH}end_talk_template.png', 0)
 DEAD_TOBBSTONE_TEMPLATE = cv2.imread(f'{ASSETS_PATH}dead_tombstone_template.png', 0)
 DEAD_OK_TEMPLATE = cv2.imread(f'{ASSETS_PATH}dead_ok_template.png', 0)
 
+SKULL_TEMPLATE = cv2.imread(f'{ASSETS_PATH}skull_template.png', 0)
+
 BIG_MOUSE_RANGES = (
     ((0, 180, 119), (4, 255, 187)),
     ((0, 255, 17), (0, 255, 153)),

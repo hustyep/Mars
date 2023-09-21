@@ -109,6 +109,7 @@ class Notifier(Subject, Observer):
                 self.check_alert(frame)
                 self.check_rune_status(frame, minimap)
                 self.check_minal(frame, minimap)
+                self.check_skull(frame)
             time.sleep(0.05)
 
     def check_exception(self, frame):
@@ -320,7 +321,28 @@ class Notifier(Subject, Observer):
                 index = np.argmin(distances)
                 config.minal_closest_pos = config.routine[index].location
                 config.minal_active = True
-                
+    
+    def check_skull(self, frame):
+        player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+        player = utils.multi_match(
+                frame, player_template, threshold=0.9)
+        if len(player) == 0:
+            return
+        player_pos = player[0]
+        crop = frame[player_pos[1]-140:player_pos[1]-100, player_pos[0]+25:player_pos[0]+65]
+        res = utils.multi_match(crop, SKULL_TEMPLATE)
+        if len(res) > 0:
+            self._notify(BotWarnning.BINDED)
+
+            config.enabled = False
+            while(len(res) > 0):
+                for _ in range(4):
+                    USB().key_press('left')
+                    USB().key_press("right")
+                res = utils.multi_match(crop, SKULL_TEMPLATE)
+            config.enabled = True
+            
+    
     def _notify(self, event: Enum, arg=None, info: str = '') -> None:
         now = time.time()
         noticed_time = self.notice_time_record.get(event, 0)
