@@ -64,17 +64,17 @@ def step(direction, target):
         MoveUp(dy=abs(d_y)).execute()
     elif direction == "down":
         MoveDown(dy=abs(d_y)).execute()
-    # elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 1:
-    #     if d_y < 0 and d_x < 0:
-    #         ShadowAssault(direction='upleft')
-    #     elif d_y < 0 and d_x > 0:
-    #         ShadowAssault(direction='upright')
-    #     elif d_y > 0 and d_x < 0:
-    #         ShadowAssault(direction='downleft')           
-    #     elif d_y > 0 and d_x > 0:
-    #         ShadowAssault(direction='downright')
-    #     else:
-    #         ShadowAssault(direction=direction)   
+    elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 2:
+        if d_y < 0 and d_x < 0:
+            ShadowAssault(direction='upleft')
+        elif d_y < 0 and d_x > 0:
+            ShadowAssault(direction='upright')
+        elif d_y > 0 and d_x < 0:
+            ShadowAssault(direction='downleft')           
+        elif d_y > 0 and d_x > 0:
+            ShadowAssault(direction='downright')
+        else:
+            ShadowAssault(direction=direction)   
     elif abs(d_x) >= 26:
         # FlashJump(dx=d_x)
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
@@ -210,7 +210,7 @@ class ShadowAssault(Command):
         if self.jump:
             if self.direction.startswith('down'):
                 key_down('down')
-                press(Key.JUMP, 3)
+                press(Key.JUMP, 2, down_time=0.1, up_time=0.1)
                 key_up("down")
             else:
                 press(Key.JUMP)

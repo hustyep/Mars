@@ -269,7 +269,7 @@ class Command(Component):
         if not self.canUse():
             return False
 
-        if self.__class__.key is None:
+        if len(self.__class__.key) == 0:
             return False
 
         super().main()
