@@ -28,10 +28,10 @@ class Key:
     # Potion
     EXP_POTION = '0'
     WEALTH_POTION = "-"
-    GOLD_POTION = ''
+    GOLD_POTION = '='
     GUILD_POTION = "9"
     CANDIED_APPLE = '5'
-    LEGION_WEALTHY = '='
+    LEGION_WEALTHY = ''
     EXP_COUPON = '6'
 
     # Skills
@@ -541,7 +541,7 @@ class Potion(Command):
         for potion in self.potions:
             if potion.canUse():
                 potion.main()
-                break
+                time.sleep(0.1)
 
 
 class EXP_POTION(Command):
