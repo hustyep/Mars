@@ -10,7 +10,7 @@
 @, label=Summoning
 *, x=191, y=70, frequency=7, interval=0, skip=False, adjust=False
     ShadowAssault, direction=upleft, jump=True, distance=80
-*, x=157, y=34, frequency=7, interval=0, skip=False, adjust=True
+*, x=155, y=34, frequency=7, interval=0, skip=False, adjust=True
     ErdaShower, direction=left
 *, x=115, y=34, frequency=7, interval=0, skip=False, adjust=False
     SuddenRaid

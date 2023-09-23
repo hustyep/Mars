@@ -210,11 +210,11 @@ class ShadowAssault(Command):
         if self.jump:
             if self.direction.startswith('down'):
                 key_down('down')
-                press(Key.JUMP, 2, down_time=0.1, up_time=0.1)
+                press(Key.JUMP, 1, down_time=0.2, up_time=0.2)
                 key_up("down")
             else:
                 press(Key.JUMP)
-                time.sleep(0.2 if self.distance > 32 else 0.4)
+                time.sleep(0.1 if self.distance > 32 else 0.4)
 
         key_down(self.direction) 
         time.sleep(0.05)        
@@ -251,7 +251,7 @@ class RopeLift(Command):
             press(Key.JUMP, up_time=0.1)
         press(self.__class__.key, up_time=self.dy * 0.07)
         if self.dy >= 32:
-            time.sleep((self.dy - 32) * 0.03)
+            time.sleep((self.dy - 32) * 0.01)
 
 
 class CruelStab(Command):
@@ -526,13 +526,13 @@ class Potion(Command):
     def __init__(self):
         super().__init__(locals())
         self.potions = [
-            EXP_POTION(),
-            WEALTH_POTION(),
             GOLD_POTION(),
-            GUILD_POTION(),
             CANDIED_APPLE(),
             LEGION_WEALTHY(),
+            EXP_POTION(),
+            WEALTH_POTION(),
             EXP_COUPON(),
+            GUILD_POTION(),
         ]
 
     def main(self):
@@ -541,7 +541,7 @@ class Potion(Command):
         for potion in self.potions:
             if potion.canUse():
                 potion.main()
-                time.sleep(0.1)
+                time.sleep(0.5)
 
 
 class EXP_POTION(Command):
