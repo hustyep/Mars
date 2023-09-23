@@ -210,7 +210,7 @@ class ShadowAssault(Command):
         if self.jump:
             if self.direction.startswith('down'):
                 key_down('down')
-                press(Key.JUMP, 1, down_time=0.2, up_time=0.2)
+                press(Key.JUMP, 1, down_time=0.25, up_time=0.2)
                 key_up("down")
             else:
                 press(Key.JUMP)
@@ -436,9 +436,9 @@ class Buff(Command):
     def __init__(self):
         super().__init__(locals())
         self.buffs = [
+            MAPLE_WARRIOR(),
             GODDESS_BLESSING(),
             LAST_RESORT(),
-            MAPLE_WARRIOR(),
             FOR_THE_GUILD(),
             HARD_HITTER(),
             SHADOW_WALKER(),
@@ -528,11 +528,11 @@ class Potion(Command):
         self.potions = [
             GOLD_POTION(),
             CANDIED_APPLE(),
+            GUILD_POTION(),
             LEGION_WEALTHY(),
+            EXP_COUPON(),
             EXP_POTION(),
             WEALTH_POTION(),
-            EXP_COUPON(),
-            GUILD_POTION(),
         ]
 
     def main(self):
