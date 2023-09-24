@@ -36,7 +36,8 @@ class Component:
         self.main()
 
     def main(self):
-        self.print_debug_info()
+        pass
+        # self.print_debug_info()
 
     def update(self, *args, **kwargs):
         """Updates this Component's constructor arguments with new arguments."""
@@ -90,7 +91,7 @@ class Point(Component):
 
     def main(self):
         """Executes the set of actions associated with this Point."""
-        self.print_debug_info()
+        # self.print_debug_info()
 
         if self.interval > 0:
             if self.counter == 0 or time.time() - self.counter >= self.interval:
@@ -297,22 +298,27 @@ class Move(Command):
         self.prev_direction = new
 
     def main(self):
-        self.print_debug_info()
+        # self.print_debug_info()
         
         counter = self.max_steps
         path = config.layout.shortest_path(config.player_pos, self.target)
         threshold = settings.move_tolerance / math.sqrt(2)
+
+        if config.notice_level == 5:
+            print(f"[move]path: {path}")
 
         for i, point in enumerate(path):
             self.prev_direction = ''
             local_error = utils.distance(config.player_pos, point)
             global_error = utils.distance(config.player_pos, self.target)
 
+            if config.notice_level == 5 and not (config.player_pos[0] == point[0] and config.player_pos[1] == point[1]):
+                print(f'[move] from {config.player_pos} to {point}, target:{self.target}')
+
             while config.enabled and counter > 0 and \
                     local_error > settings.move_tolerance and \
                     global_error > settings.move_tolerance:
                 d_x = point[0] - config.player_pos[0]
-                player_x = config.player_pos[0]
                 if abs(d_x) > threshold:
                     if d_x < 0:
                         key = 'left'
@@ -320,9 +326,6 @@ class Move(Command):
                         key = 'right'
                     self._new_direction(key)
                     step(key, point)
-                    # 判断是否上了绳子
-                    # if config.player_pos[0] == player_x:
-                    #     press('s')
                     if settings.record_layout:
                         config.layout.add(*config.player_pos)
                     if i < len(path) - 1:
@@ -336,7 +339,7 @@ class Move(Command):
                             key = 'up'
                         else:
                             key = 'down'
-                        print(f"move down: {local_error} | {global_error}")
+                        # print(f"move down: {local_error} | {global_error}")
                         self._new_direction(key)
                         step(key, point)
                         if settings.record_layout:
@@ -359,8 +362,10 @@ class Adjust(Command):
         self.max_steps = settings.validate_nonnegative_int(max_steps)
 
     def main(self):
-        self.print_debug_info()
+        # self.print_debug_info()
         
+        print(f'[Adjust] from {config.player_pos} to {self.target}')
+
         counter = self.max_steps
         d_x = self.target[0] - config.player_pos[0]
         d_y = self.target[1] - config.player_pos[1]
@@ -382,13 +387,12 @@ class Adjust(Command):
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('right')
-                counter -= 1
             elif abs(d_y) > threshold:
                 if d_y < 0:
                     MoveUp(dy=abs(d_y)).execute()
                 else:
                     MoveDown(dy=abs(d_y)).execute()
-                counter -= 1
+            counter -= 1
             d_x = self.target[0] - config.player_pos[0]
             d_y = self.target[1] - config.player_pos[1]
 
@@ -400,7 +404,7 @@ class AdjustX(Command):
         self.max_steps = settings.validate_nonnegative_int(max_steps)
 
     def main(self):
-        self.print_debug_info()
+        print(f'[AdjustX] from {config.player_pos} to {self.target}')
         
         counter = self.max_steps
         d_x = self.target[0] - config.player_pos[0]
@@ -424,13 +428,12 @@ class AdjustX(Command):
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('right')
-                counter -= 1
             elif abs(d_y) > threshold_y:
                 if d_y < 0:
                     MoveUp(dy=abs(d_y)).execute()
                 else:
                     MoveDown(dy=abs(d_y)).execute()
-                counter -= 1
+            counter -= 1
             d_x = self.target[0] - config.player_pos[0]
             d_y = self.target[1] - config.player_pos[1]
 

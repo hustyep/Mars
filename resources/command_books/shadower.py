@@ -288,7 +288,6 @@ class MesoExplosion(Command):
     """Uses 'MesoExplosion' once."""
 
     def main(self):
-        self.print_debug_info()
         press(Key.MESO_EXPLOSION)
 
 
@@ -297,7 +296,6 @@ class CruelStabRandomDirection(Command):
     backswing = 0.2
 
     def main(self):
-        self.print_debug_info()
         press(Key.CRUEL_STAB, 1, up_time=0.2)
         MesoExplosion().execute()
         time.sleep(self.backswing)

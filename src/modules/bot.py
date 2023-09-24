@@ -182,7 +182,7 @@ class Bot(Configurable, Observer):
 
         move = config.command_book['move']
         move(*config.minal_pos).execute()
-        adjust = config.command_book['adjust']
+        adjust = config.command_book['adjustx']
         adjust(*config.minal_pos).execute()
         time.sleep(0.5)
         if config.minal_pos[0] > config.player_pos[0]:

@@ -383,7 +383,8 @@ class Notifier(Subject, Observer):
                 if config.notice_level < 5:
                     return
                 text = f'🔎[{event.value}] {info}'
-                self.send_message(text=text)
+                print(text)
+                # self.send_message(text=text)
 
     def othersLongStayWarnning(self, num):
         duration = int(time.time() - self.others_comming_time)
