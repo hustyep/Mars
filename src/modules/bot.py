@@ -109,8 +109,8 @@ class Bot(Configurable, Observer):
         move(*config.rune_pos).execute()
         adjust = config.command_book['adjust']
         adjust(*config.rune_pos).execute()
-        # adjustx = config.command_book['adjustx']
-        # adjustx(*config.rune_pos).execute()
+        adjustx = config.command_book['adjustx']
+        adjustx(*config.rune_pos).execute()
         time.sleep(0.5)
         if not config.rune_active:
             return
