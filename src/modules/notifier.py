@@ -23,11 +23,6 @@ from src.common.bot_notification import *
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
 
-class MineralType(Enum):
-    HEART = 'heart mineral'
-    CRYSTAL = 'crystal mineral'
-    HERB_YELLOW = 'yellow herb'
-    HERB_PURPLE = 'purple herb'
     
 def exception_hook(exc_type, exc_value, tb):
     print('Traceback:')
@@ -64,8 +59,6 @@ class Notifier(Subject, Observer):
 
         capture.attach(self)
         
-        self.mineral_detect_time = 0
-
         self.player_pos_updated_time = 0
         self.player_pos = (0, 0)
 
@@ -76,8 +69,6 @@ class Notifier(Subject, Observer):
 
         self.rune_active_time = 0
         self.rune_alert_delay = 300         # 5 minutes
-
-        self.mining_time = 0
 
         self.black_screen_threshold = 0.9
         self.white_room_threshold = 0.3
@@ -108,8 +99,6 @@ class Notifier(Subject, Observer):
             if config.enabled:
                 self.check_alert(frame)
                 self.check_rune_status(frame, minimap)
-                self.check_minal(frame, minimap)
-                self.check_skull(frame)
             time.sleep(0.05)
 
     def check_exception(self, frame):
@@ -261,89 +250,6 @@ class Notifier(Subject, Observer):
         # Alert if rune hasn't been solved
         elif len(rune_buff) == 0 and now - self.rune_active_time > self.rune_alert_delay and self.rune_active_time != 0:
             self.notifyRuneError(now - self.rune_active_time)
-
-    def check_minal(self, frame, minimap):
-        if not config.mining_enable:
-            return
-        
-        if frame is None or minimap is None:
-            config.minal_active = False
-            self.mining_time = 0
-            return
-
-        if config.minal_active:
-            return
-
-        if self.mineral_detect_time > 0 and time.time() - self.mineral_detect_time < 3:
-            return
-        
-        self.mineral_detect_time = time.time()
-        player_min = utils.multi_match(minimap, PLAYER_TEMPLATE, threshold=0.8)
-        if len(player_min) == 0:
-            return
-        player_pos = player_min[0]
-
-        matches = utils.multi_match(frame, MINAL_HEART_TEMPLATE)
-        mineral_type = MineralType.HEART
-        if len(matches) == 0:
-            matches = utils.multi_match(frame, HERB_YELLOW_TEMPLATE)
-            mineral_type = MineralType.HERB_YELLOW
-        if len(matches) == 0:
-            matches = utils.multi_match(frame, HERB_PURPLE_TEMPLATE)
-            mineral_type = MineralType.HERB_PURPLE
-        if len(matches) == 0:
-            matches = utils.multi_match(frame, MINAL_CRYSTAL_TEMPLATE)
-            mineral_type = MineralType.CRYSTAL
-        if len(matches) > 0:
-            self._notify(BotInfo.MINE_ACTIVE, info=mineral_type.value)
-            player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
-            player = utils.multi_match(
-                frame, player_template, threshold=0.9)
-            if len(player) > 0:
-                minal_full_pos = matches[0]
-                if mineral_type == MineralType.HERB_YELLOW:
-                    minal_full_pos = (minal_full_pos[0] - 16, minal_full_pos[1] - 70)
-                elif mineral_type == MineralType.HERB_PURPLE:
-                    minal_full_pos = (minal_full_pos[0] - 18, minal_full_pos[1] - 40)
-                elif mineral_type == MineralType.CRYSTAL:
-                    minal_full_pos = (minal_full_pos[0], minal_full_pos[1] - 50)
-                elif mineral_type == MineralType.HEART:
-                    minal_full_pos = (minal_full_pos[0], minal_full_pos[1] - 80)
-
-                player_full_pos = player[0]
-                dx_full = minal_full_pos[0] - player_full_pos[0]
-                dy_full = minal_full_pos[1] - (player_full_pos[1] - 130)
-                minal_pos = (
-                    player_pos[0] + round(dx_full / 15.0), player_pos[1] + round(dy_full / 15.0))
-                config.minal_pos = minal_pos
-                distances = list(
-                    map(distance_to_minal, config.routine.sequence))
-                index = np.argmin(distances)
-                config.minal_closest_pos = config.routine[index].location
-                config.minal_active = True
-    
-    def check_skull(self, frame):
-        player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
-        player = utils.multi_match(
-                frame, player_template, threshold=0.9)
-        if len(player) == 0:
-            return
-        player_pos = player[0]
-        crop = frame[player_pos[1]-140:player_pos[1]-100, player_pos[0]+25:player_pos[0]+65]
-        res = utils.multi_match(crop, SKULL_TEMPLATE)
-        if len(res) > 0:
-            self._notify(BotWarnning.BINDED)
-
-            config.enabled = False
-            while(len(res) > 0):
-                for _ in range(4):
-                    USB().key_press('left')
-                    USB().key_press("right")
-                if capture.frame is None:
-                    break
-                crop = capture.frame[player_pos[1]-140:player_pos[1]-100, player_pos[0]+25:player_pos[0]+65]
-                res = utils.multi_match(crop, SKULL_TEMPLATE)
-            config.enabled = True
             
     
     def _notify(self, event: Enum, arg=None, info: str = '') -> None:
@@ -481,16 +387,4 @@ def distance_to_rune(point):
 
     if isinstance(point, Point):
         return utils.distance(config.rune_pos, point.location)
-    return float('inf')
-
-
-def distance_to_minal(point):
-    """
-    Calculates the distance from POINT to the minal.
-    :param point:   The position to check.
-    :return:        The distance from POINT to the minal, infinity if it is not a Point object.
-    """
-
-    if isinstance(point, Point):
-        return utils.distance(config.minal_pos, point.location)
     return float('inf')
