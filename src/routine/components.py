@@ -370,8 +370,12 @@ class Adjust(Command):
         d_x = self.target[0] - config.player_pos[0]
         d_y = self.target[1] - config.player_pos[1]
         threshold = settings.adjust_tolerance / math.sqrt(2)
+        
         while config.enabled and counter > 0 and (abs(d_x) > threshold or abs(d_y) > threshold):
-            if abs(d_x) > threshold:
+            if abs(d_x) > settings.move_tolerance:
+                Move(*self.target)
+                return
+            elif abs(d_x) > threshold:
                 walk_counter = 0
                 if d_x < 0:
                     key_down('left')
@@ -413,7 +417,10 @@ class AdjustX(Command):
         threshold_x = 2
         threshold_y = 5
         while config.enabled and counter > 0 and (abs(d_x) > threshold_x or abs(d_y) > threshold_y):
-            if abs(d_x) > threshold_x:
+            if abs(d_x) > settings.move_tolerance:
+                Move(*self.target)
+                return
+            elif abs(d_x) > threshold_x:
                 walk_counter = 0
                 if d_x < 0:
                     key_down('left')
