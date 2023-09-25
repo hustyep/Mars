@@ -212,6 +212,8 @@ class Bot(Configurable, Observer):
                 press(arrow, 1, down_time=0.1)
         time.sleep(3.5)
         config.minal_active = False
+        config.minal_pos = None
+        config.minal_closest_pos = None
 
     def load_commands(self, file):
         try:
@@ -222,8 +224,12 @@ class Bot(Configurable, Observer):
 
     def toggle(self, enabled: bool, reason: str = ''):
         config.rune_active = False
-        config.rune_pos = (0, 0)
-        config.rune_closest_pos = (0, 0)
+        config.rune_pos = None
+        config.rune_closest_pos = None
+        
+        config.minal_active = False
+        config.minal_pos = None
+        config.minal_closest_pos = None
 
         if enabled:
             capture.calibrated = False

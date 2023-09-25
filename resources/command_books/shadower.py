@@ -210,7 +210,7 @@ class ShadowAssault(Command):
         if self.jump:
             if self.direction.startswith('down'):
                 key_down('down')
-                press(Key.JUMP, 1, down_time=0.25, up_time=0.2)
+                press(Key.JUMP, 1, down_time=0.3, up_time=0.2)
                 key_up("down")
             else:
                 press(Key.JUMP)
@@ -293,7 +293,7 @@ class MesoExplosion(Command):
 
 class CruelStabRandomDirection(Command):
     """Uses 'CruelStab' once."""
-    backswing = 0.2
+    backswing = 0.23
 
     def main(self):
         press(Key.CRUEL_STAB, 1, up_time=0.2)

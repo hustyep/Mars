@@ -340,7 +340,6 @@ class Move(Command):
                             key = 'up'
                         else:
                             key = 'down'
-                        # print(f"move down: {local_error} | {global_error}")
                         self._new_direction(key)
                         step(key, point)
                         if settings.record_layout:
@@ -370,7 +369,7 @@ class Adjust(Command):
         counter = self.max_steps
         d_x = self.target[0] - config.player_pos[0]
         d_y = self.target[1] - config.player_pos[1]
-        threshold = 2
+        threshold = settings.adjust_tolerance / math.sqrt(2)
         while config.enabled and counter > 0 and (abs(d_x) > threshold or abs(d_y) > threshold):
             if abs(d_x) > threshold:
                 walk_counter = 0
@@ -430,12 +429,13 @@ class AdjustX(Command):
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('right')
+                counter -= 1
             elif abs(d_y) > threshold_y:
                 if d_y < 0:
                     MoveUp(dy=abs(d_y)).execute()
                 else:
                     MoveDown(dy=abs(d_y)).execute()
-            counter -= 1
+                counter -= 1
             d_x = self.target[0] - config.player_pos[0]
             d_y = self.target[1] - config.player_pos[1]
 
