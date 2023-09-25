@@ -5,6 +5,7 @@ from src.common.dll_helper import dll_helper
 from src.modules.bot import bot
 from src.modules.capture import capture
 from src.modules.notifier import notifier
+from src.modules.detector import detector
 from src.modules.listener import listener
 from src.modules.gui import GUI
 from src.modules.chat_bot import chat_bot
@@ -30,6 +31,10 @@ while not capture.ready:
 
 notifier.start()
 while not notifier.ready:
+    time.sleep(0.01)
+
+detector.start()
+while not detector.ready:
     time.sleep(0.01)
 
 listener.start()
