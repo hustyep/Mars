@@ -330,6 +330,7 @@ class Move(Command):
                         config.layout.add(*config.player_pos)
                     if i < len(path) - 1:
                         time.sleep(0.15)
+                    counter -= 1
                 else:
                     global_d_y = self.target[1] - config.player_pos[1]
                     d_y = point[1] - config.player_pos[1]
@@ -346,7 +347,7 @@ class Move(Command):
                             config.layout.add(*config.player_pos)
                         if i < len(path) - 1:
                             time.sleep(0.05)
-                counter -= 1
+                        counter -= 1
                 if threshold > settings.adjust_tolerance:
                     threshold -= 1
                 local_error = utils.distance(config.player_pos, point)
@@ -387,12 +388,13 @@ class Adjust(Command):
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('right')
+                counter -= 1
             elif abs(d_y) > threshold:
                 if d_y < 0:
                     MoveUp(dy=abs(d_y)).execute()
                 else:
                     MoveDown(dy=abs(d_y)).execute()
-            counter -= 1
+                counter -= 1
             d_x = self.target[0] - config.player_pos[0]
             d_y = self.target[1] - config.player_pos[1]
 

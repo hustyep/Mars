@@ -81,7 +81,7 @@ def step(direction, target):
         press(Key.FLASH_JUMP, 2, down_time=0.03, up_time=0.03)
         CruelStabRandomDirection().execute()
     else:
-        time.sleep(0.01)
+        time.sleep(0.2)
 
 
 #########################
