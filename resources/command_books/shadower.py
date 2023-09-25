@@ -74,8 +74,8 @@ def step(direction, target):
         elif d_y > 0 and d_x > 0:
             ShadowAssault(direction='downright').execute()
         else:
-            ShadowAssault(direction=direction).execute()   
-    elif abs(d_x) >= 26:
+            ShadowAssault(direction=direction)   
+    elif abs(d_x) >= 28:
         # FlashJump(dx=d_x)
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
         press(Key.FLASH_JUMP, 2, down_time=0.03, up_time=0.03)
@@ -216,7 +216,7 @@ class ShadowAssault(Command):
         if self.jump:
             if self.direction.startswith('down'):
                 key_down('down')
-                press(Key.JUMP, 1, down_time=0.3, up_time=0.2)
+                press(Key.JUMP, 1, down_time=0.2, up_time=0.2)
                 key_up("down")
             else:
                 press(Key.JUMP)
