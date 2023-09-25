@@ -66,15 +66,15 @@ def step(direction, target):
         MoveDown(dy=abs(d_y)).execute()
     elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 2:
         if d_y < 0 and d_x < 0:
-            ShadowAssault(direction='upleft')
+            ShadowAssault(direction='upleft').execute()
         elif d_y < 0 and d_x > 0:
-            ShadowAssault(direction='upright')
+            ShadowAssault(direction='upright').execute()
         elif d_y > 0 and d_x < 0:
-            ShadowAssault(direction='downleft')           
+            ShadowAssault(direction='downleft').execute()           
         elif d_y > 0 and d_x > 0:
-            ShadowAssault(direction='downright')
+            ShadowAssault(direction='downright').execute()
         else:
-            ShadowAssault(direction=direction)   
+            ShadowAssault(direction=direction).execute()   
     elif abs(d_x) >= 26:
         # FlashJump(dx=d_x)
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
