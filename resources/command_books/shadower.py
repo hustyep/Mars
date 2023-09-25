@@ -80,6 +80,10 @@ def step(direction, target):
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
         press(Key.FLASH_JUMP, 2, down_time=0.03, up_time=0.03)
         CruelStabRandomDirection().execute()
+    elif abs(d_x) >= 20:
+        press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
+        press(Key.FLASH_JUMP, 1, down_time=0.03, up_time=0.03)
+        CruelStabRandomDirection().execute()
     else:
         time.sleep(0.2)
 
@@ -524,21 +528,21 @@ class Potion(Command):
     def __init__(self):
         super().__init__(locals())
         self.potions = [
-            GOLD_POTION(),
-            CANDIED_APPLE(),
-            GUILD_POTION(),
-            LEGION_WEALTHY(),
-            EXP_COUPON(),
-            EXP_POTION(),
-            WEALTH_POTION(),
+            GOLD_POTION,
+            CANDIED_APPLE,
+            GUILD_POTION,
+            LEGION_WEALTHY,
+            EXP_COUPON,
+            EXP_POTION,
+            WEALTH_POTION,
         ]
 
     def main(self):
         if SHADOW_WALKER.castedTime != 0 and time.time() - SHADOW_WALKER.castedTime <= 35:
             return
         for potion in self.potions:
-            if potion.canUse():
-                potion.main()
+            if potion().canUse():
+                potion().main()
                 time.sleep(0.5)
 
 
