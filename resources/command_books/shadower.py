@@ -208,9 +208,11 @@ class ShadowAssault(Command):
         time.sleep(0.2)
 
         if self.direction.endswith('left'):
-            press('left', down_time=0.1)
+            if config.player_direction != 'left':
+                press('left', down_time=0.1)
         elif self.direction.endswith("right"):
-            press("right", down_time=0.1)
+            if config.player_direction != 'right':
+                press("right", down_time=0.1)
         if self.jump:
             if self.direction.startswith('down'):
                 key_down('down')
