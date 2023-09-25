@@ -440,18 +440,18 @@ class Buff(Command):
     def __init__(self):
         super().__init__(locals())
         self.buffs = [
-            MAPLE_WARRIOR(),
-            GODDESS_BLESSING(),
-            LAST_RESORT(),
-            FOR_THE_GUILD(),
-            HARD_HITTER(),
-            SHADOW_WALKER(),
+            MAPLE_WARRIOR,
+            GODDESS_BLESSING,
+            LAST_RESORT,
+            FOR_THE_GUILD,
+            HARD_HITTER,
+            SHADOW_WALKER,
         ]
 
     def main(self):
         for buff in self.buffs:
-            if buff.canUse():
-                buff.main()
+            if buff().canUse():
+                buff().execute()
                 break
 
 
@@ -544,7 +544,7 @@ class Potion(Command):
             return
         for potion in self.potions:
             if potion().canUse():
-                potion().main()
+                potion().execute()
                 time.sleep(0.5)
 
 
