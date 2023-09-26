@@ -1,16 +1,16 @@
 
 @, label=Summoning
-*, x=57, y=38, frequency=7, skip=False, adjust=false
+*, x=57, y=38, frequency=7, interval=0, skip=False, adjust=false
     ShadowVeil, direction=right
-*, x=120, y=28, frequency=7, skip=False, adjust=True
+*, x=120, y=28, frequency=7, interval=0, skip=False, adjust=True
     Wait, duration=0.5
     DarkFlare, direction=right
     Wait, duration=0.5
 
 @, label=Bottom mobbing
-*, x=23, y=38, frequency=1, skip=False, adjust=False
+*, x=23, y=38, frequency=1, interval=0, skip=False, adjust=False
     MesoExplosion
-*, x=76, y=38, frequency=1, skip=False, adjust=False
+*, x=76, y=38, frequency=1, interval=0, skip=False, adjust=False
     MesoExplosion
-*, x=155, y=38, frequency=1, skip=False, adjust=False
+*, x=165, y=38, frequency=1, interval=0, skip=False, adjust=False
     MesoExplosion
