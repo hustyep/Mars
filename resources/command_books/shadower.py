@@ -67,9 +67,9 @@ def step(direction, target):
     elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 2:
         ShadowAssault(dx=d_x, dy=d_y).execute()
     elif abs(d_x) >= 20:
-        FlashJump(dx=d_x).execute()
+        FlashJump(dx=abs(d_x)).execute()
         CruelStabRandomDirection().execute()
-        sleep_while_move_y(interval=0.018)
+        sleep_while_move_y(interval=0.016)
     else:
         time.sleep(0.05)
 
@@ -163,7 +163,7 @@ class FlashJump(Command):
         self.print_debug_info()
 
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
-        press(Key.FLASH_JUMP, 2, down_time=0.03, up_time=0.03)
+        press(Key.FLASH_JUMP, self.time, down_time=0.03, up_time=0.03)
 
 
 class ShadowAssault(Command):
