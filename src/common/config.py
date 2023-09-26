@@ -76,6 +76,7 @@ mining_enable = False
 minal_active = False
 minal_pos = None
 minal_closest_pos = None
+mineral_type = None
 
 # invisible skill used time
 hide_start = 0

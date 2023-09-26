@@ -17,6 +17,8 @@ from src.common.common import Observer, Subject
 from src.modules.notifier import notifier
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
+from src.modules.detector import MineralType
+from src.common.image_template import *
 
 
 class Bot(Configurable, Observer):
@@ -184,13 +186,42 @@ class Bot(Configurable, Observer):
         move(*config.minal_pos).execute()
         adjust = config.command_book['adjustx']
         adjust(*config.minal_pos).execute()
-        time.sleep(0.5)
-        if config.minal_pos[0] > config.player_pos[0]:
-            if config.player_direction == 'left':
-                press('right')
-        elif config.minal_pos[0] < config.player_pos[0]:
-            if config.player_direction == 'right':
-                press('left')
+        time.sleep(0.2)
+        
+        mineral_template = MINAL_HEART_TEMPLATE
+        if config.mineral_type == MineralType.CRYSTAL:
+            mineral_template = MINAL_CRYSTAL_TEMPLATE
+        elif config.mineral_type == MineralType.HERB_YELLOW:
+            mineral_template = HERB_YELLOW_TEMPLATE
+        elif config.mineral_type == MineralType.HERB_PURPLE:
+            mineral_template = HERB_PURPLE_TEMPLATE
+                                    
+        matches = utils.multi_match(frame, mineral_template)
+        if len(matches) > 0:
+            player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+            player = utils.multi_match(
+                frame, player_template, threshold=0.9)
+            player_x = player[0][0]
+            mineral_x = matches[0][0]
+            if config.mineral_type == MineralType.HERB_YELLOW or config.mineral_type == MineralType.HERB_PURPLE:
+                mineral_x -= 18
+            if mineral_x > player_x:
+                if config.player_direction == 'left':
+                    press('right')
+                if mineral_x - player_x >= 40:
+                    press('right', (mineral_x - player_x)//40)
+            elif mineral_x < player_x:
+                if config.player_direction == 'right':
+                    press('left')
+                if player_x - mineral_x >= 40:
+                    press('left', (player_x - mineral_x)//40)
+            else:
+                if config.player_direction == 'right':
+                    press('right')
+                    press('left')
+                else:
+                    press('left')
+                    press('right')
         else:
             if config.player_direction == 'right':
                 press('right', 2)
@@ -198,6 +229,20 @@ class Bot(Configurable, Observer):
             else:
                 press('left', 2)
                 press('right')
+        time.sleep(0.3)
+        # if config.minal_pos[0] > config.player_pos[0]:
+        #     if config.player_direction == 'left':
+        #         press('right')
+        # elif config.minal_pos[0] < config.player_pos[0]:
+        #     if config.player_direction == 'right':
+        #         press('left')
+        # else:
+        #     if config.player_direction == 'right':
+        #         press('right', 2)
+        #         press('left')
+        #     else:
+        #         press('left', 2)
+        #         press('right')
 
         press(self.config['Interact'], 1, down_time=0.2,
               up_time=0.8)        # Inherited from Configurable

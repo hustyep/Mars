@@ -83,6 +83,7 @@ class Detector():
             player = utils.multi_match(
                 frame, player_template, threshold=0.9)
             if len(player) > 0:
+                config.mineral_type = mineral_type
                 minal_full_pos = matches[0]
                 if mineral_type == MineralType.HERB_YELLOW:
                     minal_full_pos = (
