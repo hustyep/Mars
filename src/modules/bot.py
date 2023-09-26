@@ -195,7 +195,8 @@ class Bot(Configurable, Observer):
             mineral_template = HERB_YELLOW_TEMPLATE
         elif config.mineral_type == MineralType.HERB_PURPLE:
             mineral_template = HERB_PURPLE_TEMPLATE
-                                    
+                        
+        frame = capture.frame            
         matches = utils.multi_match(frame, mineral_template)
         if len(matches) > 0:
             player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE

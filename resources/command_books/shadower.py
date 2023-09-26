@@ -82,13 +82,13 @@ def sleep_while_move_y():
     player_y = config.player_pos[1]
     count = 0
     while True:
-        time.sleep(0.05)
+        time.sleep(0.02)
         if player_y == config.player_pos[1]:
             count += 1
         else:
             count = 0
             player_y = config.player_pos[1]
-        if count == 3:
+        if count == 5:
             break
     
 
