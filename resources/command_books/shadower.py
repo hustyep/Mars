@@ -65,32 +65,32 @@ def step(direction, target):
     elif direction == "down":
         MoveDown(dy=abs(d_y)).execute()
     elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 2:
-        if d_y < 0 and d_x < 0:
-            ShadowAssault(direction='upleft').execute()
-        elif d_y < 0 and d_x > 0:
-            ShadowAssault(direction='upright').execute()
-        elif d_y > 0 and d_x < 0:
-            ShadowAssault(direction='downleft').execute()           
-        elif d_y > 0 and d_x > 0:
-            ShadowAssault(direction='downright').execute()
-        else:
-            ShadowAssault(direction=direction)   
-    elif abs(d_x) >= 28:
-        # FlashJump(dx=d_x)
-        press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
-        press(Key.FLASH_JUMP, 2, down_time=0.03, up_time=0.03)
-        CruelStabRandomDirection().execute()
+        ShadowAssault(dx=d_x, dy=d_y).execute()
     elif abs(d_x) >= 20:
-        press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
-        press(Key.FLASH_JUMP, 1, down_time=0.03, up_time=0.03)
+        FlashJump(dx=d_x).execute()
         CruelStabRandomDirection().execute()
+        sleep_while_move_y()
     else:
-        time.sleep(0.2)
+        time.sleep(0.05)
 
 
 #########################
 #        Y轴移动         #
 #########################
+
+def sleep_while_move_y():
+    player_y = config.player_pos[1]
+    count = 0
+    while True:
+        time.sleep(0.05)
+        if player_y == config.player_pos[1]:
+            count += 1
+        else:
+            count = 0
+            player_y = config.player_pos[1]
+        if count == 3:
+            break
+    
 
 class MoveUp(Command):
     def __init__(self, dy: int = 20):
@@ -99,9 +99,10 @@ class MoveUp(Command):
 
     def main(self):
         self.print_debug_info()
-        
+
         if self.dy <= 6:
-            press(Key.JUMP, up_time=1)
+            press(Key.JUMP)
+            sleep_while_move_y()
         elif self.dy <= 24:
             JumpUp(dy=self.dy).execute()
         elif self.dy <= 40 and ShadowAssault().canUse():
@@ -117,15 +118,16 @@ class MoveDown(Command):
 
     def main(self):
         self.print_debug_info()
-        
+
         if self.dy >= 25 and ShadowAssault.usable_count() >= 3:
             ShadowAssault(direction='down', jump='True',
                           distance=self.dy).execute()
         else:
             key_down('down')
-            press(Key.JUMP, 2, down_time=0.1, up_time=0.1)
+            press(Key.JUMP, 1, down_time=0.2, up_time=0.2)
             key_up('down')
-            time.sleep(0.8 if self.dy >= 15 else 0.7)
+            sleep_while_move_y()
+            # time.sleep(0.8 if self.dy >= 15 else 0.7)
 
 
 class JumpUp(Command):
@@ -135,14 +137,15 @@ class JumpUp(Command):
 
     def main(self):
         self.print_debug_info()
-        
+
         time.sleep(0.5)
         press(Key.JUMP)
         key_down('up')
         time.sleep(0.06 if self.dy >= 20 else 0.1)
         press(Key.FLASH_JUMP, 1)
         key_up('up')
-        time.sleep(1.5)
+        sleep_while_move_y()
+        # time.sleep(1.5)
 
 
 class FlashJump(Command):
@@ -152,20 +155,15 @@ class FlashJump(Command):
         super().__init__(locals())
 
         if dx is not None:
-            self.time = 1 if dx <= 40 else 2
+            self.time = 1 if dx <= 30 else 2
         else:
             self.time = time
 
     def main(self):
         self.print_debug_info()
 
-        time.sleep(0.5)
-        press(Key.JUMP, 1)
-        # key_down(self.direction)
-        time.sleep(0.08)
-        press(Key.FLASH_JUMP, self.time)
-        # key_up(self.direction)
-        time.sleep(1.2)
+        press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
+        press(Key.FLASH_JUMP, self.time, down_time=0.03, up_time=0.03)
 
 
 class ShadowAssault(Command):
@@ -178,11 +176,35 @@ class ShadowAssault(Command):
     usable_times = 4
     cooldown = 60
 
-    def __init__(self, direction='up', jump='False', distance=80):
+    def __init__(self, direction='up', jump='True', distance=80, dx=None, dy=None):
         super().__init__(locals())
-        self.direction = direction
-        self.jump = settings.validate_boolean(jump)
-        self.distance = settings.validate_nonnegative_int(distance)
+        if dx is None or dy is None:
+            self.direction = direction
+            self.jump = settings.validate_boolean(jump)
+            self.distance = settings.validate_nonnegative_int(distance)
+        else:
+            if dy < 0 and dx < 0:
+                self.direction = 'upleft'
+                self.jump = True
+            elif dy < 0 and dx > 0:
+                self.direction = 'upright'
+                self.jump = True
+            elif dy > 0 and dx < 0:
+                self.direction = 'downleft'
+                self.jump = True
+            elif dy > 0 and dx > 0:
+                self.direction = 'downright'
+                self.jump = True
+            elif dy != 0:
+                self.direction = 'up' if dy < 0 else 'down'
+                self.jump = True
+            elif dx != 0:
+                self.direction = 'left' if dx < 0 else 'right'
+                self.jump = False
+            else:
+                self.direction = direction
+                self.jump = settings.validate_boolean(jump)
+            self.distance = math.sqrt(dx ** 2 + dy ** 2)
 
     @staticmethod
     def usable_count():
@@ -205,6 +227,9 @@ class ShadowAssault(Command):
     def main(self):
         self.print_debug_info()
 
+        if self.distance == 0:
+            return
+
         time.sleep(0.2)
 
         if self.direction.endswith('left'):
@@ -222,8 +247,8 @@ class ShadowAssault(Command):
                 press(Key.JUMP)
                 time.sleep(0.1 if self.distance > 32 else 0.4)
 
-        key_down(self.direction) 
-        time.sleep(0.05)        
+        key_down(self.direction)
+        time.sleep(0.05)
 
         cur_time = time.time()
         if (cur_time - self.__class__.castedTime) > self.__class__.cooldown + self.__class__.backswing:
@@ -232,8 +257,9 @@ class ShadowAssault(Command):
         else:
             self.__class__.usable_times -= 1
         press(Key.SHADOW_ASSAULT)
-        key_up(self.direction) 
-        time.sleep(self.backswing)
+        key_up(self.direction)
+        # time.sleep(self.backswing)
+        sleep_while_move_y()
 
         if settings.record_layout:
             config.layout.add(*config.player_pos)
@@ -255,9 +281,11 @@ class RopeLift(Command):
             press(Key.JUMP, up_time=0.2)
         elif self.dy >= 32:
             press(Key.JUMP, up_time=0.1)
-        press(self.__class__.key, up_time=self.dy * 0.07)
-        if self.dy >= 32:
-            time.sleep((self.dy - 32) * 0.01)
+        press(self.__class__.key)
+        sleep_while_move_y()
+        # press(self.__class__.key, up_time=self.dy * 0.07)
+        # if self.dy >= 32:
+        #     time.sleep((self.dy - 32) * 0.01)
 
 
 class CruelStab(Command):
@@ -271,7 +299,7 @@ class CruelStab(Command):
 
     def main(self):
         self.print_debug_info()
-        
+
         time.sleep(0.05)
         key_down(self.direction)
         time.sleep(0.05)
@@ -299,7 +327,7 @@ class MesoExplosion(Command):
 
 class CruelStabRandomDirection(Command):
     """Uses 'CruelStab' once."""
-    backswing = 0.23
+    backswing = 0.1
 
     def main(self):
         press(Key.CRUEL_STAB, 1, up_time=0.2)
@@ -475,6 +503,7 @@ class SHADOW_WALKER(Command):
     def main(self):
         super().main()
         config.hide_start = time.time()
+
 
 class EPIC_ADVENTURE(Command):
     key = Key.EPIC_ADVENTURE

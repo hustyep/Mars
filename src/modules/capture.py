@@ -184,7 +184,7 @@ class Capture(Subject):
             # Package display information to be polled by GUI
             self.minimap = minimap
 
-            self.notify(BotDebug.PLAYER_LOCATION_UPDATE)
+            # self.notify(BotDebug.PLAYER_LOCATION_UPDATE)
         elif config.enabled:
             now = time.time()
             if self.lost_player_time == 0:
