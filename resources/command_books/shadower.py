@@ -78,7 +78,7 @@ def step(direction, target):
 #        Y轴移动         #
 #########################
 
-def sleep_while_move_y(interval=0.02, count=5):
+def sleep_while_move_y(interval=0.02, n=5):
     player_y = config.player_pos[1]
     count = 0
     while True:
@@ -88,7 +88,7 @@ def sleep_while_move_y(interval=0.02, count=5):
         else:
             count = 0
             player_y = config.player_pos[1]
-        if count == count:
+        if count == n:
             break
     
 
@@ -163,7 +163,7 @@ class FlashJump(Command):
         self.print_debug_info()
 
         press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
-        press(Key.FLASH_JUMP, self.time, down_time=0.03, up_time=0.03)
+        press(Key.FLASH_JUMP, 2, down_time=0.03, up_time=0.03)
 
 
 class ShadowAssault(Command):
