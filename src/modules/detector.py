@@ -46,6 +46,7 @@ class Detector():
             if config.enabled:
                 self.check_mineral(frame, minimap)
                 self.check_skull(frame)
+                self.check_dead(frame)
             time.sleep(1)
 
     def check_mineral(self, frame, minimap):
@@ -85,7 +86,7 @@ class Detector():
                 minal_full_pos = matches[0]
                 if mineral_type == MineralType.HERB_YELLOW:
                     minal_full_pos = (
-                        minal_full_pos[0] - 16, minal_full_pos[1] - 70)
+                        minal_full_pos[0] - 18, minal_full_pos[1] - 70)
                 elif mineral_type == MineralType.HERB_PURPLE:
                     minal_full_pos = (
                         minal_full_pos[0] - 18, minal_full_pos[1] - 40)
@@ -132,6 +133,25 @@ class Detector():
                                      100, player_pos[0]+25:player_pos[0]+65]
                 res = utils.multi_match(crop, SKULL_TEMPLATE)
             config.enabled = True
+
+    # Check for dead
+    def check_dead(self, frame):
+        x = (frame.shape[1] - 450) // 2
+        y = (frame.shape[0] - 200) // 2
+        image = frame[y:y+200, x:x+450]
+        tombstone = utils.multi_match(
+            image, DEAD_TOBBSTONE_TEMPLATE, threshold=0.9)
+        if tombstone:
+            notifier._notify(BotError.DEAD)
+            ok_btn = utils.multi_match(
+                image, DEAD_OK_TEMPLATE, threshold=0.9)
+            if ok_btn:
+                USB().mouse_abs_move(capture.window['left'] + ok_btn[0][0] + x,
+                                     capture.window['top'] + ok_btn[0][1] + y)
+                time.sleep(1)
+                USB().mouse_left_click()
+                time.sleep(1)
+                USB().mouse_left_click()
 
 
 detector = Detector()

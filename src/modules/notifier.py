@@ -118,23 +118,7 @@ class Notifier(Subject, Observer):
             self._notify(BotFatal.WHITE_ROOM)
         else:
             self.notice_time_record[BotFatal.WHITE_ROOM] = 0
-
-        # Check for dead
-        x = (frame.shape[1] - 450) // 2
-        y = (frame.shape[0] - 200) // 2
-        image = frame[y:y+200, x:x+450]
-        tombstone = utils.multi_match(
-            image, DEAD_TOBBSTONE_TEMPLATE, threshold=0.9)
-        if tombstone:
-            self._notify(BotError.DEAD)
-            ok_btn = utils.multi_match(
-                image, DEAD_OK_TEMPLATE, threshold=0.9)
-            if ok_btn:
-                USB().mouse_abs_move(capture.window['left'] + ok_btn[0][0] + x, capture.window['top'] + ok_btn[0][1] + y)
-                time.sleep(1)
-                USB().mouse_left_click()
-                time.sleep(1)
-                USB().mouse_left_click()
+            
                 
         # Check for no movement
         if config.enabled and operator.eq(config.player_pos, self.player_pos):
@@ -171,6 +155,7 @@ class Notifier(Subject, Observer):
                 if win32gui.IsIconic(capture.hwnd):
                     win32gui.SendMessage(
                         capture.hwnd, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
+                    time.sleep(0.1)
                 win32gui.SetForegroundWindow(capture.hwnd)
             except Exception as e:
                 print(e)
