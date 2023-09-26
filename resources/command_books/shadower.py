@@ -78,11 +78,11 @@ def step(direction, target):
 #        Y轴移动         #
 #########################
 
-def sleep_while_move_y():
+def sleep_while_move_y(interval=0.03):
     player_y = config.player_pos[1]
     count = 0
     while True:
-        time.sleep(0.02)
+        time.sleep(interval)
         if player_y == config.player_pos[1]:
             count += 1
         else:
@@ -172,7 +172,7 @@ class ShadowAssault(Command):
     to the current Layout if necessary.
     """
 
-    backswing = 0.85
+    backswing = 0.1
     usable_times = 4
     cooldown = 60
 
@@ -258,9 +258,9 @@ class ShadowAssault(Command):
             self.__class__.usable_times -= 1
         press(Key.SHADOW_ASSAULT)
         key_up(self.direction)
-        # time.sleep(self.backswing)
         sleep_while_move_y()
-
+        time.sleep(self.backswing)
+        
         if settings.record_layout:
             config.layout.add(*config.player_pos)
 
