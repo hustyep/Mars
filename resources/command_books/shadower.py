@@ -172,7 +172,7 @@ class ShadowAssault(Command):
     to the current Layout if necessary.
     """
 
-    backswing = 0.05
+    backswing = 0.15
     usable_times = 4
     cooldown = 60
 
@@ -258,8 +258,8 @@ class ShadowAssault(Command):
             self.__class__.usable_times -= 1
         press(Key.SHADOW_ASSAULT)
         key_up(self.direction)
-        sleep_while_move_y(interval=0.04)
         time.sleep(self.backswing)
+        sleep_while_move_y(interval=0.04)
         
         if settings.record_layout:
             config.layout.add(*config.player_pos)
@@ -603,7 +603,7 @@ class WEALTH_POTION(Command):
 
 class GOLD_POTION(Command):
     key = Key.GOLD_POTION
-    cooldown = 1800
+    cooldown = 1810
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
@@ -615,7 +615,7 @@ class GOLD_POTION(Command):
 
 class GUILD_POTION(Command):
     key = Key.GUILD_POTION
-    cooldown = 1800
+    cooldown = 1810
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
@@ -639,7 +639,7 @@ class CANDIED_APPLE(Command):
 
 class LEGION_WEALTHY(Command):
     key = Key.LEGION_WEALTHY
-    cooldown = 1800
+    cooldown = 1810
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
@@ -651,7 +651,7 @@ class LEGION_WEALTHY(Command):
 
 class EXP_COUPON(Command):
     key = Key.EXP_COUPON
-    cooldown = 1800
+    cooldown = 1810
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
