@@ -43,7 +43,7 @@ class Detector():
             frame = capture.frame
             minimap = capture.minimap
 
-            if config.enabled:
+            if config.enabled and frame is not None and minimap is not None:
                 self.check_mineral(frame, minimap)
                 self.check_skull(frame)
                 self.check_dead(frame)

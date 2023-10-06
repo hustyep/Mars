@@ -64,7 +64,7 @@ def step(direction, target):
         MoveUp(dy=abs(d_y)).execute()
     elif direction == "down":
         MoveDown(dy=abs(d_y)).execute()
-    elif abs(d_y) >= 26 and ShadowAssault.usable_count() > 2:
+    elif abs(d_y) >= 26 and abs(d_x) >= 24 and ShadowAssault.usable_count() > 2:
         ShadowAssault(dx=d_x, dy=d_y).execute()
     elif abs(d_x) >= 20:
         FlashJump(dx=abs(d_x)).execute()
@@ -78,7 +78,7 @@ def step(direction, target):
 #        Y轴移动         #
 #########################
 
-def sleep_while_move_y(interval=0.02, n=5):
+def sleep_while_move_y(interval=0.02, n=6):
     player_y = config.player_pos[1]
     count = 0
     while True:
@@ -144,7 +144,7 @@ class JumpUp(Command):
         time.sleep(0.06 if self.dy >= 20 else 0.1)
         press(Key.FLASH_JUMP, 1)
         key_up('up')
-        sleep_while_move_y()
+        sleep_while_move_y(interval=0.05, n=6)
         # time.sleep(1.5)
 
 
@@ -155,7 +155,7 @@ class FlashJump(Command):
         super().__init__(locals())
 
         if dx is not None:
-            self.time = 1 if dx <= 30 else 2
+            self.time = 1 if dx <= 32 else 2
         else:
             self.time = time
 
@@ -282,7 +282,7 @@ class RopeLift(Command):
         elif self.dy >= 32:
             press(Key.JUMP, up_time=0.1)
         press(self.__class__.key)
-        sleep_while_move_y()
+        sleep_while_move_y(interval=0.05, n=6)
         # press(self.__class__.key, up_time=self.dy * 0.07)
         # if self.dy >= 32:
         #     time.sleep((self.dy - 32) * 0.01)
@@ -486,18 +486,21 @@ class Buff(Command):
 class GODDESS_BLESSING(Command):
     key = Key.GODDESS_BLESSING
     cooldown = 180
-    backswing = 0.75
+    precast = 0.3
+    backswing = 0.8
 
 
 class LAST_RESORT(Command):
     key = Key.LAST_RESORT
     cooldown = 75
-    backswing = 0.75
+    precast = 0.3
+    backswing = 0.8
 
 
 class SHADOW_WALKER(Command):
     key = Key.SHADOW_WALKER
-    cooldown = 190
+    cooldown = 180
+    precast = 0.3
     backswing = 0.8
 
     def main(self):
@@ -514,7 +517,7 @@ class EPIC_ADVENTURE(Command):
 class MAPLE_WARRIOR(Command):
     key = Key.MAPLE_WARRIOR
     cooldown = 900
-    backswing = 0.75
+    backswing = 0.8
 
 
 class FOR_THE_GUILD(Command):

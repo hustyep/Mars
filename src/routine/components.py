@@ -36,8 +36,7 @@ class Component:
         self.main()
 
     def main(self):
-        pass
-        # self.print_debug_info()
+        self.print_debug_info()
 
     def update(self, *args, **kwargs):
         """Updates this Component's constructor arguments with new arguments."""

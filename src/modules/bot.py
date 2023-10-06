@@ -111,8 +111,8 @@ class Bot(Configurable, Observer):
         move(*config.rune_pos).execute()
         adjust = config.command_book['adjust']
         adjust(*config.rune_pos).execute()
-        adjustx = config.command_book['adjustx']
-        adjustx(*config.rune_pos).execute()
+        # adjustx = config.command_book['adjustx']
+        # adjustx(*config.rune_pos).execute()
         time.sleep(0.5)
         if not config.rune_active:
             return
@@ -127,18 +127,14 @@ class Bot(Configurable, Observer):
                 return
             frame = capture.frame
             solution = rune.show_magic(frame)
-            if solution is None and retry:
-                self._solve_rune(retry=False)
-                return
-            else:
-                print(', '.join(solution))
-                if len(solution) == 4:
-                    print('Solution found, entering result')
-                    used_frame = frame
-                    find_solution = True
-                    for arrow in solution:
-                        press(arrow, 1, down_time=0.1)
-                    break
+            print(', '.join(solution))
+            if len(solution) == 4:
+                print('Solution found, entering result')
+                used_frame = frame
+                find_solution = True
+                for arrow in solution:
+                    press(arrow, 1, down_time=0.1)
+                break
             time.sleep(0.1)
         time.sleep(0.3)
 
@@ -198,10 +194,10 @@ class Bot(Configurable, Observer):
                         
         frame = capture.frame            
         matches = utils.multi_match(frame, mineral_template)
-        if len(matches) > 0:
-            player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
-            player = utils.multi_match(
+        player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+        player = utils.multi_match(
                 frame, player_template, threshold=0.9)
+        if len(matches) > 0 and len(player) > 0:
             player_x = player[0][0]
             mineral_x = matches[0][0]
             if config.mineral_type == MineralType.HERB_YELLOW or config.mineral_type == MineralType.HERB_PURPLE:
