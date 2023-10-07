@@ -1,3 +1,4 @@
+$, target=mob_name, value='FloraFooterSoldier'
 
 @, label=Bottom mobbing
 *, x=46, y=70, frequency=1, interval=0, skip=False, adjust=False

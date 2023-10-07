@@ -101,15 +101,11 @@ if __name__ == "__main__":
     #     threading.Thread(target=run).start()
     # while True:
     #     time.sleep(1)
+    img = cv2.imread(".test/maple_230831073143476.png")
+    MOB_TEMPLATE = cv2.imread('.test/mob1.png', 0)
     start = time.time()
-    img = cv2.imread(".test/Maple_230919_153412.png")
-    PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/player_sllee_template.png', 0)
-    DEAD_OK_TEMPLATE = cv2.imread('assets/skull_template.png', 0)
     player = multi_match(
-                img, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
-    player_pos = player[0]
-    crop = img[player_pos[1]-140:player_pos[1]-100, player_pos[0]+25:player_pos[0]+65]
-    res = multi_match(crop, DEAD_OK_TEMPLATE)
+                img, MOB_TEMPLATE, threshold=0.9)
     print(f'{time.time() - start}')
     # cv2.imshow("123", crop)
     # cv2.waitKey()

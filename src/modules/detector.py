@@ -6,7 +6,7 @@ import numpy as np
 from enum import Enum
 
 from src.routine.components import Point
-from src.common import config, utils
+from src.common import config, utils, settings
 from src.common.usb import USB
 from src.common.image_template import *
 from src.common.bot_notification import *
@@ -26,6 +26,10 @@ class Detector():
     def __init__(self):
         """Initializes this Detector object's main thread."""
         super().__init__()
+
+        self.mob_template = None
+        self.player_pos_min = None
+        self.player_pos = None
 
         self.ready = False
         self.thread = threading.Thread(target=self._main)
@@ -47,7 +51,8 @@ class Detector():
                 self.check_mineral(frame, minimap)
                 self.check_skull(frame)
                 self.check_dead(frame)
-            time.sleep(1)
+            time.sleep(0.2)
+        
 
     def check_mineral(self, frame, minimap):
         if not config.mining_enable:

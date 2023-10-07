@@ -8,7 +8,7 @@ class Auto(LabelFrame):
         super().__init__(parent, 'Auto', **kwargs)
 
         self.settings = AutoSettings('auto')
-        config.mining_enable = bool(self.settings.get("Mining"))
+        self.update_config()
 
         row = Frame(self)
         row.pack(side=tk.TOP, expand=True, pady=5, padx=5)
@@ -38,13 +38,18 @@ class Auto(LabelFrame):
             value = self.check_values[i]
             self.settings.set(check.cget('text'), value.get())
         self.settings.save_config()
+        self.update_config()
+        
+    def update_config(self):
         config.mining_enable = bool(self.settings.get("Mining"))
+        config.mob_detect = bool(self.settings.get("MobDetect"))
 
 class AutoSettings(Configurable):
     DEFAULT_CONFIG = {
         'MVP': False,
         'Ask': False,
         'Mining': False,
+        'MobDetect': False
     }
 
     def get(self, key):

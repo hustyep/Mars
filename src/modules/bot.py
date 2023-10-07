@@ -8,7 +8,7 @@ from src.chat_bot.chat_bot_entity import ChatBotCommand
 from src.detection import rune
 from src.routine.routine import Routine
 from src.routine.components import Point
-from src.common import config, utils
+from src.common import config, utils, settings
 from src.common.action_simulator import ActionSimulator
 from src.common.bot_notification import *
 from src.common.vkeys import press, releaseAll
@@ -94,10 +94,69 @@ class Bot(Configurable, Observer):
                         and element.location == config.minal_closest_pos:
                     self._mining()
 
-                element.execute()
-                config.routine.step()
+                if isinstance(element, Point) and self.change_direction(element):
+                    press('right' if config.player_direction == 'left' else 'left')
+                    while(self.has_reachable_mobs() == False):
+                        time.sleep(0.01)
+                    element.execute()
+                    config.routine.step()
+                else:
+                    element.execute()
+                    config.routine.step()
             else:
                 time.sleep(0.01)
+
+    def change_direction(self, point):
+        if config.player_direction == 'left':
+            return point[0] > config.player_pos[0]
+        else:
+            return point[0] < config.player_pos[0]
+
+    @utils.run_if_enabled
+    def detect_mobs(self):
+        mobs = []
+
+        frame = capture.frame
+        minimap = capture.minimap
+
+        if frame is None or minimap is None:
+            return mobs
+
+        if not config.mob_detect:
+            return mobs
+
+        if len(config.routine.mob_template) == 0:
+            return mobs
+
+        for mob_template in config.routine.mob_template:
+            mobs_tmp = utils.multi_match(frame, mob_template, threshold=0.9)
+            if len(mobs_tmp) > 0:
+                for mob in mobs_tmp:
+                    mobs.append(mob)
+        return mobs
+
+    def has_reachable_mobs(self):
+        mobs = self.detect_mobs()
+        if len(mobs) == 0:
+            return False
+        player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+        player_match = utils.multi_match(
+            capture.frame, player_template, threshold=0.9)
+        if len(player_match) == 0:
+            return False
+        player_pos = player_match[0]
+        reachable_h = settings.move_tolerance * 4 * 15
+        reachable_v = settings.move_tolerance * 2 * 15
+        for mob in mobs:
+            if abs(mob[1] - player_pos[1]) > reachable_v:
+                continue
+            if config.player_direction == 'left':
+                if player_pos[0] - mob[0] > 0 and player_pos[0] - mob[0] <= reachable_h:
+                    return True
+            else:
+                if player_pos[0] - mob[0] < 0 and mob[0] - player_pos[0] <= reachable_h:
+                    return True
+        return False
 
     @utils.run_if_enabled
     def _solve_rune(self, retry=True):
@@ -185,7 +244,7 @@ class Bot(Configurable, Observer):
         adjust = config.command_book['adjustx']
         adjust(*config.minal_pos).execute()
         time.sleep(0.2)
-        
+
         mineral_template = MINAL_HEART_TEMPLATE
         if config.mineral_type == MineralType.CRYSTAL:
             mineral_template = MINAL_CRYSTAL_TEMPLATE
@@ -193,12 +252,12 @@ class Bot(Configurable, Observer):
             mineral_template = HERB_YELLOW_TEMPLATE
         elif config.mineral_type == MineralType.HERB_PURPLE:
             mineral_template = HERB_PURPLE_TEMPLATE
-                        
-        frame = capture.frame            
+
+        frame = capture.frame
         matches = utils.multi_match(frame, mineral_template)
         player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
         player = utils.multi_match(
-                frame, player_template, threshold=0.9)
+            frame, player_template, threshold=0.9)
         if len(matches) > 0 and len(player) > 0:
             player_x = player[0][0]
             mineral_x = matches[0][0]
@@ -270,7 +329,7 @@ class Bot(Configurable, Observer):
         config.rune_active = False
         config.rune_pos = None
         config.rune_closest_pos = None
-        
+
         config.minal_active = False
         config.minal_pos = None
         config.minal_closest_pos = None

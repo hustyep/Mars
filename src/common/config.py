@@ -80,3 +80,5 @@ mineral_type = None
 
 # invisible skill used time
 hide_start = 0
+
+mob_detect = False

@@ -2,6 +2,7 @@
 
 from src.common import config, settings, utils
 import csv
+import cv2
 from os.path import splitext, basename
 from src.routine.components import Point, Label, Jump, Setting, Command, SYMBOLS
 from src.routine.layout import Layout
@@ -41,6 +42,7 @@ class Routine:
         self.index = 0
         self.sequence = []
         self.display = []       # Updated alongside sequence
+        self.mob_template = []
 
     @dirty
     @update
@@ -186,6 +188,7 @@ class Routine:
         self.set([])
         self.dirty = False
         self.path = ''
+        self.mob_template = []
         config.layout = None
         settings.reset()
 
@@ -223,6 +226,8 @@ class Routine:
             if isinstance(c, Jump):
                 c.bind()
 
+        self.setup_mob_template()
+
         self.dirty = False
         self.path = file
         config.layout = Layout.load(file)
@@ -246,6 +251,8 @@ class Routine:
                         self.append_component(result)
                         if isinstance(result, Point):
                             curr_point = result
+                        elif isinstance(result, Setting):
+                            result.main()
                 line += 1
 
     def _eval(self, row, i):
@@ -267,12 +274,31 @@ class Routine:
                 if isinstance(obj, Label):
                     obj.set_index(len(self))
                     self.labels[obj.label] = obj
-                if isinstance(obj, Setting):
-                    obj.main()
                 return obj
             except (ValueError, TypeError) as e:
                 print(line_error + f"Found invalid arguments for '{c.__name__}':")
                 print(f"{' ' * 4} -  {e}")
+
+    def setup_mob_template(self):
+        if len(settings.mob_name) > 0:
+            try:
+                mob_template = cv2.imread(f'assets/{settings.mob_name}.png', 0)
+            except:
+                pass
+            if mob_template is not None:
+                self.mob_template.append(mob_template)
+            try:
+                mob_template_l = cv2.imread(f'assets/{settings.mob_name}_L.png', 0)
+            except:
+                pass
+            if mob_template_l is not None:
+                self.mob_template.append(mob_template_l)
+            try:
+                mob_template_r = cv2.imread(f'assets/{settings.mob_name}_R.png', 0)
+            except:
+                pass
+            if mob_template_r is not None:
+                self.mob_template.append(mob_template_r)
 
     @staticmethod
     def get_all_components():

@@ -80,18 +80,20 @@ SETTING_VALIDATORS = {
     'move_tolerance': int,
     'adjust_tolerance': int,
     'record_layout': validate_boolean,
-    'buff_cooldown': validate_nonnegative_int
+    'buff_cooldown': validate_nonnegative_int,
+    'mob_name': str
 }
 
 
 def reset():
     """Resets all settings to their default values."""
 
-    global move_tolerance, adjust_tolerance, record_layout, buff_cooldown
+    global move_tolerance, adjust_tolerance, record_layout, buff_cooldown, mob_name
     move_tolerance = 13
     adjust_tolerance = 3
     record_layout = False
     buff_cooldown = 180
+    mob_name = ''
 
 
 # The allowed error from the destination when moving towards a Point
@@ -105,5 +107,8 @@ record_layout = False
 
 # The amount of time (in seconds) to wait between each call to the 'buff' command
 buff_cooldown = 180
+
+# The image name of the mob template in the map
+mob_name = ''
 
 reset()
