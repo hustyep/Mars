@@ -127,16 +127,18 @@ class Bot(Configurable, Observer):
                 return
             frame = capture.frame
             solution = rune.show_magic(frame)
-            print(', '.join(solution))
+            if solution is None:
+                return
             if len(solution) == 4:
                 print('Solution found, entering result')
+                print(', '.join(solution))
                 used_frame = frame
                 find_solution = True
                 for arrow in solution:
                     press(arrow, 1, down_time=0.1)
                 break
             time.sleep(0.1)
-        time.sleep(0.3)
+        time.sleep(0.2)
 
         if find_solution:
             threading.Timer(0.001, self.check_rune_solve_result,

@@ -162,7 +162,10 @@ class FlashJump(Command):
     def main(self):
         self.print_debug_info()
 
-        press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
+        if self.time == 1:
+            press(Key.JUMP, 1, down_time=0.05, up_time=0.05)
+        else:
+            press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
         press(Key.FLASH_JUMP, self.time, down_time=0.03, up_time=0.03)
 
 
