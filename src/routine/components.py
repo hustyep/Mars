@@ -594,7 +594,7 @@ class Detect_Mobs(Command):
         if len(player_match) == 0:
             return mobs
         
-        player_pos = player_match[0]
+        player_pos = (player_match[0][0], player_match[0][1] - 55)
         crop = frame[player_pos[1]-self.top:player_pos[1]+self.bottom, player_pos[0]-self.left:player_pos[0]+self.right]
         
         for mob_template in config.routine.mob_template:
