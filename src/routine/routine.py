@@ -282,19 +282,19 @@ class Routine:
     def setup_mob_template(self):
         if len(settings.mob_name) > 0:
             try:
-                mob_template = cv2.imread(f'assets/{settings.mob_name}.png', 0)
+                mob_template = cv2.imread(f'assets/mobs/{settings.mob_name}.png', 0)
             except:
                 pass
             if mob_template is not None:
                 self.mob_template.append(mob_template)
             try:
-                mob_template_l = cv2.imread(f'assets/{settings.mob_name}_L.png', 0)
+                mob_template_l = cv2.imread(f'assets/mobs/{settings.mob_name}_L.png', 0)
             except:
                 pass
             if mob_template_l is not None:
                 self.mob_template.append(mob_template_l)
             try:
-                mob_template_r = cv2.imread(f'assets/{settings.mob_name}_R.png', 0)
+                mob_template_r = cv2.imread(f'assets/mobs/{settings.mob_name}_R.png', 0)
             except:
                 pass
             if mob_template_r is not None:

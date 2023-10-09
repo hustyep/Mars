@@ -573,6 +573,10 @@ class Detect_Mobs(Command):
         self.right = right
         # print("Detect_Mobs")
 
+    @utils.run_if_enabled
+    def execute(self):
+        return self.main()
+
     def main(self):
         mobs = []
 
@@ -583,10 +587,10 @@ class Detect_Mobs(Command):
             return mobs
 
         if not config.mob_detect:
-            return mobs
+            return [(0, 0)]
 
         if len(config.routine.mob_template) == 0:
-            return mobs
+            return [(0, 0)]
                     
         player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
         player_match = utils.multi_match(
@@ -594,7 +598,7 @@ class Detect_Mobs(Command):
         if len(player_match) == 0:
             return mobs
         
-        player_pos = (player_match[0][0], player_match[0][1] - 55)
+        player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
         crop = frame[player_pos[1]-self.top:player_pos[1]+self.bottom, player_pos[0]-self.left:player_pos[0]+self.right]
         
         for mob_template in config.routine.mob_template:

@@ -76,20 +76,25 @@ class HitAndRun(Command):
         super().__init__(locals())
         self.direction = direction
         self.target = target
-            
+
     def main(self):
-        if self.direction != config.player_direction:
-            time.sleep(0.5)
-            key_up(self.direction)
-            while len(Detect_Mobs(top=15*15,right=60*15).execute()) == 0:
-                time.sleep(0.01)
-            key_down(self.direction)
-        mobs = Detect_Mobs(top=15*15,right=30*15).execute()
         d_x = self.target[0] - config.player_pos[0]
-        FlashJump(dx=abs(d_x)).execute()
-        if len(mobs) > 0:
+        if config.mob_detect:
+            if self.direction != config.player_direction:
+                time.sleep(0.5)
+                key_up(self.direction)
+                while len(Detect_Mobs(top=15*15,right=60*15).execute()) == 0:
+                    time.sleep(0.01)
+                key_down(self.direction)
+            mobs = Detect_Mobs(top=15*15,right=30*15 if self.direction=='right' else 0,left=30*15 if self.direction=='left' else 0).execute()
+            FlashJump(dx=abs(d_x)).execute()
+            if mobs is not None and len(mobs) > 0:
+                CruelStabRandomDirection().execute()
+            sleep_while_move_y(interval=0.016)
+        else:
+            FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
-        sleep_while_move_y(interval=0.016)
+            sleep_while_move_y(interval=0.016)
 
 def change_direction(point):
     if config.player_direction == 'left':
