@@ -3,7 +3,7 @@
 from src.common import config, settings, utils
 import time
 import math
-from src.routine.components import Command
+from src.routine.components import Command, Detect_Mobs
 from src.common.vkeys import press, key_down, key_up, releaseAll
 
 
@@ -67,12 +67,35 @@ def step(direction, target):
     elif abs(d_y) >= 26 and abs(d_x) >= 24 and ShadowAssault.usable_count() > 2:
         ShadowAssault(dx=d_x, dy=d_y).execute()
     elif abs(d_x) >= 20:
-        FlashJump(dx=abs(d_x)).execute()
-        CruelStabRandomDirection().execute()
-        sleep_while_move_y(interval=0.016)
+        HitAndRun(direction, target).execute()
     else:
         time.sleep(0.05)
+        
+class HitAndRun(Command):
+    def __init__(self, direction, target):
+        super().__init__(locals())
+        self.direction = direction
+        self.target = target
+            
+    def main(self):
+        if self.direction != config.player_direction:
+            time.sleep(0.5)
+            key_up(self.direction)
+            while len(Detect_Mobs(top=15*15,right=60*15).execute()) == 0:
+                time.sleep(0.01)
+            key_down(self.direction)
+        mobs = Detect_Mobs(top=15*15,right=30*15).execute()
+        d_x = self.target[0] - config.player_pos[0]
+        FlashJump(dx=abs(d_x)).execute()
+        if len(mobs) > 0:
+            CruelStabRandomDirection().execute()
+        sleep_while_move_y(interval=0.016)
 
+def change_direction(point):
+    if config.player_direction == 'left':
+        return point[0] > config.player_pos[0]
+    else:
+        return point[0] < config.player_pos[0]
 
 #########################
 #        Y轴移动         #

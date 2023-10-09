@@ -4,6 +4,8 @@ import math
 import time
 from src.common import config, utils, settings
 from src.common.vkeys import key_down, key_up, press, releaseAll, press_acc
+from src.modules.capture import capture
+from src.common.image_template import *
 
 #################################
 #       Routine Components      #
@@ -560,3 +562,46 @@ class Potion(Command):
         print(
             "\n[!] 'potion' command not implemented in current command book, aborting process.")
         config.enabled = False
+
+
+class Detect_Mobs(Command):
+    def __init__(self, top=0, left=0, right=0, bottom=0):
+        super().__init__(locals())
+        self.top = top
+        self.bottom = bottom
+        self.left = left
+        self.right = right
+        # print("Detect_Mobs")
+
+    def main(self):
+        mobs = []
+
+        frame = capture.frame
+        minimap = capture.minimap
+
+        if frame is None or minimap is None:
+            return mobs
+
+        if not config.mob_detect:
+            return mobs
+
+        if len(config.routine.mob_template) == 0:
+            return mobs
+                    
+        player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+        player_match = utils.multi_match(
+            capture.frame, player_template, threshold=0.9)
+        if len(player_match) == 0:
+            return mobs
+        
+        player_pos = player_match[0]
+        crop = frame[player_pos[1]-self.top:player_pos[1]+self.bottom, player_pos[0]-self.left:player_pos[0]+self.right]
+        
+        for mob_template in config.routine.mob_template:
+            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.9)
+            if len(mobs_tmp) > 0:
+                for mob in mobs_tmp:
+                    mobs.append(mob)
+
+        return mobs
+    
