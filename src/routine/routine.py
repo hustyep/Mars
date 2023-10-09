@@ -43,6 +43,8 @@ class Routine:
         self.sequence = []
         self.display = []       # Updated alongside sequence
         self.mob_template = []
+        self.guard_point_l = (100, 0)
+        self.guard_point_r = (0, 0)
 
     @dirty
     @update
@@ -251,6 +253,10 @@ class Routine:
                         self.append_component(result)
                         if isinstance(result, Point):
                             curr_point = result
+                            if curr_point[0] < self.guard_point_l:
+                                self.guard_point_l = curr_point
+                            elif curr_point[0] > self.guard_point_r:
+                                self.guard_point_r = curr_point
                         elif isinstance(result, Setting):
                             result.main()
                 line += 1

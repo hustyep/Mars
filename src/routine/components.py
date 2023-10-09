@@ -625,7 +625,6 @@ def sleep_while_move_y(interval=0.02, n=6):
 
 def direction_changed():
     if config.player_direction == 'left':
-        width = capture.minimap.shape[1]
-        return abs(width - config.player_pos[0]) <= 1.5 * settings.move_tolerance
+        return abs(config.routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
     else:
-        return config.player_pos[0] <= 1.5 * settings.move_tolerance 
+        return abs(config.routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance

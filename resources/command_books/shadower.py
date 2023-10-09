@@ -86,7 +86,7 @@ class HitAndRun(Command):
                     time.sleep(0.01)
                 key_down(self.direction)
             for _ in range(2):
-                has_mobs = Detect_Mobs(top=30*15,bottom=15*15,right=50*15 if self.direction=='right' else -30,left=50*15 if self.direction=='left' else -30).execute()
+                has_mobs = Detect_Mobs(top=30*15,bottom=15*15,right=50*15 if self.direction=='right' else 50,left=50*15 if self.direction=='left' else 50).execute()
                 if has_mobs:
                     break
             FlashJump(dx=abs(d_x)).execute()
