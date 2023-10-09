@@ -101,16 +101,18 @@ if __name__ == "__main__":
     #     threading.Thread(target=run).start()
     # while True:
     #     time.sleep(1)
-    frame = cv2.imread(".test/maple_231009054039705.png")
+    frame = cv2.imread(".test/maple_230925003000872.png")
     
     PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/player_sllee_template.png', 0)
     player_match = multi_match(frame, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
     player_pos = (player_match[0][0], player_match[0][1] - 55)
     crop = frame[player_pos[1]-225:player_pos[1], player_pos[0]:player_pos[0]+450]
     
-    MOB_TEMPLATE = cv2.imread('.test/FloraFooterSoldier_R.png', 0)
+    MOB_TEMPLATE_L = cv2.imread('.test/FloraFooterSoldier_L.png', 0)
+    MOB_TEMPLATE_R = cv2.imread('.test/FloraFooterSoldier_R.png', 0)
     start = time.time()
-    mobs = multi_match(crop, MOB_TEMPLATE, threshold=0.9)
+    mobs = multi_match(frame, MOB_TEMPLATE_L, threshold=0.9)
+    mobs = multi_match(frame, MOB_TEMPLATE_R, threshold=0.9)
     print(f'{time.time() - start}')
     # cv2.imshow("123", crop)
     # cv2.waitKey()

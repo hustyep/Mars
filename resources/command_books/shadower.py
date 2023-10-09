@@ -3,9 +3,8 @@
 from src.common import config, settings, utils
 import time
 import math
-from src.routine.components import Command, Detect_Mobs
+from src.routine.components import Command, Detect_Mobs, direction_changed, sleep_while_move_y
 from src.common.vkeys import press, key_down, key_up, releaseAll
-
 
 # List of key mappings
 class Key:
@@ -80,45 +79,31 @@ class HitAndRun(Command):
     def main(self):
         d_x = self.target[0] - config.player_pos[0]
         if config.mob_detect:
-            if self.direction != config.player_direction:
-                time.sleep(0.5)
+            if direction_changed():
+                time.sleep(0.2)
                 key_up(self.direction)
-                while len(Detect_Mobs(top=15*15,right=60*15).execute()) == 0:
+                while not Detect_Mobs(top=30*15,bottom=15*15,right=80*15).execute():
                     time.sleep(0.01)
                 key_down(self.direction)
-            mobs = Detect_Mobs(top=15*15,right=30*15 if self.direction=='right' else 0,left=30*15 if self.direction=='left' else 0).execute()
+            for _ in range(2):
+                has_mobs = Detect_Mobs(top=30*15,bottom=15*15,right=50*15 if self.direction=='right' else -30,left=50*15 if self.direction=='left' else -30).execute()
+                if has_mobs:
+                    break
             FlashJump(dx=abs(d_x)).execute()
-            if mobs is not None and len(mobs) > 0:
+            if has_mobs:
                 CruelStabRandomDirection().execute()
+            else:
+                time.sleep(0.5)
             sleep_while_move_y(interval=0.016)
         else:
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             sleep_while_move_y(interval=0.016)
-
-def change_direction(point):
-    if config.player_direction == 'left':
-        return point[0] > config.player_pos[0]
-    else:
-        return point[0] < config.player_pos[0]
+            
 
 #########################
 #        Y轴移动         #
 #########################
-
-def sleep_while_move_y(interval=0.02, n=6):
-    player_y = config.player_pos[1]
-    count = 0
-    while True:
-        time.sleep(interval)
-        if player_y == config.player_pos[1]:
-            count += 1
-        else:
-            count = 0
-            player_y = config.player_pos[1]
-        if count == n:
-            break
-    
 
 class MoveUp(Command):
     def __init__(self, dy: int = 20):

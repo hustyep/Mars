@@ -575,31 +575,26 @@ class Detect_Mobs(Command):
 
     @utils.run_if_enabled
     def execute(self):
-        print('Detect_Mobs start')
-        mobs = self.main()
-        print(f'Detect_Mobs end: {len(mobs)}')
-        return mobs
+        return self.main()
 
     def main(self):
-        mobs = []
-
         frame = capture.frame
         minimap = capture.minimap
 
         if frame is None or minimap is None:
-            return mobs
+            return False
 
         if not config.mob_detect:
-            return [(0, 0)]
+            return True
 
         if len(config.routine.mob_template) == 0:
-            return [(0, 0)]
+            return True
                     
         player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
         player_match = utils.multi_match(
             capture.frame, player_template, threshold=0.9)
         if len(player_match) == 0:
-            return mobs
+            return True
         
         player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
         crop = frame[player_pos[1]-self.top:player_pos[1]+self.bottom, player_pos[0]-self.left:player_pos[0]+self.right]
@@ -607,8 +602,30 @@ class Detect_Mobs(Command):
         for mob_template in config.routine.mob_template:
             mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.9)
             if len(mobs_tmp) > 0:
-                for mob in mobs_tmp:
-                    mobs.append(mob)
+                return True
 
-        return mobs
+        return False
     
+#############################
+#      Shared Functions     #
+#############################
+
+def sleep_while_move_y(interval=0.02, n=6):
+    player_y = config.player_pos[1]
+    count = 0
+    while True:
+        time.sleep(interval)
+        if player_y == config.player_pos[1]:
+            count += 1
+        else:
+            count = 0
+            player_y = config.player_pos[1]
+        if count == n:
+            break
+
+def direction_changed():
+    if config.player_direction == 'left':
+        width = capture.minimap.shape[1]
+        return abs(width - config.player_pos[0]) <= 1.5 * settings.move_tolerance
+    else:
+        return config.player_pos[0] <= 1.5 * settings.move_tolerance 
