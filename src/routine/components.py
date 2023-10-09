@@ -365,7 +365,7 @@ class Adjust(Command):
     def main(self):
         # self.print_debug_info()
         
-        print(f'[Adjust] from {config.player_pos} to {self.target}')
+        # print(f'[Adjust] from {config.player_pos} to {self.target}')
 
         counter = self.max_steps
         d_x = self.target[0] - config.player_pos[0]
@@ -575,7 +575,10 @@ class Detect_Mobs(Command):
 
     @utils.run_if_enabled
     def execute(self):
-        return self.main()
+        print('Detect_Mobs start')
+        mobs = self.main()
+        print(f'Detect_Mobs end: {len(mobs)}')
+        return mobs
 
     def main(self):
         mobs = []

@@ -67,8 +67,8 @@ def multi_match(frame, template, threshold=0.95):
 
         cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
                       p[1]+template.shape[0]), (0, 0, 225), 2)
-    # cv2.imshow("result", src_copy)
-    # cv2.waitKey()
+    cv2.imshow("result", src_copy)
+    cv2.waitKey()
     return results
 
 def filter_color(img, ranges):
@@ -101,11 +101,16 @@ if __name__ == "__main__":
     #     threading.Thread(target=run).start()
     # while True:
     #     time.sleep(1)
-    img = cv2.imread(".test/maple_230831073143476.png")
-    MOB_TEMPLATE = cv2.imread('.test/mob1.png', 0)
+    frame = cv2.imread(".test/maple_231009054039705.png")
+    
+    PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/player_sllee_template.png', 0)
+    player_match = multi_match(frame, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
+    player_pos = (player_match[0][0], player_match[0][1] - 55)
+    crop = frame[player_pos[1]-225:player_pos[1], player_pos[0]:player_pos[0]+450]
+    
+    MOB_TEMPLATE = cv2.imread('.test/FloraFooterSoldier_R.png', 0)
     start = time.time()
-    player = multi_match(
-                img, MOB_TEMPLATE, threshold=0.9)
+    mobs = multi_match(crop, MOB_TEMPLATE, threshold=0.9)
     print(f'{time.time() - start}')
     # cv2.imshow("123", crop)
     # cv2.waitKey()
