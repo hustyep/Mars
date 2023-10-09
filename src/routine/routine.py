@@ -253,9 +253,9 @@ class Routine:
                         self.append_component(result)
                         if isinstance(result, Point):
                             curr_point = result
-                            if curr_point.location[0] < self.guard_point_l:
+                            if curr_point.location[0] < self.guard_point_l[0]:
                                 self.guard_point_l = curr_point.location
-                            elif curr_point.location[0] > self.guard_point_r:
+                            elif curr_point.location[0] > self.guard_point_r[0]:
                                 self.guard_point_r = curr_point.location
                         elif isinstance(result, Setting):
                             result.main()

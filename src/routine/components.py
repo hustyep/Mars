@@ -575,7 +575,9 @@ class Detect_Mobs(Command):
 
     @utils.run_if_enabled
     def execute(self):
-        return self.main()
+        result = self.main()
+        print(f"Detect_Mobs: {'True' if result else 'False'}")
+        return result
 
     def main(self):
         frame = capture.frame
@@ -600,7 +602,7 @@ class Detect_Mobs(Command):
         crop = frame[player_pos[1]-self.top:player_pos[1]+self.bottom, player_pos[0]-self.left:player_pos[0]+self.right]
         
         for mob_template in config.routine.mob_template:
-            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.9)
+            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.95)
             if len(mobs_tmp) > 0:
                 return True
 

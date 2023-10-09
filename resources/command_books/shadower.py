@@ -80,20 +80,22 @@ class HitAndRun(Command):
         d_x = self.target[0] - config.player_pos[0]
         if config.mob_detect:
             if direction_changed():
-                time.sleep(0.2)
+                print("direction_changed")
+                time.sleep(0.1)
                 key_up(self.direction)
-                while not Detect_Mobs(top=30*15,bottom=15*15,right=80*15).execute():
+                time.sleep(1 if self.direction == "right" else 1.5)
+                while not Detect_Mobs(top=30*15,bottom=15*15,left=60*15,right=60*15).execute():
                     time.sleep(0.01)
                 key_down(self.direction)
-            for _ in range(2):
-                has_mobs = Detect_Mobs(top=30*15,bottom=15*15,right=50*15 if self.direction=='right' else 50,left=50*15 if self.direction=='left' else 50).execute()
-                if has_mobs:
-                    break
+            # for _ in range(2):
+            #     has_mobs = Detect_Mobs(top=30*15,bottom=15*15,right=50*15 if self.direction=='right' else 50,left=50*15 if self.direction=='left' else 50).execute()
+            #     if has_mobs:
+            #         break
             FlashJump(dx=abs(d_x)).execute()
-            if has_mobs:
-                CruelStabRandomDirection().execute()
-            else:
-                time.sleep(0.5)
+            # if has_mobs:
+            CruelStabRandomDirection().execute()
+            # else:
+            #     time.sleep(0.5)
             sleep_while_move_y(interval=0.016)
         else:
             FlashJump(dx=abs(d_x)).execute()
@@ -174,14 +176,12 @@ class FlashJump(Command):
 
     def main(self):
         self.print_debug_info()
-        print("FlashJump start")
 
         if self.time == 1:
             press(Key.JUMP, 1, down_time=0.05, up_time=0.05)
         else:
             press(Key.JUMP, 1, down_time=0.03, up_time=0.03)
         press(Key.FLASH_JUMP, self.time, down_time=0.03, up_time=0.03)
-        print("FlashJump end")
 
 
 class ShadowAssault(Command):
