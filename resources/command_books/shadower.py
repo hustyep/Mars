@@ -435,7 +435,7 @@ class SuddenRaid(Command):
     def canUse(self, next_t: float = 0) -> bool:
         usable = super().canUse(next_t)
         if usable:
-            mobs = Detect_Mobs(top=1000,bottom=1000,left=1000,right=1000).execute()
+            mobs = Detect_Mobs(top=500,bottom=500,left=500,right=500,debug=False).execute()
             return mobs is not None and len(mobs) > 0
         else:
             return False
