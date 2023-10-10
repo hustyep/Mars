@@ -463,13 +463,13 @@ class TrickBlade(Command):
         else:
             self.direction = settings.validate_horizontal_arrows(direction)
             
-    # def canUse(self, next_t: float = 0) -> bool:
-    #     usable = super().canUse(next_t)
-    #     if usable:
-    #         mobs = Detect_Mobs(top=150,bottom=150,left=200,right=200).execute()
-    #         return mobs is not None and len(mobs) > 0
-    #     else:
-    #         return False
+    def canUse(self, next_t: float = 0) -> bool:
+        usable = super().canUse(next_t)
+        if usable:
+            mobs = Detect_Mobs(top=200,bottom=200,left=300,right=300).execute()
+            return mobs is not None and len(mobs) > 0
+        else:
+            return False
 
 
 class SlashShadowFormation(Command):
