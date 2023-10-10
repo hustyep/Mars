@@ -8,7 +8,7 @@ from src.chat_bot.chat_bot_entity import ChatBotCommand
 from src.detection import rune
 from src.routine.routine import Routine
 from src.routine.components import Point
-from src.common import config, utils, settings
+from src.common import config, utils
 from src.common.action_simulator import ActionSimulator
 from src.common.bot_notification import *
 from src.common.vkeys import press, releaseAll
@@ -122,7 +122,7 @@ class Bot(Configurable, Observer):
         print('\nSolving rune:')
         used_frame = None
         find_solution = False
-        for i in range(10):
+        for i in range(4):
             if not config.rune_active:
                 return
             frame = capture.frame
