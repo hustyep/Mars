@@ -3,8 +3,8 @@ $, target=mob_name, value=FloraFooterSoldier
 @, label=Bottom mobbing
 *, x=46, y=70, frequency=1, interval=0, skip=False, adjust=False
 *, x=118, y=70, frequency=1, interval=0, skip=False, adjust=False
-*, x=118, y=70, frequency=1, interval=0, skip=False, adjust=False
     ShadowVeil
+*, x=191, y=70, frequency=1, interval=0, skip=False, adjust=False
 
 @, label=Summoning
 *, x=191, y=70, frequency=4, interval=0, skip=False, adjust=False
