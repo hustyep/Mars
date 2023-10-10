@@ -83,7 +83,7 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.1)
                 key_up(self.direction)
-                time.sleep(1 if self.direction == "right" else 1)
+                time.sleep(0.5)
                 mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
                 count = 0
                 while count < 500 and (mobs is None or len(mobs) < 2):
@@ -385,10 +385,8 @@ class DarkFlare(Command):
 
 
 class ShadowVeil(Command):
-    """
-    Uses 'ShadowVeil' in a given direction, or towards the center of the map if
-    no direction is specified.
-    """
+    key = Key.SHADOW_VEIL
+    cooldown = 60
     backswing = 0.8
 
     def __init__(self, direction=None):
@@ -402,14 +400,11 @@ class ShadowVeil(Command):
         self.print_debug_info()
         if self.direction is not None:
             press(self.direction)
-        press(Key.SHADOW_VEIL, 1, up_time=self.backswing)
+        super().main()
 
 
 class ErdaShower(Command):
-    """
-    Use ErdaShower in a given direction, Placing ErdaFountain if specified. Adds the player's position
-    to the current Layout if necessary.
-    """
+    key = Key.ERDA_SHOWER
     cooldown = 120
     backswing = 0.8
 
@@ -421,6 +416,8 @@ class ErdaShower(Command):
             self.direction = settings.validate_horizontal_arrows(direction)
 
     def main(self):
+        if not self.canUse():
+            return False
         self.print_debug_info()
         if self.direction:
             press(self.direction)
@@ -435,6 +432,14 @@ class SuddenRaid(Command):
     cooldown = 30
     backswing = 0.7
 
+    def canUse(self, next_t: float = 0) -> bool:
+        usable = super().canUse(next_t)
+        if usable:
+            mobs = Detect_Mobs(top=300,bottom=300,left=300,right=300).execute()
+            return mobs is not None and len(mobs) > 0
+        else:
+            return False
+            
 
 class Arachnid(Command):
     key = Key.ARACHNID
@@ -443,10 +448,9 @@ class Arachnid(Command):
 
 
 class TrickBlade(Command):
-    """
-    Uses 'TrickBlade' in a given direction, or towards the center of the map if
-    no direction is specified.
-    """
+    key = Key.TRICKBLADE
+    cooldown = 14
+    backswing = 0.9
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -454,16 +458,14 @@ class TrickBlade(Command):
             self.direction = direction
         else:
             self.direction = settings.validate_horizontal_arrows(direction)
-
-    def main(self):
-        if self.direction:
-            press(self.direction, 1, down_time=0.1, up_time=0.05)
+            
+    def canUse(self, next_t: float = 0) -> bool:
+        usable = super().canUse(next_t)
+        if usable:
+            mobs = Detect_Mobs(top=150,bottom=150,left=200,right=200).execute()
+            return mobs is not None and len(mobs) > 0
         else:
-            if config.player_pos[0] > 0.5:
-                press('left', 1, down_time=0.1, up_time=0.05)
-            else:
-                press('right', 1, down_time=0.1, up_time=0.05)
-        press(Key.TRICKBLADE, up_time=0.9)
+            return False
 
 
 class SlashShadowFormation(Command):
