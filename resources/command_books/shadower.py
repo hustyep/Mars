@@ -65,7 +65,7 @@ def step(direction, target):
         MoveDown(dy=abs(d_y)).execute()
     elif abs(d_y) >= 26 and abs(d_x) >= 24 and ShadowAssault.usable_count() > 2:
         ShadowAssault(dx=d_x, dy=d_y).execute()
-    elif abs(d_x) >= 20:
+    elif abs(d_x) >= 24:
         HitAndRun(direction, target).execute()
     else:
         time.sleep(0.05)
@@ -81,9 +81,9 @@ class HitAndRun(Command):
         if config.mob_detect:
             if direction_changed():
                 print("direction_changed")
-                time.sleep(0.1)
+                time.sleep(0.05)
                 key_up(self.direction)
-                time.sleep(0.5)
+                time.sleep(1)
                 mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
                 count = 0
                 while count < 500 and (mobs is None or len(mobs) < 2):
@@ -100,7 +100,7 @@ class HitAndRun(Command):
             CruelStabRandomDirection().execute()
             # else:
             #     time.sleep(0.5)
-            sleep_while_move_y(interval=0.016)
+            sleep_while_move_y(interval=0.02, n=5)
         else:
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
@@ -435,7 +435,7 @@ class SuddenRaid(Command):
     def canUse(self, next_t: float = 0) -> bool:
         usable = super().canUse(next_t)
         if usable:
-            mobs = Detect_Mobs(top=300,bottom=300,left=300,right=300).execute()
+            mobs = Detect_Mobs(top=1000,bottom=1000,left=1000,right=1000).execute()
             return mobs is not None and len(mobs) > 0
         else:
             return False
@@ -459,13 +459,13 @@ class TrickBlade(Command):
         else:
             self.direction = settings.validate_horizontal_arrows(direction)
             
-    def canUse(self, next_t: float = 0) -> bool:
-        usable = super().canUse(next_t)
-        if usable:
-            mobs = Detect_Mobs(top=150,bottom=150,left=200,right=200).execute()
-            return mobs is not None and len(mobs) > 0
-        else:
-            return False
+    # def canUse(self, next_t: float = 0) -> bool:
+    #     usable = super().canUse(next_t)
+    #     if usable:
+    #         mobs = Detect_Mobs(top=150,bottom=150,left=200,right=200).execute()
+    #         return mobs is not None and len(mobs) > 0
+    #     else:
+    #         return False
 
 
 class SlashShadowFormation(Command):

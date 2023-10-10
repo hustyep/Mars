@@ -12,6 +12,7 @@ $, target=mob_name, value=FloraFooterSoldier
     ShadowAssault, direction=upleft, jump=True, distance=80
     Wait, duration=0.1
 *, x=155, y=34, frequency=4, interval=0, skip=False, adjust=True
+    Wait, duration=0.5
     SuddenRaid
     ErdaShower, direction=left
     Wait, duration=0.1
