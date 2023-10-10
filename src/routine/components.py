@@ -565,12 +565,13 @@ class Potion(Command):
 
 
 class Detect_Mobs(Command):
-    def __init__(self, top=0, left=0, right=0, bottom=0):
+    def __init__(self, top=0, left=0, right=0, bottom=0, debug=False):
         super().__init__(locals())
         self.top = top
         self.bottom = bottom
         self.left = left
         self.right = right
+        self.debug = debug
         # print("Detect_Mobs")
 
     @utils.run_if_enabled
@@ -604,7 +605,7 @@ class Detect_Mobs(Command):
         
         mobs = []
         for mob_template in config.routine.mob_template:
-            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.95)
+            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.95, debug=self.debug)
             if len(mobs_tmp) > 0:
                 for mob in mobs_tmp:
                     mobs.append(mob)

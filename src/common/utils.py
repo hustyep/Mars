@@ -109,7 +109,7 @@ def single_match(frame, template, threshold=0.95):
         return None, None
 
 
-def multi_match(frame, template, threshold=0.95):
+def multi_match(frame, template, threshold=0.95, debug=False):
     """
     Finds all matches in FRAME that are similar to TEMPLATE by at least THRESHOLD.
     :param frame:       The image in which to search.
@@ -135,8 +135,9 @@ def multi_match(frame, template, threshold=0.95):
 
         cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
                       p[1]+template.shape[0]), (0, 0, 225), 2)
-    # cv2.imshow("result", src_copy)
-    # cv2.waitKey()
+    if debug:
+        cv2.imshow("result", src_copy)
+        cv2.waitKey()
     return results
 
 def trans_point(point:tuple[int, int], ratio:float):
