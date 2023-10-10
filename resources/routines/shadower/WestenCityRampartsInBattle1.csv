@@ -2,7 +2,7 @@ $, target=mob_name, value=FloraFooterSoldier
 
 @, label=Bottom mobbing
 *, x=46, y=70, frequency=1, interval=0, skip=False, adjust=False
-*, x=118, y=70, frequency=1, interval=0, skip=False, adjust=False
+*, x=118, y=70, frequency=4, interval=0, skip=False, adjust=False
     ShadowVeil
 *, x=191, y=70, frequency=1, interval=0, skip=False, adjust=False
 
@@ -11,10 +11,11 @@ $, target=mob_name, value=FloraFooterSoldier
     ShadowAssault, direction=upleft, jump=True, distance=80
     Wait, duration=0.1
 *, x=155, y=34, frequency=4, interval=0, skip=False, adjust=True
-    Wait, duration=0.5
+    Wait, duration=0.1
     SuddenRaid
     ErdaShower, direction=left
     Wait, duration=0.1
+    SuddenRaid
 *, x=115, y=34, frequency=4, interval=0, skip=False, adjust=False
 *, x=76, y=33, frequency=4, interval=0, skip=False, adjust=True
     DarkFlare, direction=left
