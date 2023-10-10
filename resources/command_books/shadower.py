@@ -86,7 +86,7 @@ class HitAndRun(Command):
                 time.sleep(1)
                 mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
                 count = 0
-                while count < 500 and (mobs is None or len(mobs) < 2):
+                while count < 500 and mobs is not None and len(mobs) < 2:
                     count += 1
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
