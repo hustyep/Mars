@@ -364,6 +364,7 @@ class DarkFlare(Command):
     """
     cooldown = 120
     backswing = 0.3
+    key = Key.DARK_FLARE
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -374,6 +375,9 @@ class DarkFlare(Command):
 
     def main(self):
         self.print_debug_info()
+        
+        while not self.canUse():
+            time.sleep(0.1)
         if self.direction is None:
             if config.player_pos[0] > 75:
                 self.direction = 'left'
@@ -416,8 +420,8 @@ class ErdaShower(Command):
             self.direction = settings.validate_horizontal_arrows(direction)
 
     def main(self):
-        if not self.canUse():
-            return False
+        while not self.canUse():
+            time.sleep(0.1)
         self.print_debug_info()
         if self.direction:
             press(self.direction)
