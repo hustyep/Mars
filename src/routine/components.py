@@ -576,7 +576,7 @@ class Detect_Mobs(Command):
     @utils.run_if_enabled
     def execute(self):
         result = self.main()
-        print(f"Detect_Mobs: {'True' if result else 'False'}")
+        print(f"Detect_Mobs: {len(result)}")
         return result
 
     def main(self):
@@ -584,29 +584,32 @@ class Detect_Mobs(Command):
         minimap = capture.minimap
 
         if frame is None or minimap is None:
-            return False
+            return []
 
         if not config.mob_detect:
-            return True
+            return [(0,0),(0,0)]
 
         if len(config.routine.mob_template) == 0:
-            return True
+            return [(0,0),(0,0)]
                     
         player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
         player_match = utils.multi_match(
             capture.frame, player_template, threshold=0.9)
         if len(player_match) == 0:
-            return True
+            print("lost player")
+            return [(0,0),(0,0)]
         
         player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
         crop = frame[player_pos[1]-self.top:player_pos[1]+self.bottom, player_pos[0]-self.left:player_pos[0]+self.right]
         
+        mobs = []
         for mob_template in config.routine.mob_template:
             mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.95)
             if len(mobs_tmp) > 0:
-                return True
+                for mob in mobs_tmp:
+                    mobs.append(mob)
 
-        return False
+        return mobs
     
 #############################
 #      Shared Functions     #

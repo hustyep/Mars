@@ -83,9 +83,13 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.1)
                 key_up(self.direction)
-                time.sleep(1 if self.direction == "right" else 1.5)
-                while not Detect_Mobs(top=30*15,bottom=15*15,left=60*15,right=60*15).execute():
+                time.sleep(1 if self.direction == "right" else 1)
+                mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
+                count = 0
+                while count < 500 and (mobs is None or len(mobs) < 2):
+                    count += 1
                     time.sleep(0.01)
+                    mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
                 key_down(self.direction)
             # for _ in range(2):
             #     has_mobs = Detect_Mobs(top=30*15,bottom=15*15,right=50*15 if self.direction=='right' else 50,left=50*15 if self.direction=='left' else 50).execute()
@@ -100,7 +104,7 @@ class HitAndRun(Command):
         else:
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
-            sleep_while_move_y(interval=0.016)
+            sleep_while_move_y(interval=0.02, n=5)
             
 
 #########################
@@ -170,7 +174,7 @@ class FlashJump(Command):
         super().__init__(locals())
 
         if dx is not None:
-            self.time = 1 if dx <= 32 else 2
+            self.time = 2 if dx <= 32 else 2
         else:
             self.time = time
 
@@ -459,7 +463,7 @@ class TrickBlade(Command):
                 press('left', 1, down_time=0.1, up_time=0.05)
             else:
                 press('right', 1, down_time=0.1, up_time=0.05)
-        press(Key.TRICKBLADE, 3)
+        press(Key.TRICKBLADE, up_time=0.9)
 
 
 class SlashShadowFormation(Command):
