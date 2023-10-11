@@ -515,7 +515,7 @@ class GODDESS_BLESSING(Command):
     key = Key.GODDESS_BLESSING
     cooldown = 180
     precast = 0.3
-    backswing = 0.8
+    backswing = 0.9
 
 
 class LAST_RESORT(Command):
@@ -605,13 +605,12 @@ class Potion(Command):
         for potion in self.potions:
             if potion().canUse():
                 potion().execute()
-                time.sleep(0.5)
 
 
 class EXP_POTION(Command):
     key = Key.EXP_POTION
     cooldown = 7250
-    backswing = 0
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
@@ -623,7 +622,7 @@ class EXP_POTION(Command):
 class WEALTH_POTION(Command):
     key = Key.WEALTH_POTION
     cooldown = 7250
-    backswing = 0
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Wealthy Potion')
@@ -635,7 +634,7 @@ class WEALTH_POTION(Command):
 class GOLD_POTION(Command):
     key = Key.GOLD_POTION
     cooldown = 1810
-    backswing = 0
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
@@ -647,7 +646,7 @@ class GOLD_POTION(Command):
 class GUILD_POTION(Command):
     key = Key.GUILD_POTION
     cooldown = 1810
-    backswing = 0
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
@@ -659,7 +658,7 @@ class GUILD_POTION(Command):
 class CANDIED_APPLE(Command):
     key = Key.CANDIED_APPLE
     cooldown = 1800
-    backswing = 0
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
@@ -671,7 +670,7 @@ class CANDIED_APPLE(Command):
 class LEGION_WEALTHY(Command):
     key = Key.LEGION_WEALTHY
     cooldown = 1810
-    backswing = 0
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Legion Wealthy')
@@ -683,7 +682,7 @@ class LEGION_WEALTHY(Command):
 class EXP_COUPON(Command):
     key = Key.EXP_COUPON
     cooldown = 1810
-    backswing = 0
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Coupon')

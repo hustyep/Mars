@@ -207,13 +207,13 @@ class Bot(Configurable, Observer):
             if mineral_x > player_x:
                 if config.player_direction == 'left':
                     press('right')
-                if mineral_x - player_x >= 40:
-                    press('right', (mineral_x - player_x)//40)
+                if mineral_x - player_x >= 50:
+                    press('right', (mineral_x - player_x)//50)
             elif mineral_x < player_x:
                 if config.player_direction == 'right':
                     press('left')
-                if player_x - mineral_x >= 40:
-                    press('left', (player_x - mineral_x)//40)
+                if player_x - mineral_x >= 50:
+                    press('left', (player_x - mineral_x)//50)
             else:
                 if config.player_direction == 'right':
                     press('right')
