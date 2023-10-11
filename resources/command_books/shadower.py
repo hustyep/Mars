@@ -101,9 +101,9 @@ class HitAndRun(Command):
             #     time.sleep(0.5)
             sleep_while_move_y(interval=0.016, n=5)
             if self.direction == 'right':
-                has_elite = Detect_Mobs(top=200,bottom=-50,left=-200,right=700,isElite=True).execute()
+                has_elite = Detect_Mobs(top=160,bottom=-50,left=-300,right=700,isElite=True).execute()
             else:
-                has_elite = Detect_Mobs(top=200,bottom=-50,left=700,right=-200,isElite=True).execute()
+                has_elite = Detect_Mobs(top=160,bottom=-50,left=700,right=-300,isElite=True).execute()
             if has_elite is not None and len(has_elite) > 0:
                 SonicBlow().execute()
         else:
@@ -368,7 +368,7 @@ class DarkFlare(Command):
     no direction is specified.
     """
     cooldown = 120
-    backswing = 0.3
+    backswing = 0.8
     key = Key.DARK_FLARE
 
     def __init__(self, direction=None):
@@ -390,12 +390,14 @@ class DarkFlare(Command):
                 self.direction = 'right'
 
         press(self.direction)
-        press(Key.DARK_FLARE, 2, up_time=self.backswing)
+        press(Key.DARK_FLARE, 1, up_time=self.backswing)
+        self.__class__.castedTime = time.time()
 
 
 class ShadowVeil(Command):
     key = Key.SHADOW_VEIL
     cooldown = 60
+    precast = 0.3
     backswing = 0.8
 
     def __init__(self, direction=None):
@@ -433,6 +435,7 @@ class ErdaShower(Command):
         key_down('down')
         press(Key.ERDA_SHOWER)
         key_up('down')
+        self.__class__.castedTime = time.time()
         time.sleep(self.backswing)
 
 
