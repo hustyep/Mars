@@ -595,7 +595,7 @@ class Detect_Mobs(Command):
         if not self.isElite and len(mob_templates) == 0:
             return [(0,0),(0,0)]
         
-        if not config.routine.role_template:
+        if config.routine.role_template is None:
             return [(0,0),(0,0)]
                   
         player_match = utils.multi_match(

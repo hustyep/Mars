@@ -320,7 +320,7 @@ class Routine:
         
         if len(settings.role_name) > 0:
             try:
-                self.role_template = cv2.imread(f'assets/roles/player_{settings.mob_name}_template.png', 0)
+                self.role_template = cv2.imread(f'assets/roles/player_{settings.role_name}_template.png', 0)
             except:
                 pass
                 

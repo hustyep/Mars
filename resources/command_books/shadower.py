@@ -91,8 +91,8 @@ class HitAndRun(Command):
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=30*15,bottom=15*15,left=60*15,right=60*15).execute()
                 key_down(self.direction)
-            has_elite = Detect_Mobs(top=300,bottom=300,left=600,right=600).execute()
-            if len(has_elite) > 0:
+            has_elite = Detect_Mobs(top=300,bottom=300,left=600,right=600,isElite=True).execute()
+            if has_elite is not None and len(has_elite) > 0:
                 SonicBlow().execute()
             FlashJump(dx=abs(d_x)).execute()
             # if has_mobs:
@@ -481,7 +481,7 @@ class SlashShadowFormation(Command):
 class SonicBlow(Command):
     key = Key.SONIC_BLOW
     cooldown = 45
-    backswing = 5
+    backswing = 3
 
 
 ###################
