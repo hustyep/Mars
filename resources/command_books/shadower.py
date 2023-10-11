@@ -81,7 +81,7 @@ class HitAndRun(Command):
         if config.mob_detect:
             if direction_changed():
                 print("direction_changed")
-                time.sleep(0.05)
+                time.sleep(0.1)
                 key_up(self.direction)
                 time.sleep(1)
                 mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
@@ -89,7 +89,7 @@ class HitAndRun(Command):
                 while count < 500 and mobs is not None and len(mobs) < 2:
                     count += 1
                     time.sleep(0.01)
-                    mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
+                    mobs = Detect_Mobs(top=30*15,bottom=15*15,left=60*15,right=60*15).execute()
                 key_down(self.direction)
             # for _ in range(2):
             #     has_mobs = Detect_Mobs(top=30*15,bottom=15*15,right=50*15 if self.direction=='right' else 50,left=50*15 if self.direction=='left' else 50).execute()

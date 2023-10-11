@@ -1,15 +1,16 @@
 $, target=move_tolerance, value=10
+$, target=mob_name, value=Foreberion
 
 @, label=Summoning
-*, x=25, y=49, interval=60, skip=False, adjust=True
+*, x=27, y=49, frequency=1, interval=60, skip=False, adjust=True
     DarkFlare, direction=right
-*, x=131, y=79, interval=60, skip=False, adjust=True
-*, x=131, y=39, interval=60, skip=False, adjust=True
+*, x=131, y=79, frequency=1, interval=60, skip=False, adjust=True
+*, x=131, y=39, frequency=1, interval=60, skip=False, adjust=True
     MesoExplosion
     Wait, duration=0.1
     ErdaShower, direction=left
 
 @, label=Bottom mobbing
-*, x=6, y=80, frequency=1, skip=False, adjust=False
-*, x=79, y=79, frequency=1, skip=False, adjust=False
-*, x=151, y=80, frequency=1, skip=False, adjust=False
+*, x=6, y=80, frequency=1, interval=0, skip=False, adjust=False
+*, x=79, y=79, frequency=1, interval=0, skip=False, adjust=False
+*, x=151, y=80, frequency=1, interval=0, skip=False, adjust=False

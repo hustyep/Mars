@@ -577,7 +577,7 @@ class Detect_Mobs(Command):
     @utils.run_if_enabled
     def execute(self):
         result = self.main()
-        # print(f"Detect_Mobs: {len(result)}")
+        print(f"Detect_Mobs: {len(result)}")
         return result
 
     def main(self):
@@ -598,7 +598,7 @@ class Detect_Mobs(Command):
             capture.frame, player_template, threshold=0.9)
         if len(player_match) == 0:
             print("lost player")
-            return [(0,0),(0,0)]
+            return []
         
         player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
         y_start = max(0, player_pos[1]-self.top)
