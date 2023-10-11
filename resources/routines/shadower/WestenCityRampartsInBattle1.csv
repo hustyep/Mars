@@ -15,10 +15,11 @@ $, target=role_name, value=sllee
     Wait, duration=0.1
     SuddenRaid
     ErdaShower, direction=left
-    Wait, duration=0.1
+    Wait, duration=0.2
     SuddenRaid
 *, x=115, y=34, frequency=4, interval=0, skip=False, adjust=False
 *, x=76, y=33, frequency=4, interval=0, skip=False, adjust=True
+    TrickBlade, direction=left
     DarkFlare, direction=left
     TrickBlade, direction=left
     ShadowAssault, direction=downleft, jump=True, distance=80

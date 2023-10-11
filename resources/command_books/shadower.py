@@ -84,6 +84,9 @@ class HitAndRun(Command):
                 time.sleep(0.1)
                 key_up(self.direction)
                 time.sleep(1)
+                has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,isElite=True).execute()
+                if has_elite is not None and len(has_elite) > 0:
+                    SonicBlow().execute()
                 mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
                 count = 0
                 while count < 500 and mobs is not None and len(mobs) < 2:
@@ -91,19 +94,14 @@ class HitAndRun(Command):
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=300,bottom=100,left=60*15,right=60*15).execute()
                 key_down(self.direction)
-            has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,isElite=True).execute()
-            if has_elite is not None and len(has_elite) > 0:
-                SonicBlow().execute()
-            FlashJump(dx=abs(d_x)).execute()
-            # if has_mobs:
-            CruelStabRandomDirection().execute()
-            # else:
-            #     time.sleep(0.5)
-            sleep_while_move_y(interval=0.016, n=5)
+                
             if self.direction == 'right':
-                has_elite = Detect_Mobs(top=160,bottom=-50,left=-300,right=700,isElite=True).execute()
+                has_elite = Detect_Mobs(top=160,bottom=-50,left=-300,right=900,isElite=True).execute()
             else:
-                has_elite = Detect_Mobs(top=160,bottom=-50,left=700,right=-300,isElite=True).execute()
+                has_elite = Detect_Mobs(top=160,bottom=-50,left=900,right=-300,isElite=True).execute()
+            FlashJump(dx=abs(d_x)).execute()
+            CruelStabRandomDirection().execute()
+            sleep_while_move_y(interval=0.02, n=4)
             if has_elite is not None and len(has_elite) > 0:
                 SonicBlow().execute()
         else:
@@ -367,7 +365,7 @@ class DarkFlare(Command):
     Uses 'DarkFlare' in a given direction, or towards the center of the map if
     no direction is specified.
     """
-    cooldown = 120
+    cooldown = 58
     backswing = 0.8
     key = Key.DARK_FLARE
 
@@ -391,12 +389,12 @@ class DarkFlare(Command):
 
         press(self.direction)
         press(Key.DARK_FLARE, 1, up_time=self.backswing)
-        self.__class__.castedTime = time.time()
+        # self.__class__.castedTime = time.time()
 
 
 class ShadowVeil(Command):
     key = Key.SHADOW_VEIL
-    cooldown = 60
+    cooldown = 58
     precast = 0.3
     backswing = 0.8
 
@@ -416,7 +414,7 @@ class ShadowVeil(Command):
 
 class ErdaShower(Command):
     key = Key.ERDA_SHOWER
-    cooldown = 120
+    cooldown = 58
     backswing = 0.8
 
     def __init__(self, direction=None):
