@@ -81,7 +81,8 @@ SETTING_VALIDATORS = {
     'adjust_tolerance': int,
     'record_layout': validate_boolean,
     'buff_cooldown': validate_nonnegative_int,
-    'mob_name': str
+    'mob_name': str,
+    'role_name': str,
 }
 
 
@@ -94,7 +95,7 @@ def reset():
     record_layout = False
     buff_cooldown = 180
     mob_name = ''
-
+    role_name = ''
 
 # The allowed error from the destination when moving towards a Point
 move_tolerance = 13
@@ -110,5 +111,9 @@ buff_cooldown = 180
 
 # The image name of the mob template in the map
 mob_name = ''
+
+
+# The name of the role
+role_name = ''
 
 reset()

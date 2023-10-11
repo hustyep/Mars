@@ -104,6 +104,3 @@ MINAL_HEART_TEMPLATE = cv2.imread('assets/minal_heart_template2.png', 0)
 HERB_YELLOW_TEMPLATE = cv2.imread('assets/herb_yellow_template.png', 0)
 HERB_PURPLE_TEMPLATE = cv2.imread('assets/herb_purple_template.png', 0)
 MINAL_CRYSTAL_TEMPLATE = cv2.imread('assets/minal_crystal_template.png', 0)
-
-PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/player_sllee_template.png', 0)
-PLAYER_ISSL_TEMPLATE = cv2.imread('assets/player_issl_template.png', 0)

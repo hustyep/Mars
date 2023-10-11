@@ -89,7 +89,7 @@ def single_match(frame, template, threshold=0.95):
     :return:            The top-left and bottom-right positions of the best match.
     """
 
-    if frame is None:
+    if frame is None or template is None:
         return
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -118,7 +118,7 @@ def multi_match(frame, template, threshold=0.95, debug=False):
     :return:            An array of matches that exceed THRESHOLD.
     """
 
-    if frame is None or template.shape[0] > frame.shape[0] or template.shape[1] > frame.shape[1]:
+    if frame is None or template is None or template.shape[0] > frame.shape[0] or template.shape[1] > frame.shape[1]:
         return []
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     if (template.ndim > 2):

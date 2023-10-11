@@ -43,6 +43,8 @@ class Routine:
         self.sequence = []
         self.display = []       # Updated alongside sequence
         self.mob_template = []
+        self.elite_template = []
+        self.role_template = None
         self.guard_point_l = (100, 0)
         self.guard_point_r = (0, 0)
 
@@ -191,6 +193,7 @@ class Routine:
         self.dirty = False
         self.path = ''
         self.mob_template = []
+        self.elite_template = []
         config.layout = None
         settings.reset()
 
@@ -228,7 +231,7 @@ class Routine:
             if isinstance(c, Jump):
                 c.bind()
 
-        self.setup_mob_template()
+        self.setup_template()
 
         self.dirty = False
         self.path = file
@@ -285,27 +288,42 @@ class Routine:
                 print(line_error + f"Found invalid arguments for '{c.__name__}':")
                 print(f"{' ' * 4} -  {e}")
 
-    def setup_mob_template(self):
+    def setup_template(self):
         if len(settings.mob_name) > 0:
             try:
                 mob_template = cv2.imread(f'assets/mobs/{settings.mob_name}.png', 0)
+                elite_template = cv2.imread(f'assets/mobs/{settings.mob_name}_elite.png', 0)
             except:
                 pass
             if mob_template is not None:
                 self.mob_template.append(mob_template)
+            if elite_template is not None:
+                self.elite_template.append(elite_template)
             try:
                 mob_template_l = cv2.imread(f'assets/mobs/{settings.mob_name}_L.png', 0)
+                elite_template_l = cv2.imread(f'assets/mobs/{settings.mob_name}_elite_L.png', 0)
             except:
                 pass
             if mob_template_l is not None:
                 self.mob_template.append(mob_template_l)
+            if elite_template_l is not None:
+                self.elite_template.append(elite_template_l)
             try:
                 mob_template_r = cv2.imread(f'assets/mobs/{settings.mob_name}_R.png', 0)
+                elite_template_r = cv2.imread(f'assets/mobs/{settings.mob_name}_elite_R.png', 0)
             except:
                 pass
             if mob_template_r is not None:
                 self.mob_template.append(mob_template_r)
-
+            if elite_template_r is not None:
+                self.elite_template.append(elite_template_r)
+        
+        if len(settings.role_name) > 0:
+            try:
+                self.role_template = cv2.imread(f'assets/roles/player_{settings.mob_name}_template.png', 0)
+            except:
+                pass
+                
     @staticmethod
     def get_all_components():
         """Returns a dictionary mapping all creatable Components to their names."""

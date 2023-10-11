@@ -565,12 +565,13 @@ class Potion(Command):
 
 
 class Detect_Mobs(Command):
-    def __init__(self, top=0, left=0, right=0, bottom=0, debug=False):
+    def __init__(self, top=0, left=0, right=0, bottom=0, isElite=False, debug=False):
         super().__init__(locals())
         self.top = top
         self.bottom = bottom
         self.left = left
         self.right = right
+        self.isElite = isElite
         self.debug = debug
         # print("Detect_Mobs")
 
@@ -590,12 +591,15 @@ class Detect_Mobs(Command):
         if not config.mob_detect:
             return [(0,0),(0,0)]
 
-        if len(config.routine.mob_template) == 0:
+        mob_templates = config.routine.elite_template if self.isElite else config.routine.mob_template
+        if not self.isElite and len(mob_templates) == 0:
             return [(0,0),(0,0)]
-                    
-        player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+        
+        if not config.routine.role_template:
+            return [(0,0),(0,0)]
+                  
         player_match = utils.multi_match(
-            capture.frame, player_template, threshold=0.9)
+            capture.frame, config.routine.role_template, threshold=0.9)
         if len(player_match) == 0:
             print("lost player")
             return []
@@ -606,7 +610,7 @@ class Detect_Mobs(Command):
         crop = frame[y_start:player_pos[1]+self.bottom, x_start:player_pos[0]+self.right]
         
         mobs = []
-        for mob_template in config.routine.mob_template:
+        for mob_template in mob_templates:
             mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.95, debug=self.debug)
             if len(mobs_tmp) > 0:
                 for mob in mobs_tmp:

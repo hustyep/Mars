@@ -196,7 +196,7 @@ class Bot(Configurable, Observer):
 
         frame = capture.frame
         matches = utils.multi_match(frame, mineral_template)
-        player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+        player_template = config.routine.role_template
         player = utils.multi_match(
             frame, player_template, threshold=0.9)
         if len(matches) > 0 and len(player) > 0:

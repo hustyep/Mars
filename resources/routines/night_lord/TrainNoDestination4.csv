@@ -1,3 +1,4 @@
+$, target=role_name, value=issl
 
 @, label=Bottom mobbing
 *, x=0, y=66, frequency=1, skip=False, adjust=False

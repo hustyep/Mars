@@ -1,4 +1,5 @@
 $, target=mob_name, value=FloraFooterSoldier
+$, target=role_name, value=sllee
 
 @, label=Bottom mobbing
 *, x=46, y=70, frequency=1, interval=0, skip=False, adjust=False

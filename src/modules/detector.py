@@ -27,7 +27,6 @@ class Detector():
         """Initializes this Detector object's main thread."""
         super().__init__()
 
-        self.mob_template = None
         self.player_pos_min = None
         self.player_pos = None
 
@@ -84,7 +83,7 @@ class Detector():
             mineral_type = MineralType.CRYSTAL
         if len(matches) > 0:
             notifier._notify(BotInfo.MINE_ACTIVE, info=mineral_type.value)
-            player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+            player_template = config.routine.role_template
             player = utils.multi_match(
                 frame, player_template, threshold=0.9)
             if len(player) > 0:
@@ -116,7 +115,7 @@ class Detector():
                 config.minal_active = True
 
     def check_skull(self, frame):
-        player_template = PLAYER_SLLEE_TEMPLATE if config.command_book.name == 'shadower' else PLAYER_ISSL_TEMPLATE
+        player_template = config.routine.role_template
         player = utils.multi_match(
             frame, player_template, threshold=0.9)
         if len(player) == 0:

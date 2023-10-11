@@ -1,5 +1,6 @@
 $, target=move_tolerance, value=10
 $, target=mob_name, value=Foreberion
+$, target=role_name, value=sllee
 
 @, label=Summoning
 *, x=27, y=49, frequency=1, interval=60, skip=False, adjust=True
