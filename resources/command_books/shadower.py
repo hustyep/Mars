@@ -91,7 +91,7 @@ class HitAndRun(Command):
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=300,bottom=100,left=60*15,right=60*15).execute()
                 key_down(self.direction)
-            has_elite = Detect_Mobs(top=200,bottom=100,left=300,right=300,isElite=True).execute()
+            has_elite = Detect_Mobs(top=250,bottom=100,left=300,right=300,isElite=True).execute()
             if has_elite is not None and len(has_elite) > 0:
                 SonicBlow().execute()
             FlashJump(dx=abs(d_x)).execute()
