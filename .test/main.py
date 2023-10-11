@@ -101,7 +101,7 @@ if __name__ == "__main__":
     #     threading.Thread(target=run).start()
     # while True:
     #     time.sleep(1)
-    frame = cv2.imread(".test/Maple_230919_153412.png")
+    frame = cv2.imread(".test/maple_231003174903228.png")
     
     PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/roles/player_sllee_template.png', 0)
     player_match = multi_match(frame, PLAYER_SLLEE_TEMPLATE, threshold=0.9)

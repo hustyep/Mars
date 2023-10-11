@@ -79,12 +79,11 @@ class HitAndRun(Command):
     def main(self):
         d_x = self.target[0] - config.player_pos[0]
         if config.mob_detect:
-            has_elite = Detect_Mobs(top=200,bottom=100,left=300,right=300,isElite=True).execute()
             if direction_changed():
                 print("direction_changed")
                 time.sleep(0.1)
                 key_up(self.direction)
-                time.sleep(0.8)
+                time.sleep(1)
                 mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
                 count = 0
                 while count < 500 and mobs is not None and len(mobs) < 2:
@@ -92,6 +91,7 @@ class HitAndRun(Command):
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=300,bottom=100,left=60*15,right=60*15).execute()
                 key_down(self.direction)
+            has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,isElite=True).execute()
             if has_elite is not None and len(has_elite) > 0:
                 SonicBlow().execute()
             FlashJump(dx=abs(d_x)).execute()
@@ -101,9 +101,9 @@ class HitAndRun(Command):
             #     time.sleep(0.5)
             sleep_while_move_y(interval=0.016, n=5)
             if self.direction == 'right':
-                has_elite = Detect_Mobs(top=200,bottom=100,left=-200,right=700,isElite=True).execute()
+                has_elite = Detect_Mobs(top=200,bottom=-50,left=-200,right=700,isElite=True).execute()
             else:
-                has_elite = Detect_Mobs(top=200,bottom=100,left=700,right=-200,isElite=True).execute()
+                has_elite = Detect_Mobs(top=200,bottom=-50,left=700,right=-200,isElite=True).execute()
             if has_elite is not None and len(has_elite) > 0:
                 SonicBlow().execute()
         else:
