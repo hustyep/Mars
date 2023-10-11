@@ -89,9 +89,9 @@ class HitAndRun(Command):
                 while count < 500 and mobs is not None and len(mobs) < 2:
                     count += 1
                     time.sleep(0.01)
-                    mobs = Detect_Mobs(top=30*15,bottom=15*15,left=60*15,right=60*15).execute()
+                    mobs = Detect_Mobs(top=300,bottom=100,left=60*15,right=60*15).execute()
                 key_down(self.direction)
-            has_elite = Detect_Mobs(top=300,bottom=300,left=600,right=600,isElite=True).execute()
+            has_elite = Detect_Mobs(top=200,bottom=100,left=300,right=300,isElite=True).execute()
             if has_elite is not None and len(has_elite) > 0:
                 SonicBlow().execute()
             FlashJump(dx=abs(d_x)).execute()
@@ -99,7 +99,7 @@ class HitAndRun(Command):
             CruelStabRandomDirection().execute()
             # else:
             #     time.sleep(0.5)
-            sleep_while_move_y(interval=0.02, n=5)
+            sleep_while_move_y(interval=0.016, n=5)
         else:
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
@@ -438,8 +438,8 @@ class SuddenRaid(Command):
     def canUse(self, next_t: float = 0) -> bool:
         usable = super().canUse(next_t)
         if usable:
-            mobs = Detect_Mobs(top=500,bottom=500,left=500,right=500,debug=False).execute()
-            return mobs is not None and len(mobs) > 0
+            mobs = Detect_Mobs(top=400,bottom=400,left=400,right=400,debug=False).execute()
+            return mobs is not None and len(mobs) > 1
         else:
             return False
             
@@ -465,7 +465,7 @@ class TrickBlade(Command):
     def canUse(self, next_t: float = 0) -> bool:
         usable = super().canUse(next_t)
         if usable:
-            mobs = Detect_Mobs(top=200,bottom=200,left=300,right=300).execute()
+            mobs = Detect_Mobs(top=200,bottom=100,left=300,right=300).execute()
             return mobs is not None and len(mobs) > 0
         else:
             return False
