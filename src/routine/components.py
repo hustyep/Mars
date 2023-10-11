@@ -578,7 +578,8 @@ class Detect_Mobs(Command):
     @utils.run_if_enabled
     def execute(self):
         result = self.main()
-        print(f"Detect_{'Elite' if self.isElite else 'Mobs'}: {len(result)}")
+        if result is not None and len(result) > 0:
+            print(f"Detect_{'Elite' if self.isElite else 'Mobs'}: {len(result)}")
         return result
 
     def main(self):
