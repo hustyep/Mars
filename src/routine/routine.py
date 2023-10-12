@@ -44,6 +44,7 @@ class Routine:
         self.display = []       # Updated alongside sequence
         self.mob_template = []
         self.elite_template = []
+        self.boss_template = []
         self.role_template = None
         self.guard_point_l = (100, 0)
         self.guard_point_r = (0, 0)
@@ -293,12 +294,16 @@ class Routine:
             try:
                 mob_template = cv2.imread(f'assets/mobs/{settings.mob_name}.png', 0)
                 elite_template = cv2.imread(f'assets/mobs/{settings.mob_name}_elite.png', 0)
+                boss_template = cv2.imread(f'assets/mobs/{settings.mob_name}_boss.png', 0)
             except:
                 pass
             if mob_template is not None:
                 self.mob_template.append(mob_template)
             if elite_template is not None:
                 self.elite_template.append(elite_template)
+            if boss_template is not None:
+                self.boss_template.append(boss_template)
+                self.boss_template.append(cv2.flip(boss_template, 1))
             try:
                 mob_template_l = cv2.imread(f'assets/mobs/{settings.mob_name}_L.png', 0)
                 elite_template_l = cv2.imread(f'assets/mobs/{settings.mob_name}_elite_L.png', 0)

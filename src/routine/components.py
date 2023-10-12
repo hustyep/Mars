@@ -564,14 +564,21 @@ class Potion(Command):
         config.enabled = False
 
 
+from enum import Enum, auto
+
+class MobType(Enum):
+    NORMAL = 'normal mob'
+    ELITE = 'elite mob'
+    BOSS = 'boss mob'
+
 class Detect_Mobs(Command):
-    def __init__(self, top=0, left=0, right=0, bottom=0, isElite=False, debug=False):
+    def __init__(self, top=0, left=0, right=0, bottom=0, type:MobType=MobType.NORMAL, debug=False):
         super().__init__(locals())
         self.top = top
         self.bottom = bottom
         self.left = left
         self.right = right
-        self.isElite = isElite
+        self.type = type
         self.debug = debug
         # print("Detect_Mobs")
 
@@ -579,7 +586,7 @@ class Detect_Mobs(Command):
     def execute(self):
         result = self.main()
         if result is not None and len(result) > 0:
-            print(f"Detect_{'Elite' if self.isElite else 'Mobs'}: {len(result)}")
+            print(f"Detected {self.type.value}: {len(result)}")
         return result
 
     def main(self):
@@ -589,9 +596,16 @@ class Detect_Mobs(Command):
         if frame is None or minimap is None:
             return []
 
-        mob_templates = config.routine.elite_template if self.isElite else config.routine.mob_template
+        match (self.type):
+            case (MobType.BOSS):
+                mob_templates = config.routine.boss_template
+            case (MobType.ELITE):
+                mob_templates = config.routine.elite_template
+            case (_):
+                mob_templates = config.routine.mob_template
+                
         if len(mob_templates) == 0:
-            raise ValueError(f"Miss {'elite' if self.isElite else 'mob'} template")
+            raise ValueError(f"Miss {self.type.value} template")
         
         if config.routine.role_template is None:
             raise ValueError('Miss Role template')
@@ -600,7 +614,7 @@ class Detect_Mobs(Command):
             capture.frame, config.routine.role_template, threshold=0.9)
         if len(player_match) == 0:
             print("lost player")
-            return [] if self.isElite else [(0,0)]
+            return [(0,0)] if self.type == MobType.NORMAL else []
         
         player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
         y_start = max(0, player_pos[1]-self.top)
