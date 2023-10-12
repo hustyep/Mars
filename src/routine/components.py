@@ -603,7 +603,7 @@ class Detect_Mobs(Command):
             capture.frame, config.routine.role_template, threshold=0.9)
         if len(player_match) == 0:
             print("lost player")
-            return []
+            return [] if self.isElite else [(0,0)]
         
         player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
         y_start = max(0, player_pos[1]-self.top)
@@ -634,6 +634,14 @@ def sleep_while_move_y(interval=0.02, n=6):
             count = 0
             player_y = config.player_pos[1]
         if count == n:
+            break
+        
+def sleep_before_y(target_y, tolorance=0):
+    count = 0
+    while abs(config.player_pos[1] - target_y) > tolorance:
+        time.sleep(0.02)
+        count += 1
+        if count == 20:
             break
 
 def direction_changed():

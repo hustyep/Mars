@@ -3,7 +3,7 @@
 from src.common import config, settings, utils
 import time
 import math
-from src.routine.components import Command, Detect_Mobs, direction_changed, sleep_while_move_y
+from src.routine.components import Command, Detect_Mobs, direction_changed, sleep_while_move_y, sleep_before_y
 from src.common.vkeys import press, key_down, key_up, releaseAll
 
 # List of key mappings
@@ -92,22 +92,24 @@ class HitAndRun(Command):
                 while count < 500 and mobs is not None and len(mobs) < 2:
                     count += 1
                     time.sleep(0.01)
-                    mobs = Detect_Mobs(top=300,bottom=100,left=60*15,right=60*15).execute()
+                    mobs = Detect_Mobs(top=300,bottom=100,left=80*15,right=80*15).execute()
                 key_down(self.direction)
-                
+            
+            key_up(self.direction)    
             if self.direction == 'right':
-                has_elite = Detect_Mobs(top=160,bottom=-50,left=-300,right=900,isElite=True).execute()
+                has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,isElite=True).execute()
             else:
-                has_elite = Detect_Mobs(top=160,bottom=-50,left=900,right=-300,isElite=True).execute()
+                has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,isElite=True).execute()
+            key_down(self.direction)
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
-            sleep_while_move_y(interval=0.02, n=4)
+            sleep_before_y(target_y=self.target[1], tolorance=1)
             if has_elite is not None and len(has_elite) > 0:
                 SonicBlow().execute()
         else:
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
-            sleep_while_move_y(interval=0.02, n=5)
+            sleep_before_y(target_y=self.target[1])
             
 
 #########################
@@ -365,7 +367,7 @@ class DarkFlare(Command):
     Uses 'DarkFlare' in a given direction, or towards the center of the map if
     no direction is specified.
     """
-    cooldown = 58
+    cooldown = 57
     backswing = 0.8
     key = Key.DARK_FLARE
 
@@ -394,7 +396,7 @@ class DarkFlare(Command):
 
 class ShadowVeil(Command):
     key = Key.SHADOW_VEIL
-    cooldown = 58
+    cooldown = 57
     precast = 0.3
     backswing = 0.8
 
@@ -446,7 +448,7 @@ class SuddenRaid(Command):
         usable = super().canUse(next_t)
         if usable:
             mobs = Detect_Mobs(top=500,bottom=500,left=500,right=500,debug=False).execute()
-            return mobs is not None and len(mobs) > 0
+            return mobs is None or len(mobs) > 0
         else:
             return False
             
@@ -473,7 +475,7 @@ class TrickBlade(Command):
         usable = super().canUse(next_t)
         if usable:
             mobs = Detect_Mobs(top=200,bottom=100,left=300,right=300).execute()
-            return mobs is not None and len(mobs) > 0
+            return mobs is None or len(mobs) > 0
         else:
             return False
 
@@ -488,7 +490,7 @@ class SlashShadowFormation(Command):
 class SonicBlow(Command):
     key = Key.SONIC_BLOW
     cooldown = 45
-    backswing = 3
+    backswing = 2.6
 
 
 ###################
