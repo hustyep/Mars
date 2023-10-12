@@ -113,7 +113,7 @@ class Notifier(Subject, Observer):
         if config.enabled:
             if np.count_nonzero(gray < 15) / height / width > self.black_screen_threshold:
                 self._notify(BotError.BLACK_SCREEN)
-            elif np.count_nonzero(gray == 0) > 0.7 and not config.lost_minimap:
+            elif np.count_nonzero(gray == 0) / height / width > 0.7 and not config.lost_minimap:
                 self._notify(BotInfo.BOSS_APPEAR)
 
         # Check for white room
