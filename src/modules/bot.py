@@ -8,7 +8,7 @@ from src.chat_bot.chat_bot_entity import ChatBotCommand
 from src.detection import rune
 from src.routine.routine import Routine
 from src.routine.components import Point
-from src.common import config, utils
+from src.common import config, utils, settings
 from src.common.action_simulator import ActionSimulator
 from src.common.bot_notification import *
 from src.common.vkeys import press, releaseAll
@@ -109,10 +109,10 @@ class Bot(Configurable, Observer):
     @utils.run_if_enabled
     def _point_check(self, element):
         if config.rune_active and isinstance(element, Point) \
-            and element.location == config.rune_closest_pos:
+            and utils.distance(config.rune_pos, config.player_pos) < settings.move_tolerance:
             self._solve_rune()
         if config.minal_active and isinstance(element, Point) \
-            and element.location == config.minal_closest_pos:
+            and utils.distance(config.minal_pos, config.player_pos) < settings.move_tolerance:
             self._mining()
 
     @utils.run_if_enabled
