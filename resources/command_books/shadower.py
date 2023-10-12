@@ -106,7 +106,8 @@ class HitAndRun(Command):
             threading.Thread(target=detect_elite, args=(self.direction,)).start()
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
-            sleep_before_y(target_y=self.target[1], tolorance=0)
+            # sleep_before_y(target_y=self.target[1], tolorance=1)
+            sleep_while_move_y(interval=0.018, n=5)
             if config.elite_detected:
                 SonicBlow().execute()
         else:
@@ -401,7 +402,7 @@ class ShadowVeil(Command):
     key = Key.SHADOW_VEIL
     cooldown = 57
     precast = 0.3
-    backswing = 0.8
+    backswing = 0.9
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -493,7 +494,7 @@ class SlashShadowFormation(Command):
 class SonicBlow(Command):
     key = Key.SONIC_BLOW
     cooldown = 45
-    backswing = 2.6
+    backswing = 3
 
 
 ###################
