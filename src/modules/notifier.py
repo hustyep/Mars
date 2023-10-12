@@ -110,8 +110,11 @@ class Notifier(Subject, Observer):
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Check for unexpected black screen
-        if config.enabled and np.count_nonzero(gray < 15) / height / width > self.black_screen_threshold:
-            self._notify(BotError.BLACK_SCREEN)
+        if config.enabled:
+            if np.count_nonzero(gray < 15) / height / width > self.black_screen_threshold:
+                self._notify(BotError.BLACK_SCREEN)
+            elif np.count_nonzero(gray == 0) > 0.7 and not config.lost_minimap:
+                self._notify(BotInfo.BOSS_APPEAR)
 
         # Check for white room
         if config.started_time and np.count_nonzero(gray == 255) / height / width >= self.white_room_threshold:
@@ -119,7 +122,6 @@ class Notifier(Subject, Observer):
         else:
             self.notice_time_record[BotFatal.WHITE_ROOM] = 0
             
-                
         # Check for no movement
         if config.enabled and operator.eq(config.player_pos, self.player_pos):
             interval = int(time.time() - self.player_pos_updated_time)
@@ -266,6 +268,8 @@ class Notifier(Subject, Observer):
                 image_path = utils.save_screenshot(frame=capture.frame)
                 self.send_message(text=text, image_path=image_path)
             elif event_type == BotInfo:
+                if event.value == BotInfo.BOSS_APPEAR:
+                    config.elite_boss_detected = True
                 if config.notice_level < 4:
                     return
                 text = f'💡[{event.value}] {info}'

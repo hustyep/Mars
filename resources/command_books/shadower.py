@@ -56,6 +56,10 @@ def step(direction, target):
     Should not press any arrow keys, as those are handled by Mars.
     """
 
+    if config.elite_boss_detected:
+        config.elite_boss_detected = False
+        SlashShadowFormation().execute()
+
     if config.stage_fright and direction != 'up' and utils.bernoulli(0.75):
         time.sleep(utils.rand_float(0.1, 0.3))
     d_x = target[0] - config.player_pos[0]
@@ -485,11 +489,9 @@ class TrickBlade(Command):
 
 
 class SlashShadowFormation(Command):
-    """Uses 'SlashShadowFormation' once."""
-
-    def main(self):
-        press(Key.SLASH_SHADOW_FORMATION, 3)
-
+    key = Key.SLASH_SHADOW_FORMATION
+    cooldown = 90
+    backswing = 0.8
 
 class SonicBlow(Command):
     key = Key.SONIC_BLOW

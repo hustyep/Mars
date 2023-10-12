@@ -84,3 +84,4 @@ hide_start = 0
 mob_detect = False
 
 elite_detected = False
+elite_boss_detected = False
