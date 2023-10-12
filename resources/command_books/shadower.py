@@ -95,7 +95,7 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.08)
                 key_up(self.direction)
-                time.sleep(1)
+                time.sleep(0.9)
                 has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,isElite=True).execute()
                 if has_elite is not None and len(has_elite) > 0:
                     SonicBlow().execute()
@@ -111,7 +111,7 @@ class HitAndRun(Command):
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
-            sleep_while_move_y(interval=0.018, n=5)
+            sleep_while_move_y(interval=0.017, n=5)
             if config.elite_detected:
                 SonicBlow().execute()
         else:
