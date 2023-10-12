@@ -66,6 +66,9 @@ class Bot(Configurable, Observer):
         last_fed = 0
         while True:
             if config.enabled and len(config.routine) > 0:
+                # current element
+                element = config.routine[config.routine.index]
+                
                 # feed pets
                 pet_settings = config.gui.settings.pets
                 auto_feed = pet_settings.auto_feed.get()
@@ -77,9 +80,9 @@ class Bot(Configurable, Observer):
 
                 # Use Buff and Potion
                 if isinstance(element, Point):
-                    if config.player_direction == 'left' and element == config.routine.guard_point_l:
+                    if config.player_direction == 'left' and element.location == config.routine.guard_point_l:
                         pass
-                    elif  config.player_direction == 'right' and element == config.routine.guard_point_r:
+                    elif  config.player_direction == 'right' and element.location == config.routine.guard_point_r:
                         pass
                     else:
                         config.command_book.buff.main()
@@ -88,9 +91,6 @@ class Bot(Configurable, Observer):
                 # Highlight the current Point
                 config.gui.view.routine.select(config.routine.index)
                 config.gui.view.details.display_info(config.routine.index)
-
-                # current element
-                element = config.routine[config.routine.index]
                 
                 # first check rune and mineral
                 self._point_check(element)
@@ -109,10 +109,10 @@ class Bot(Configurable, Observer):
     @utils.run_if_enabled
     def _point_check(self, element):
         if config.rune_active and isinstance(element, Point) \
-            and utils.distance(config.rune_pos, config.player_pos) < settings.move_tolerance:
+            and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or config.rune_closest_pos == element.location):
             self._solve_rune()
         if config.minal_active and isinstance(element, Point) \
-            and utils.distance(config.minal_pos, config.player_pos) < settings.move_tolerance:
+            and (utils.distance(config.minal_pos, config.player_pos) <= settings.move_tolerance * 2 or config.minal_closest_pos == element.location):
             self._mining()
 
     @utils.run_if_enabled
