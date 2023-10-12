@@ -120,7 +120,7 @@ class Notifier(Subject, Observer):
             elif np.count_nonzero(gray == 0) / height / width > 0.7 and not config.lost_minimap:
                 last_time = self.notice_time_record.get(BotInfo.BOSS_APPEAR, 0)
                 if last_time == 0 or time.time() - last_time >= 120:
-                    threading.Timer(5, self.notify_boss_appear)
+                    threading.Timer(5, self.notify_boss_appear).start()
 
         # Check for white room
         if config.started_time and np.count_nonzero(gray == 255) / height / width >= self.white_room_threshold:
