@@ -99,11 +99,11 @@ class HitAndRun(Command):
                 has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,isElite=True).execute()
                 if has_elite is not None and len(has_elite) > 0:
                     SonicBlow().execute()
-                mobs = Detect_Mobs(top=30*15,bottom=15*15,left=80*15,right=80*15).execute()
+                mobs = Detect_Mobs(top=30*15,bottom=60,left=1000,right=1000).execute()
                 count = 0
                 while count < 500 and mobs is not None and len(mobs) < 2:
                     count += 1
-                    time.sleep(0.01)
+                    time.sleep(0.005)
                     mobs = Detect_Mobs(top=300,bottom=100,left=80*15,right=80*15).execute()
                 key_down(self.direction)
             
