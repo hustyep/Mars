@@ -75,29 +75,45 @@ class Bot(Configurable, Observer):
                     press(self.config['Feed pet'], 1)
                     last_fed = now
 
-                # Buff
-                config.command_book.buff.main()
-
-                # Potion
-                config.command_book.potion.main()
+                # Use Buff and Potion
+                if isinstance(element, Point):
+                    if config.player_direction == 'left' and element == config.routine.guard_point_l:
+                        pass
+                    elif  config.player_direction == 'right' and element == config.routine.guard_point_r:
+                        pass
+                    else:
+                        config.command_book.buff.main()
+                        config.command_book.potion.main()
 
                 # Highlight the current Point
                 config.gui.view.routine.select(config.routine.index)
                 config.gui.view.details.display_info(config.routine.index)
 
-                # Execute next Point in the routine
+                # current element
                 element = config.routine[config.routine.index]
-                if config.rune_active and isinstance(element, Point) \
-                        and element.location == config.rune_closest_pos:
-                    self._solve_rune()
-                elif config.minal_active and isinstance(element, Point) \
-                        and element.location == config.minal_closest_pos:
-                    self._mining()
+                
+                # first check rune and mineral
+                self._point_check(element)
 
+                # Execute next Point in the routine
                 element.execute()
+                
+                # double check rune and mineral
+                self._point_check(element)
+                
+                # go next
                 config.routine.step()
             else:
                 time.sleep(0.01)
+
+    @utils.run_if_enabled
+    def _point_check(self, element):
+        if config.rune_active and isinstance(element, Point) \
+            and element.location == config.rune_closest_pos:
+            self._solve_rune()
+        if config.minal_active and isinstance(element, Point) \
+            and element.location == config.minal_closest_pos:
+            self._mining()
 
     @utils.run_if_enabled
     def _solve_rune(self, retry=True):
