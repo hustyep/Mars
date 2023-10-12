@@ -82,3 +82,5 @@ mineral_type = None
 hide_start = 0
 
 mob_detect = False
+
+elite_detected = False

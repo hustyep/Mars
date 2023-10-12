@@ -589,15 +589,12 @@ class Detect_Mobs(Command):
         if frame is None or minimap is None:
             return []
 
-        if not config.mob_detect:
-            return [(0,0),(0,0)]
-
         mob_templates = config.routine.elite_template if self.isElite else config.routine.mob_template
-        if not self.isElite and len(mob_templates) == 0:
-            return [(0,0),(0,0)]
+        if len(mob_templates) == 0:
+            raise ValueError(f"Miss {'elite' if self.isElite else 'mob'} template")
         
         if config.routine.role_template is None:
-            return [(0,0),(0,0)]
+            raise ValueError('Miss Role template')
                   
         player_match = utils.multi_match(
             capture.frame, config.routine.role_template, threshold=0.9)

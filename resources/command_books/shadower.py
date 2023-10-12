@@ -3,6 +3,7 @@
 from src.common import config, settings, utils
 import time
 import math
+import threading
 from src.routine.components import Command, Detect_Mobs, direction_changed, sleep_while_move_y, sleep_before_y
 from src.common.vkeys import press, key_down, key_up, releaseAll
 
@@ -70,6 +71,13 @@ def step(direction, target):
     else:
         time.sleep(0.05)
         
+def detect_elite(direction):
+    if direction == 'right':
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,isElite=True).execute()
+    else:
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,isElite=True).execute()
+    config.elite_detected = has_elite is not None and len(has_elite) > 0
+        
 class HitAndRun(Command):
     def __init__(self, direction, target):
         super().__init__(locals())
@@ -81,7 +89,7 @@ class HitAndRun(Command):
         if config.mob_detect:
             if direction_changed():
                 print("direction_changed")
-                time.sleep(0.1)
+                time.sleep(0.08)
                 key_up(self.direction)
                 time.sleep(1)
                 has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,isElite=True).execute()
@@ -95,16 +103,11 @@ class HitAndRun(Command):
                     mobs = Detect_Mobs(top=300,bottom=100,left=80*15,right=80*15).execute()
                 key_down(self.direction)
             
-            key_up(self.direction)    
-            if self.direction == 'right':
-                has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,isElite=True).execute()
-            else:
-                has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,isElite=True).execute()
-            key_down(self.direction)
+            threading.Thread(target=detect_elite, args=(self.direction,)).start()
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
-            sleep_before_y(target_y=self.target[1], tolorance=1)
-            if has_elite is not None and len(has_elite) > 0:
+            sleep_before_y(target_y=self.target[1], tolorance=0)
+            if config.elite_detected:
                 SonicBlow().execute()
         else:
             FlashJump(dx=abs(d_x)).execute()
