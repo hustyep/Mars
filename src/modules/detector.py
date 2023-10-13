@@ -97,7 +97,7 @@ class Detector():
                         minal_full_pos[0] - 18, minal_full_pos[1] - 40)
                 elif mineral_type == MineralType.CRYSTAL:
                     minal_full_pos = (
-                        minal_full_pos[0], minal_full_pos[1] - 50)
+                        minal_full_pos[0] - 10, minal_full_pos[1] - 50)
                 elif mineral_type == MineralType.HEART:
                     minal_full_pos = (
                         minal_full_pos[0] - 10, minal_full_pos[1] - 80)

@@ -95,7 +95,7 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.08)
                 key_up(self.direction)
-                time.sleep(0.9)
+                time.sleep(1)
                 has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,isElite=True).execute()
                 if has_elite is not None and len(has_elite) > 0:
                     SonicBlow().execute()
