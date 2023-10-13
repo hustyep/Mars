@@ -4,7 +4,7 @@ from src.common import config, settings, utils
 import time
 import math
 import threading
-from src.routine.components import Command, Detect_Mobs, direction_changed, sleep_while_move_y, sleep_before_y
+from src.routine.components import *
 from src.common.vkeys import press, key_down, key_up, releaseAll
 
 # List of key mappings
@@ -77,10 +77,19 @@ def step(direction, target):
         
 def detect_elite(direction):
     if direction == 'right':
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,isElite=True).execute()
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=MobType.ELITE).execute()
     else:
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,isElite=True).execute()
-    config.elite_detected = has_elite is not None and len(has_elite) > 0
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.ELITE).execute()
+    has_elite = has_elite is not None and len(has_elite) > 0
+    if has_elite:
+        config.elite_detected = True
+    else:
+        if direction == 'right':
+            has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=MobType.BOSS).execute()
+        else:
+            has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.BOSS).execute()
+        config.elite_detected = has_elite is not None and len(has_elite) > 0
+    
         
 class HitAndRun(Command):
     def __init__(self, direction, target):
@@ -95,8 +104,8 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.08)
                 key_up(self.direction)
-                time.sleep(1)
-                has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,isElite=True).execute()
+                time.sleep(0.9)
+                has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.ELITE).execute()
                 if has_elite is not None and len(has_elite) > 0:
                     SonicBlow().execute()
                 mobs = Detect_Mobs(top=30*15,bottom=60,left=1000,right=1000).execute()
@@ -362,10 +371,10 @@ class MesoExplosion(Command):
 
 class CruelStabRandomDirection(Command):
     """Uses 'CruelStab' once."""
-    backswing = 0.1
+    backswing = 0.25
 
     def main(self):
-        press(Key.CRUEL_STAB, 1, up_time=0.2)
+        press(Key.CRUEL_STAB, 1, up_time=0.25)
         MesoExplosion().execute()
         time.sleep(self.backswing)
 
@@ -424,7 +433,7 @@ class ShadowVeil(Command):
 
 class ErdaShower(Command):
     key = Key.ERDA_SHOWER
-    cooldown = 58
+    cooldown = 57
     backswing = 0.8
 
     def __init__(self, direction=None):
@@ -470,7 +479,7 @@ class Arachnid(Command):
 class TrickBlade(Command):
     key = Key.TRICKBLADE
     cooldown = 14
-    backswing = 0.9
+    backswing = 0.8
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -528,7 +537,7 @@ class GODDESS_BLESSING(Command):
     key = Key.GODDESS_BLESSING
     cooldown = 180
     precast = 0.3
-    backswing = 0.9
+    backswing = 0.85
 
 
 class LAST_RESORT(Command):
@@ -623,7 +632,7 @@ class Potion(Command):
 class EXP_POTION(Command):
     key = Key.EXP_POTION
     cooldown = 7250
-    backswing = 0.5
+    backswing = 0.3
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
@@ -635,7 +644,7 @@ class EXP_POTION(Command):
 class WEALTH_POTION(Command):
     key = Key.WEALTH_POTION
     cooldown = 7250
-    backswing = 0.5
+    backswing = 0.3
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Wealthy Potion')
@@ -647,7 +656,7 @@ class WEALTH_POTION(Command):
 class GOLD_POTION(Command):
     key = Key.GOLD_POTION
     cooldown = 1810
-    backswing = 0.5
+    backswing = 0.3
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
@@ -659,7 +668,7 @@ class GOLD_POTION(Command):
 class GUILD_POTION(Command):
     key = Key.GUILD_POTION
     cooldown = 1810
-    backswing = 0.5
+    backswing = 0.3
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
@@ -671,7 +680,7 @@ class GUILD_POTION(Command):
 class CANDIED_APPLE(Command):
     key = Key.CANDIED_APPLE
     cooldown = 1800
-    backswing = 0.5
+    backswing = 0.3
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
@@ -683,7 +692,7 @@ class CANDIED_APPLE(Command):
 class LEGION_WEALTHY(Command):
     key = Key.LEGION_WEALTHY
     cooldown = 1810
-    backswing = 0.5
+    backswing = 0.3
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Legion Wealthy')
@@ -695,7 +704,7 @@ class LEGION_WEALTHY(Command):
 class EXP_COUPON(Command):
     key = Key.EXP_COUPON
     cooldown = 1810
-    backswing = 0.5
+    backswing = 0.3
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Coupon')
