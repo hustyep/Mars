@@ -85,6 +85,7 @@ class Bot(Configurable, Observer):
                     elif  config.player_direction == 'right' and element.location == config.routine.guard_point_r:
                         pass
                     else:
+                        print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{config.routine.guard_point_l}, guard_point_r:{config.routine.guard_point_r}")
                         config.command_book.buff.main()
                         config.command_book.potion.main()
 
@@ -93,13 +94,13 @@ class Bot(Configurable, Observer):
                 config.gui.view.details.display_info(config.routine.index)
                 
                 # first check rune and mineral
-                self._point_check(element)
+                # self._point_check(element)
 
                 # Execute next Point in the routine
                 element.execute()
                 
                 # double check rune and mineral
-                self._point_check(element)
+                # self._point_check(element)
                 
                 # go next
                 config.routine.step()

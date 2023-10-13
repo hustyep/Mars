@@ -3,7 +3,8 @@
 from src.common import config
 import inspect
 import tkinter as tk
-from src.routine.components import Point, Command
+from src.routine.components import Point
+from src.routine.commands import Command
 from src.gui.edit.minimap import Minimap
 from src.gui.edit.record import Record
 from src.gui.edit.routine import Routine

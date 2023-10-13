@@ -5,6 +5,7 @@ import traceback
 from os.path import basename, splitext
 from src.common import config, utils
 from src.routine import components
+from src.routine import commands
 from src.common.interfaces import Configurable
 
 
@@ -14,8 +15,8 @@ CB_KEYBINDING_DIR = os.path.join('resources', 'keybindings')
 class CommandBook(Configurable):
     def __init__(self, file):
         self.name = splitext(basename(file))[0]
-        self.buff = components.Buff()
-        self.potion = components.Potion()
+        self.buff = commands.Buff()
+        self.potion = commands.Potion()
         self.DEFAULT_CONFIG = {}
         result = self.load_commands(file)
         if result is None:
@@ -34,9 +35,9 @@ class CommandBook(Configurable):
             print(f" !  '{ext}' is not a supported file extension.")
             return
 
-        new_step = components.step
+        new_step = commands.step
         new_cb = {}
-        for c in (components.Wait, components.Walk, components.Fall):
+        for c in (commands.Wait, commands.Walk, commands.Fall):
             new_cb[c.__name__.lower()] = c
 
         # Import the desired command book file
@@ -73,12 +74,12 @@ class CommandBook(Configurable):
 
         # Populate the new command book
         for name, command in inspect.getmembers(module, inspect.isclass):
-            if issubclass(command, components.Command):
+            if issubclass(command, commands.Command):
                 new_cb[name.lower()] = command
 
         # Check if required commands have been implemented and overridden
         required_found = True
-        for command in (components.Buff, components.Potion, components.MoveUp, components.MoveDown):
+        for command in (commands.Buff, commands.Potion, commands.MoveUp, commands.MoveDown):
             name = command.__name__.lower()
             if name not in new_cb:
                 required_found = False
@@ -87,7 +88,7 @@ class CommandBook(Configurable):
 
         # Look for overridden movement commands
         movement_found = True
-        for command in (components.Move, components.Adjust, components.AdjustX):
+        for command in (commands.Move, commands.Adjust, commands.AdjustX):
             name = command.__name__.lower()
             if name not in new_cb:
                 movement_found = False
@@ -99,9 +100,9 @@ class CommandBook(Configurable):
         if required_found and (step_found or movement_found):
             self.buff = new_cb['buff']()
             self.potion = new_cb["potion"]()
-            components.step = new_step
-            components.MoveUp = new_cb['moveup']
-            components.MoveDown = new_cb['movedown']
+            commands.step = new_step
+            commands.MoveUp = new_cb['moveup']
+            commands.MoveDown = new_cb['movedown']
             config.gui.menu.file.enable_routine_state()
             config.gui.view.status.set_cb(basename(file))
             config.routine.clear()

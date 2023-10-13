@@ -378,6 +378,6 @@ def distance_to_rune(point):
     :return:        The distance from POINT to the rune, infinity if it is not a Point object.
     """
 
-    if isinstance(point, Point):
+    if isinstance(point, Point) and point.frequency == 1:
         return utils.distance(config.rune_pos, point.location)
     return float('inf')

@@ -5,6 +5,7 @@ import time
 import math
 import threading
 from src.routine.components import *
+from src.routine.commands import *
 from src.common.vkeys import press, key_down, key_up, releaseAll
 
 # List of key mappings
@@ -59,7 +60,15 @@ def step(direction, target):
     if config.elite_boss_detected:
         config.elite_boss_detected = False
         SlashShadowFormation().execute()
-
+    
+    # check rune and mineral
+    if config.free:
+        if direction in ['left', 'right']:
+            key_up(direction)
+        point_check()
+        if direction in ['left', 'right']:
+            key_down(direction)
+        
     if config.stage_fright and direction != 'up' and utils.bernoulli(0.75):
         time.sleep(utils.rand_float(0.1, 0.3))
     d_x = target[0] - config.player_pos[0]
@@ -89,7 +98,17 @@ def detect_elite(direction):
         else:
             has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.BOSS).execute()
         config.elite_detected = has_elite is not None and len(has_elite) > 0
-    
+
+def point_check():
+    config.free = False
+    element = config.routine[config.routine.index]
+    if config.rune_active and isinstance(element, Point) \
+        and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or element.location == config.rune_closest_pos):
+        SolveRune().execute()
+    if config.minal_active and isinstance(element, Point) \
+        and (utils.distance(config.minal_pos, config.player_pos) <= settings.move_tolerance * 2 or element.location == config.minal_closest_pos):
+        Mining().execute()
+    config.free = True
         
 class HitAndRun(Command):
     def __init__(self, direction, target):
@@ -104,23 +123,23 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.08)
                 key_up(self.direction)
-                time.sleep(0.9)
+                time.sleep(1)
                 has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.ELITE).execute()
                 if has_elite is not None and len(has_elite) > 0:
                     SonicBlow().execute()
-                mobs = Detect_Mobs(top=30*15,bottom=60,left=1000,right=1000).execute()
                 count = 0
+                mobs = Detect_Mobs(top=30*15,bottom=60,left=1000,right=1000).execute()
                 while count < 500 and mobs is not None and len(mobs) < 2:
                     count += 1
-                    time.sleep(0.005)
-                    mobs = Detect_Mobs(top=300,bottom=100,left=80*15,right=80*15).execute()
+                    time.sleep(0.01)
+                    mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
                 key_down(self.direction)
             
             threading.Thread(target=detect_elite, args=(self.direction,)).start()
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
-            sleep_while_move_y(interval=0.017, n=5)
+            sleep_while_move_y(interval=0.016, n=5)
             if config.elite_detected:
                 SonicBlow().execute()
         else:
@@ -371,10 +390,10 @@ class MesoExplosion(Command):
 
 class CruelStabRandomDirection(Command):
     """Uses 'CruelStab' once."""
-    backswing = 0.25
+    backswing = 0.1
 
     def main(self):
-        press(Key.CRUEL_STAB, 1, up_time=0.25)
+        press(Key.CRUEL_STAB, 1, up_time=0.2)
         MesoExplosion().execute()
         time.sleep(self.backswing)
 
@@ -434,7 +453,7 @@ class ShadowVeil(Command):
 class ErdaShower(Command):
     key = Key.ERDA_SHOWER
     cooldown = 57
-    backswing = 0.8
+    backswing = 0.7
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -459,7 +478,7 @@ class ErdaShower(Command):
 class SuddenRaid(Command):
     key = Key.SUDDEN_RAID
     cooldown = 30
-    backswing = 0.7
+    backswing = 0.75
 
     def canUse(self, next_t: float = 0) -> bool:
         usable = super().canUse(next_t)

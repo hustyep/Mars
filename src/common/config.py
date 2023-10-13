@@ -60,6 +60,7 @@ command_book = None
 rune_active = False
 rune_pos = None
 rune_closest_pos = None
+free = True
 
 # Bot status
 started_time = None
