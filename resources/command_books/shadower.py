@@ -65,7 +65,7 @@ def step(direction, target):
     if config.free:
         if direction in ['left', 'right']:
             key_up(direction)
-        point_check()
+        point_check(target)
         if direction in ['left', 'right']:
             key_down(direction)
         
@@ -99,14 +99,13 @@ def detect_elite(direction):
             has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.BOSS).execute()
         config.elite_detected = has_elite is not None and len(has_elite) > 0
 
-def point_check():
+def point_check(target):
     config.free = False
-    element = config.routine[config.routine.index]
-    if config.rune_active and isinstance(element, Point) \
-        and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or element.location == config.rune_closest_pos):
+    if config.rune_active \
+        and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or target == config.rune_closest_pos):
         SolveRune().execute()
-    if config.minal_active and isinstance(element, Point) \
-        and (utils.distance(config.minal_pos, config.player_pos) <= settings.move_tolerance * 2 or element.location == config.minal_closest_pos):
+    if config.minal_active \
+        and (utils.distance(config.minal_pos, config.player_pos) <= settings.move_tolerance * 2 or target == config.minal_closest_pos):
         Mining().execute()
     config.free = True
         
