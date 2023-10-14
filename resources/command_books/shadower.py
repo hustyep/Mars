@@ -79,7 +79,7 @@ def step(direction, target):
         MoveDown(dy=abs(d_y)).execute()
     elif abs(d_y) >= 26 and abs(d_x) >= 24 and ShadowAssault.usable_count() > 2:
         ShadowAssault(dx=d_x, dy=d_y).execute()
-    elif abs(d_x) >= 24:
+    elif abs(d_x) >= 26:
         HitAndRun(direction, target).execute()
     else:
         time.sleep(0.05)
@@ -122,13 +122,13 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.08)
                 key_up(self.direction)
-                time.sleep(1)
+                time.sleep(1.5)
                 has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.ELITE).execute()
                 if has_elite is not None and len(has_elite) > 0:
                     SonicBlow().execute()
                 count = 0
                 mobs = Detect_Mobs(top=30*15,bottom=60,left=1000,right=1000).execute()
-                while count < 500 and mobs is not None and len(mobs) < 2:
+                while count < 200 and mobs is not None and len(mobs) < 2:
                     count += 1
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
@@ -183,7 +183,7 @@ class MoveDown(Command):
                           distance=self.dy).execute()
         else:
             key_down('down')
-            press(Key.JUMP, 1, down_time=0.2, up_time=0.2)
+            press(Key.JUMP, 1, down_time=0.1, up_time=0.5)
             key_up('down')
             sleep_while_move_y()
             # time.sleep(0.8 if self.dy >= 15 else 0.7)
@@ -509,7 +509,7 @@ class TrickBlade(Command):
     def canUse(self, next_t: float = 0) -> bool:
         usable = super().canUse(next_t)
         if usable:
-            mobs = Detect_Mobs(top=200,bottom=100,left=300,right=300).execute()
+            mobs = Detect_Mobs(top=200,bottom=150,left=400,right=400).execute()
             return mobs is None or len(mobs) > 0
         else:
             return False

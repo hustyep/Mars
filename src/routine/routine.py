@@ -294,35 +294,21 @@ class Routine:
         if len(settings.mob_name) > 0:
             try:
                 mob_template = cv2.imread(f'assets/mobs/{settings.mob_name}.png', 0)
-                elite_template = cv2.imread(f'assets/mobs/{settings.mob_name}_elite.png', 0)
                 boss_template = cv2.imread(f'assets/mobs/{settings.mob_name}_boss.png', 0)
             except:
                 pass
             if mob_template is not None:
                 self.mob_template.append(mob_template)
-            if elite_template is not None:
+                self.mob_template.append(cv2.flip(mob_template, 1))
+                
+                h, w = mob_template.shape
+                elite_template = cv2.resize(mob_template, (w * 2, h * 2))
                 self.elite_template.append(elite_template)
+                self.elite_template.append(cv2.flip(elite_template, 1))
+
             if boss_template is not None:
                 self.boss_template.append(boss_template)
                 self.boss_template.append(cv2.flip(boss_template, 1))
-            try:
-                mob_template_l = cv2.imread(f'assets/mobs/{settings.mob_name}_L.png', 0)
-                elite_template_l = cv2.imread(f'assets/mobs/{settings.mob_name}_elite_L.png', 0)
-            except:
-                pass
-            if mob_template_l is not None:
-                self.mob_template.append(mob_template_l)
-            if elite_template_l is not None:
-                self.elite_template.append(elite_template_l)
-            try:
-                mob_template_r = cv2.imread(f'assets/mobs/{settings.mob_name}_R.png', 0)
-                elite_template_r = cv2.imread(f'assets/mobs/{settings.mob_name}_elite_R.png', 0)
-            except:
-                pass
-            if mob_template_r is not None:
-                self.mob_template.append(mob_template_r)
-            if elite_template_r is not None:
-                self.elite_template.append(elite_template_r)
         
         if len(settings.role_name) > 0:
             try:
