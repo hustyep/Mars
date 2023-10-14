@@ -157,15 +157,15 @@ class Adjust(Command):
                 walk_counter = 0
                 if d_x < 0:
                     key_down('left')
-                    while config.enabled and d_x < -1 * threshold and walk_counter < 60:
-                        time.sleep(0.01)
+                    while config.enabled and d_x < -1 * threshold and walk_counter < 120:
+                        time.sleep(0.005)
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('left')
                 else:
                     key_down('right')
-                    while config.enabled and d_x > threshold and walk_counter < 60:
-                        time.sleep(0.01)
+                    while config.enabled and d_x > threshold and walk_counter < 120:
+                        time.sleep(0.005)
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('right')
@@ -202,15 +202,15 @@ class AdjustX(Command):
                 walk_counter = 0
                 if d_x < 0:
                     key_down('left')
-                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 60:
-                        time.sleep(0.01)
+                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 120:
+                        time.sleep(0.005)
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('left')
                 else:
                     key_down('right')
-                    while config.enabled and d_x > threshold_x and walk_counter < 60:
-                        time.sleep(0.01)
+                    while config.enabled and d_x > threshold_x and walk_counter < 120:
+                        time.sleep(0.005)
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('right')
