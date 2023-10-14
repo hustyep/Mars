@@ -19,4 +19,5 @@ $, target=role_name, value=sllee
 *, x=78, y=26, frequency=4, interval=0, skip=False, adjust=True
     TrickBlade, direction=left
     ErdaShower, direction=left
+    TrickBlade, direction=left
     ShadowAssault, direction=downleft, jump=True, distance=80
