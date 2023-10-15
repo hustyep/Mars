@@ -294,17 +294,22 @@ class Routine:
         if len(settings.mob_name) > 0:
             try:
                 mob_template = cv2.imread(f'assets/mobs/{settings.mob_name}.png', 0)
+                elite_template = cv2.imread(f'assets/mobs/{settings.mob_name}_elite.png', 0)
                 boss_template = cv2.imread(f'assets/mobs/{settings.mob_name}_boss.png', 0)
             except:
                 pass
             if mob_template is not None:
                 self.mob_template.append(mob_template)
                 self.mob_template.append(cv2.flip(mob_template, 1))
-                
-                elite_template = cv2.resize(mob_template, None, fx=2, fy=2)
+            
+            if elite_template is not None:
                 self.elite_template.append(elite_template)
                 self.elite_template.append(cv2.flip(elite_template, 1))
-
+            elif mob_template:
+                elite_template = cv2.resize(mob_template, None, fx=2, fy=2)
+                self.elite_template.append(elite_template)
+                self.elite_template.append(cv2.flip(elite_template, 1))   
+                             
             if boss_template is not None:
                 self.boss_template.append(boss_template)
                 self.boss_template.append(cv2.flip(boss_template, 1))
