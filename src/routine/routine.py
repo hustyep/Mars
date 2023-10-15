@@ -196,6 +196,10 @@ class Routine:
         self.path = ''
         self.mob_template = []
         self.elite_template = []
+        self.boss_template = []
+        self.role_template = None
+        self.guard_point_l = (100, 0)
+        self.guard_point_r = (0, 0)
         config.layout = None
         settings.reset()
 
