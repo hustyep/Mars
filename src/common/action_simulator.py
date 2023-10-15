@@ -113,7 +113,6 @@ class ActionSimulator:
     def change_channel(num: int = 0, enable=True):
         config.enabled = False
         config.change_channel = True
-        config.rune_active = False
         config.rune_pos = None
         config.rune_closest_pos = None
         threading.Timer(5, ActionSimulator._change_channel, (num, enable, )).start()

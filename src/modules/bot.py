@@ -109,7 +109,7 @@ class Bot(Configurable, Observer):
 
     @utils.run_if_enabled
     def _point_check(self, element):
-        if config.rune_active and isinstance(element, Point) \
+        if config.rune_pos is not None and isinstance(element, Point) \
             and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or config.rune_closest_pos == element.location):
             self._solve_rune()
         if config.minal_active and isinstance(element, Point) \
@@ -131,7 +131,7 @@ class Bot(Configurable, Observer):
         # adjustx = config.command_book['adjustx']
         # adjustx(*config.rune_pos).execute()
         time.sleep(0.5)
-        if not config.rune_active:
+        if config.rune_pos is None:
             return
         press(self.config['Interact'], 1, down_time=0.2,
               up_time=0.8)        # Inherited from Configurable
@@ -140,7 +140,7 @@ class Bot(Configurable, Observer):
         used_frame = None
         find_solution = False
         for i in range(4):
-            if not config.rune_active:
+            if config.rune_pos is None:
                 return
             frame = capture.frame
             solution = rune.show_magic(frame)
@@ -284,7 +284,6 @@ class Bot(Configurable, Observer):
             pass    # TODO: UI warning popup, say check cmd for errors
 
     def toggle(self, enabled: bool, reason: str = ''):
-        config.rune_active = False
         config.rune_pos = None
         config.rune_closest_pos = None
 
@@ -309,7 +308,7 @@ class Bot(Configurable, Observer):
     def bot_status(self, ext='') -> str:
         message = (
             f"bot status: {'running' if config.enabled  else 'pause'}\n"
-            f"rune status: {f'{time.time() - notifier.rune_active_time}s' if config.rune_active else 'clear'}\n"
+            f"rune status: {f'{time.time() - notifier.rune_active_time}s' if config.rune_pos is not None else 'clear'}\n"
             f"other players: {notifier.others_count}\n"
             f"reason: {ext}\n"
         )

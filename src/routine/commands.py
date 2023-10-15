@@ -349,7 +349,7 @@ class SolveRune(Command):
     cooldown = 8
     
     def canUse(self, next_t: float = 0) -> bool:
-        return super().canUse(next_t) and config.rune_active
+        return super().canUse(next_t) and config.rune_pos is not None
 
     def main(self):
         if not self.canUse():

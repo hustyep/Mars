@@ -101,7 +101,7 @@ def detect_elite(direction):
 
 def point_check(target):
     config.free = False
-    if config.rune_active \
+    if config.rune_pos is not None \
         and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or target == config.rune_closest_pos):
         SolveRune().execute()
     if config.minal_active \

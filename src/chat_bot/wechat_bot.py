@@ -111,14 +111,12 @@ class WechatBot:
     
     def start_command(self):
         config.enabled = True
-        # bot.rune_active = False
         time.sleep(0.5)
         utils.print_state()
         self.info_command()
     
     def pause_command(self):
         config.enabled = False
-        # bot.rune_active = False
         time.sleep(0.5)
         utils.print_state()
         self.info_command()

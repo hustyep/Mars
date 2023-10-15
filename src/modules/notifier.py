@@ -213,7 +213,7 @@ class Notifier(Subject, Observer):
 
     def check_rune_status(self, frame, minimap):
         if frame is None or minimap is None:
-            config.rune_active = False
+            config.rune_pos = None
             self.rune_active_time = 0
             return
 
@@ -225,7 +225,7 @@ class Notifier(Subject, Observer):
         rune_buff = utils.multi_match(
             frame[:200, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
 
-        if not config.rune_active:
+        if not config.rune_pos:
             if matches and config.routine.sequence and len(rune_buff) == 0:
                 abs_rune_pos = (matches[0][0], matches[0][1])
                 config.rune_pos = abs_rune_pos
@@ -233,12 +233,11 @@ class Notifier(Subject, Observer):
                     map(distance_to_rune, config.routine.sequence))
                 index = np.argmin(distances)
                 config.rune_closest_pos = config.routine[index].location
-                config.rune_active = True
                 if self.rune_active_time == 0:
                     self.rune_active_time = now
                     self._notify(BotInfo.RUNE_ACTIVE)
         elif len(rune_buff) > 1:
-            config.rune_active = False
+            config.rune_pos = None
             self.rune_active_time = 0
         # Alert if rune hasn't been solved
         elif len(rune_buff) == 0 and now - self.rune_active_time > self.rune_alert_delay and self.rune_active_time != 0:
@@ -314,7 +313,7 @@ class Notifier(Subject, Observer):
         self._notify(BotInfo.OTHERS_LEAVED, arg=num, info=text_notice)
 
     def notifyRuneResolved(self, rune_type):
-        config.rune_active = False
+        config.rune_pos = None
         self.rune_active_time = 0
         self._notify(BotInfo.RUNE_LIBERATED, info=rune_type)
 

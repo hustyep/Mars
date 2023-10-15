@@ -23,7 +23,6 @@ class Minimap(LabelFrame):
 
         minimap = capture.minimap
         if minimap is not None:
-            rune_active = config.rune_active
             rune_pos = config.rune_pos
             path = config.path
             player_pos = config.player_pos
@@ -43,14 +42,14 @@ class Minimap(LabelFrame):
                 img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_AREA)
 
             # Mark the position of the active rune
-            if rune_active:
+            if rune_pos is not None:
                 cv2.circle(img,
                            utils.trans_point(rune_pos, ratio),
                            3,
                            (128, 0, 128),
                            1)
 
-            if config.minal_active:
+            if config.minal_pos is not None:
                 cv2.circle(img,
                            utils.trans_point(config.minal_pos, ratio),
                            3,

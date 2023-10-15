@@ -57,7 +57,6 @@ file_setting = None
 command_book = None
 
 # Rune status
-rune_active = False
 rune_pos = None
 rune_closest_pos = None
 free = True
