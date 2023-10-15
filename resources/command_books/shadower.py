@@ -125,24 +125,24 @@ class HitAndRun(Command):
                 time.sleep(0.08)
                 key_up(self.direction)
                 time.sleep(1)
-                has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.ELITE).execute()
-                if has_elite is not None and len(has_elite) > 0:
-                    SonicBlow().execute()
+                # has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.ELITE).execute()
+                # if has_elite is not None and len(has_elite) > 0:
+                #     SonicBlow().execute()
                 count = 0
-                mobs = Detect_Mobs(top=30*15,bottom=60,left=1000,right=1000).execute()
+                mobs = Detect_Mobs(top=30*15,bottom=60,left=800,right=800).execute()
                 while count < 60 and mobs is not None and len(mobs) < 2:
                     count += 1
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
                 key_down(self.direction)
             
-            threading.Thread(target=detect_elite, args=(self.direction,)).start()
+            # threading.Thread(target=detect_elite, args=(self.direction,)).start()
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
             sleep_while_move_y(interval=0.015, n=5)
-            if config.elite_detected:
-                SonicBlow().execute()
+            # if config.elite_detected:
+            #     SonicBlow().execute()
         else:
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
@@ -184,7 +184,7 @@ class MoveDown(Command):
             ShadowAssault(direction='down', jump='True',
                           distance=self.dy).execute()
         else:
-            time.sleep(0.1)
+            time.sleep(0.2)
             key_down('down')
             press(Key.JUMP, 1, down_time=0.1, up_time=0.5)
             sleep_while_move_y()
