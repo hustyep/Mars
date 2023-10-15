@@ -301,8 +301,7 @@ class Routine:
                 self.mob_template.append(mob_template)
                 self.mob_template.append(cv2.flip(mob_template, 1))
                 
-                h, w = mob_template.shape
-                elite_template = cv2.resize(mob_template, (w * 2, h * 2))
+                elite_template = cv2.resize(mob_template, None, fx=2, fy=2)
                 self.elite_template.append(elite_template)
                 self.elite_template.append(cv2.flip(elite_template, 1))
 

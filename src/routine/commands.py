@@ -542,7 +542,7 @@ class Detect_Mobs(Command):
         
         mobs = []
         for mob_template in mob_templates:
-            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.9 if self.type == MobType.ELITE else 0.95, debug=self.debug)
+            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.95, debug=self.debug)
             if len(mobs_tmp) > 0:
                 for mob in mobs_tmp:
                     mobs.append(mob)
