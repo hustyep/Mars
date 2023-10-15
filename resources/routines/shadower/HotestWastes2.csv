@@ -4,9 +4,11 @@ $, target=role_name, value=sllee
 
 @, label=Bottom mobbing
 *, x=22, y=56, frequency=1, interval=0, skip=False, adjust=False
+    SlashShadowFormation
 *, x=95, y=56, frequency=4, interval=0, skip=False, adjust=False
     ShadowVeil
 *, x=177, y=56, frequency=1, interval=0, skip=False, adjust=False
+    SlashShadowFormation
 
 @, label=Summoning
 *, x=154, y=56, frequency=4, interval=0, skip=False, adjust=True
@@ -16,7 +18,7 @@ $, target=role_name, value=sllee
     Wait, duration=0.1
     SuddenRaid
     DarkFlare, direction=left
-*, x=78, y=26, frequency=4, interval=0, skip=False, adjust=True
+*, x=80, y=26, frequency=4, interval=0, skip=False, adjust=True
     TrickBlade, direction=left
     ErdaShower, direction=left
     TrickBlade, direction=left

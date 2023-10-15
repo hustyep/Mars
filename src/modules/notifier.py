@@ -71,7 +71,7 @@ class Notifier(Subject, Observer):
         self.rune_alert_delay = 300         # 5 minutes
 
         self.black_screen_threshold = 0.9
-        self.white_room_threshold = 0.3
+        self.white_room_threshold = 0.4
 
         self.notice_time_record = {}
 

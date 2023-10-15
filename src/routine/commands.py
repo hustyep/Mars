@@ -364,7 +364,7 @@ class SolveRune(Command):
         used_frame = None
         find_solution = False
         for i in range(4):
-            if not config.rune_active:
+            if config.rune_pos is None:
                 return
             frame = capture.frame
             solution = rune.show_magic(frame)

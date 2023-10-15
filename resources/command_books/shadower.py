@@ -59,7 +59,8 @@ def step(direction, target):
 
     if config.elite_boss_detected:
         config.elite_boss_detected = False
-        SlashShadowFormation().execute()
+        # SlashShadowFormation().execute()
+        Arachnid().execute()
     
     # check rune and mineral
     if config.free:
@@ -95,11 +96,12 @@ def detect_elite(direction):
     if has_elite:
         config.elite_detected = True
     else:
-        if direction == 'right':
-            has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=MobType.BOSS).execute()
-        else:
-            has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.BOSS).execute()
-        config.elite_detected = has_elite is not None and len(has_elite) > 0
+        pass
+        # if direction == 'right':
+        #     has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=MobType.BOSS).execute()
+        # else:
+        #     has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.BOSS).execute()
+        # config.elite_detected = has_elite is not None and len(has_elite) > 0
 
 def point_check(target):
     config.free = False
@@ -130,7 +132,7 @@ class HitAndRun(Command):
                     SonicBlow().execute()
                 count = 0
                 mobs = Detect_Mobs(top=30*15,bottom=60,left=1000,right=1000).execute()
-                while count < 200 and mobs is not None and len(mobs) < 2:
+                while count < 60 and mobs is not None and len(mobs) < 2:
                     count += 1
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
@@ -184,10 +186,11 @@ class MoveDown(Command):
             ShadowAssault(direction='down', jump='True',
                           distance=self.dy).execute()
         else:
+            time.sleep(0.1)
             key_down('down')
             press(Key.JUMP, 1, down_time=0.1, up_time=0.5)
-            key_up('down')
             sleep_while_move_y()
+            key_up('down')
             # time.sleep(0.8 if self.dy >= 15 else 0.7)
 
 
@@ -657,7 +660,7 @@ class Potion(Command):
 class EXP_POTION(Command):
     key = Key.EXP_POTION
     cooldown = 7250
-    backswing = 0.3
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
@@ -669,7 +672,7 @@ class EXP_POTION(Command):
 class WEALTH_POTION(Command):
     key = Key.WEALTH_POTION
     cooldown = 7250
-    backswing = 0.3
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Wealthy Potion')
@@ -681,7 +684,7 @@ class WEALTH_POTION(Command):
 class GOLD_POTION(Command):
     key = Key.GOLD_POTION
     cooldown = 1810
-    backswing = 0.3
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
@@ -693,7 +696,7 @@ class GOLD_POTION(Command):
 class GUILD_POTION(Command):
     key = Key.GUILD_POTION
     cooldown = 1810
-    backswing = 0.3
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
@@ -705,7 +708,7 @@ class GUILD_POTION(Command):
 class CANDIED_APPLE(Command):
     key = Key.CANDIED_APPLE
     cooldown = 1800
-    backswing = 0.3
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
@@ -717,7 +720,7 @@ class CANDIED_APPLE(Command):
 class LEGION_WEALTHY(Command):
     key = Key.LEGION_WEALTHY
     cooldown = 1810
-    backswing = 0.3
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Legion Wealthy')
@@ -729,7 +732,7 @@ class LEGION_WEALTHY(Command):
 class EXP_COUPON(Command):
     key = Key.EXP_COUPON
     cooldown = 1810
-    backswing = 0.3
+    backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
         enabled = config.gui.settings.buffs.buff_settings.get('Exp Coupon')
