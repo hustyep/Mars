@@ -79,7 +79,9 @@ def step(direction, target):
         MoveDown(dy=abs(d_y)).execute()
     elif abs(d_y) >= 26 and abs(d_x) >= 24 and ShadowAssault.usable_count() > 2:
         ShadowAssault(dx=d_x, dy=d_y).execute()
-    elif abs(d_x) >= 26:
+    elif abs(d_x) >= 24 and abs(d_x) <= 26:
+        PhaseDash().execute()
+    elif abs(d_x) > 26:
         HitAndRun(direction, target).execute()
     else:
         time.sleep(0.05)
@@ -122,7 +124,7 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.08)
                 key_up(self.direction)
-                time.sleep(1.5)
+                time.sleep(1)
                 has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.ELITE).execute()
                 if has_elite is not None and len(has_elite) > 0:
                     SonicBlow().execute()
@@ -138,7 +140,7 @@ class HitAndRun(Command):
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
-            sleep_while_move_y(interval=0.016, n=5)
+            sleep_while_move_y(interval=0.015, n=5)
             if config.elite_detected:
                 SonicBlow().execute()
         else:
@@ -524,6 +526,11 @@ class SonicBlow(Command):
     key = Key.SONIC_BLOW
     cooldown = 45
     backswing = 3
+
+class PhaseDash(Command):
+    key = 't'
+    cooldown = 0
+    backswing = 2
 
 
 ###################
