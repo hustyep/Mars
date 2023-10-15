@@ -86,8 +86,8 @@ class Bot(Configurable, Observer):
                         pass
                     else:
                         print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{config.routine.guard_point_l}, guard_point_r:{config.routine.guard_point_r}")
-                        config.command_book.buff.main()
                         config.command_book.potion.main()
+                        config.command_book.buff.main()
 
                 # Highlight the current Point
                 config.gui.view.routine.select(config.routine.index)
