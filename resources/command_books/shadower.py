@@ -80,9 +80,7 @@ def step(direction, target):
         MoveDown(dy=abs(d_y)).execute()
     elif abs(d_y) >= 26 and abs(d_x) >= 24 and ShadowAssault.usable_count() > 2:
         ShadowAssault(dx=d_x, dy=d_y).execute()
-    elif abs(d_x) >= 24 and abs(d_x) <= 26:
-        PhaseDash().execute()
-    elif abs(d_x) > 26:
+    elif abs(d_x) >= 26:
         HitAndRun(direction, target).execute()
     else:
         time.sleep(0.05)
