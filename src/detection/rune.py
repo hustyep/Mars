@@ -14,10 +14,10 @@ mpl.rcParams['axes.unicode_minus'] = False
 
 ARROW_TL_TEMPLATE = cv2.imread('assets/rune_top_left.png', 0)
 ARROW_BR_TEMPLATE = cv2.imread('assets/rune_br_template.png', 0)
+ARROW_BL_TEMPLATE = cv2.imread(RUNE_BL_TEMPLATE_PATH, 0)
 
 ARROW_RANGES1 = (
-    ((1, 100, 100), (75, 255, 255)),
-    ((0, 100, 200), (75, 255, 255))
+    ((0, 160, 180), (70, 255, 255)),
 )
 
 ARROW_RANGES2 = (
@@ -95,18 +95,25 @@ def crop_arrow_area(frame):
     # cv2.imshow("canned", canned)
     # cv2.imwrite("rune_br_template.png", canned)
     # cv2.waitKey()
-    tl_result = multi_match(canned, ARROW_TL_TEMPLATE, threshold=0.3)
-    br_result = multi_match(canned, ARROW_BR_TEMPLATE, threshold=0.3)
     x = 0
     y = 0
+    tl_result = multi_match(canned, ARROW_TL_TEMPLATE, threshold=0.3)
     if tl_result:
         tl = tl_result[0]
         x = tl[0] + 10
         y = tl[1] + 5
-    elif br_result:
-        br = br_result[0]
-        x = br[0] - 358
-        y = br[1] - 42
+    else:
+        br_result = multi_match(canned, ARROW_BR_TEMPLATE, threshold=0.3)
+        if br_result:
+            br = br_result[0]
+            x = br[0] - 358
+            y = br[1] - 42
+        else:
+            bl_result = multi_match(canned, ARROW_BL_TEMPLATE, threshold=0.6)
+            if bl_result:
+                bl = bl_result[0]
+                x = bl[0] + 5
+                y = bl[1] - 48
 
     # tl, _ = single_match(canned, ARROW_TL_TEMPLATE)
 
