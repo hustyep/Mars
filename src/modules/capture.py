@@ -120,7 +120,7 @@ class Capture(Subject):
                 now = time.time()
                 if self.lost_minimap_time == 0:
                     self.lost_minimap_time = now
-                if now - self.lost_player_time >= self.lost_time_threshold:
+                if now - self.lost_minimap_time >= self.lost_time_threshold:
                     self.notify(BotError.LOST_MINI_MAP,
                                 now - self.lost_minimap_time)
             return False

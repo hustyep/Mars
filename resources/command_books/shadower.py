@@ -653,6 +653,7 @@ class Potion(Command):
         for potion in self.potions:
             if potion().canUse():
                 potion().execute()
+                time.sleep(0.3)
 
 
 class EXP_POTION(Command):
