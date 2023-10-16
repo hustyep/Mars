@@ -14,7 +14,7 @@ mpl.rcParams['axes.unicode_minus'] = False
 
 ARROW_TL_TEMPLATE = cv2.imread('assets/rune_top_left.png', 0)
 ARROW_BR_TEMPLATE = cv2.imread('assets/rune_br_template.png', 0)
-ARROW_BL_TEMPLATE = cv2.imread(RUNE_BL_TEMPLATE_PATH, 0)
+ARROW_BL_TEMPLATE = cv2.imread('assets/rune_bl_template.png', 0)
 
 ARROW_RANGES1 = (
     ((0, 160, 180), (70, 255, 255)),
