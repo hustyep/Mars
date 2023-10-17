@@ -359,6 +359,7 @@ class SolveRune(Command):
         Adjust(*config.rune_pos).execute()
         time.sleep(0.5)
         press('space', 1, down_time=0.2, up_time=0.8)        # Inherited from Configurable
+        self.__class__.castedTime = time.time()
 
         print('\nSolving rune:')
         used_frame = None

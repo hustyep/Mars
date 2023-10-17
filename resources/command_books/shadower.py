@@ -59,16 +59,10 @@ def step(direction, target):
 
     if config.elite_boss_detected:
         config.elite_boss_detected = False
-        # SlashShadowFormation().execute()
         Arachnid().execute()
     
     # check rune and mineral
-    if config.free:
-        if direction in ['left', 'right']:
-            key_up(direction)
-        point_check(target)
-        if direction in ['left', 'right']:
-            key_down(direction)
+    point_check(target, direction)
         
     if config.stage_fright and direction != 'up' and utils.bernoulli(0.75):
         time.sleep(utils.rand_float(0.1, 0.3))
@@ -85,30 +79,34 @@ def step(direction, target):
     else:
         time.sleep(0.05)
         
-def detect_elite(direction):
-    if direction == 'right':
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=MobType.BOSS).execute()
-    else:
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.BOSS).execute()
-    has_elite = has_elite is not None and len(has_elite) > 0
-    if has_elite:
-        config.elite_detected = True
-    else:
-        pass
-        # if direction == 'right':
-        #     has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=MobType.BOSS).execute()
-        # else:
-        #     has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.BOSS).execute()
-        # config.elite_detected = has_elite is not None and len(has_elite) > 0
+def pre_detect(direction):
+    result = detect_next_mob(direction, MobType.ELITE)
+    if not result:
+        result = detect_next_mob(direction, MobType.BOSS)
+    config.elite_detected = result
 
-def point_check(target):
+def detect_next_mob(direction, type):
+    if direction == 'right':
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=-350,right=850,type=type).execute()
+    else:
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=850,right=-350,type=type).execute()
+    return has_elite is not None and len(has_elite) > 0
+
+def point_check(target, direction):
+    if not config.free:
+        return
+
     config.free = False
+    if direction in ['left', 'right']:
+        key_up(direction)
     if config.rune_pos is not None \
         and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or target == config.rune_closest_pos):
         SolveRune().execute()
     if config.minal_active \
         and (utils.distance(config.minal_pos, config.player_pos) <= settings.move_tolerance * 2 or target == config.minal_closest_pos):
         Mining().execute()
+    if direction in ['left', 'right']:
+        key_down(direction)
     config.free = True
         
 class HitAndRun(Command):
@@ -125,9 +123,9 @@ class HitAndRun(Command):
                 time.sleep(0.08)
                 key_up(self.direction)
                 time.sleep(1)
-                # has_elite = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.ELITE).execute()
-                # if has_elite is not None and len(has_elite) > 0:
-                #     SonicBlow().execute()
+                has_boss = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.BOSS).execute()
+                if has_boss is not None and len(has_boss) > 0:
+                    SonicBlow().execute()
                 count = 0
                 mobs = Detect_Mobs(top=30*15,bottom=60,left=800,right=800).execute()
                 while count < 60 and mobs is not None and len(mobs) < 2:
@@ -136,7 +134,7 @@ class HitAndRun(Command):
                     mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
                 key_down(self.direction)
             
-            threading.Thread(target=detect_elite, args=(self.direction,)).start()
+            threading.Thread(target=pre_detect, args=(self.direction,)).start()
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
@@ -147,7 +145,8 @@ class HitAndRun(Command):
         else:
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
-            sleep_before_y(target_y=self.target[1])
+            # sleep_before_y(target_y=self.target[1])
+            sleep_while_move_y(interval=0.018, n=5)
             
 
 #########################

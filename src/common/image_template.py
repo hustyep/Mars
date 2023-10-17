@@ -15,16 +15,6 @@ DEAD_OK_TEMPLATE = cv2.imread(f'{ASSETS_PATH}dead_ok_template.png', 0)
 
 SKULL_TEMPLATE = cv2.imread(f'{ASSETS_PATH}skull_template.png', 0)
 
-BIG_MOUSE_RANGES = (
-    ((0, 180, 119), (4, 255, 187)),
-    ((0, 255, 17), (0, 255, 153)),
-)
-# big_mouse = cv2.imread('assets/big_mouse_template.png')
-# big_mouse_left = cv2.imread('assets/big_mouse_left_template.png')
-# BIG_MOUSE_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
-# BIG_MOUSE_LEFT_TEMPLATE = cv2.cvtColor(utils.filter_color(big_mouse_left, BIG_MOUSE_RANGES), cv2.COLOR_BGR2GRAY)
-BIG_MOUSE_TEMPLATE = dll_helper.loadImage('assets/big_mouse_template.png')
-
 
 # A rune's symbol on the minimap
 RUNE_RANGES = (
@@ -99,6 +89,8 @@ BLUE_RANGES = (
 GRAY_RANGES = (
     ((0, 0, 46), (180, 43, 220)),
 )
+
+# https://blog.csdn.net/weixin_45946270/article/details/124827045
 
 MINAL_HEART_TEMPLATE = cv2.imread('assets/minal_heart_template2.png', 0)
 HERB_YELLOW_TEMPLATE = cv2.imread('assets/herb_yellow_template.png', 0)
