@@ -421,15 +421,9 @@ class DarkFlare(Command):
         
         while not self.canUse():
             time.sleep(0.1)
-        if self.direction is None:
-            if config.player_pos[0] > 75:
-                self.direction = 'left'
-            else:
-                self.direction = 'right'
-
-        press(self.direction)
-        press(Key.DARK_FLARE, 1, up_time=self.backswing)
-        # self.__class__.castedTime = time.time()
+        if self.direction is not None:
+            press(self.direction)
+        super().main()
 
 
 class ShadowVeil(Command):
@@ -473,8 +467,7 @@ class ErdaShower(Command):
         key_down('down')
         press(Key.ERDA_SHOWER)
         key_up('down')
-        self.__class__.castedTime = time.time()
-        time.sleep(self.backswing)
+        super().main()
 
 
 class SuddenRaid(Command):
