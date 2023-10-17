@@ -40,7 +40,9 @@ RUNE_FAILED_TEXT_RANGES = (
     ((0, 43, 46), (10, 255, 255)),
     ((156, 43, 46), (180, 255, 255)),
 )
-
+WHITE_RANGES = (
+    ((0, 0, 150), (180, 30, 255)),
+)
 
 def single_match(frame, template):
     """
@@ -473,6 +475,17 @@ def located_arrows(frame):
     result = multi_match(canned, ARROW_TL_TEMPLATE, 0.3)
     return len(result) > 0
 
+
+def rune_interact_result(frame):
+    image = frame[130:160, 400:480]
+    image_success = filter_color(image, WHITE_RANGES)
+    image_rgb = cv2.cvtColor(image_success, cv2.COLOR_BGR2RGB)
+    text = tess.image_to_string(image_rgb, lang="eng")
+    content = text.replace("\f", "").split("\n")
+    for c in content:
+        if len(c) > 0 and 'tap the' in c.lower():
+            return True
+    return False
 
 def rune_liberate_result(frame):
     image = frame[50:400, 50:-50]

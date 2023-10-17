@@ -6,6 +6,7 @@ from src.detection import rune
 from src.modules.notifier import notifier
 from src.common.action_simulator import ActionSimulator
 from src.modules.detector import MineralType
+from src.common.bot_notification import BotWarnning
 import threading
 import math
 
@@ -348,6 +349,10 @@ class SolveRune(Command):
     """
     cooldown = 8
     
+    def __init__(self, retry=False):
+        super().__init__(locals())
+        self.retry = retry
+    
     def canUse(self, next_t: float = 0) -> bool:
         return super().canUse(next_t) and config.rune_pos is not None
 
@@ -359,8 +364,14 @@ class SolveRune(Command):
         Adjust(*config.rune_pos).execute()
         time.sleep(0.5)
         press('space', 1, down_time=0.2, up_time=0.8)        # Inherited from Configurable
-        self.__class__.castedTime = time.time()
-
+        interact_result = rune.rune_interact_result(capture.frame)
+        if interact_result:
+            self.__class__.castedTime = time.time()
+        elif not self.retry:
+            SolveRune(retry=True).execute()
+        else:
+            notifier._notify(BotWarnning.RUNE_INTERACT_FAILED)
+            return
         print('\nSolving rune:')
         used_frame = None
         find_solution = False
@@ -387,7 +398,8 @@ class SolveRune(Command):
                             (used_frame, )).start()
         else:
             self.on_rune_solve_failed(used_frame)
-            
+        
+    
     def check_rune_solve_result(self, used_frame):
         for _ in range(4):
             rune_type = rune.rune_liberate_result(capture.frame)

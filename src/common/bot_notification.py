@@ -15,6 +15,7 @@ class BotError(Enum):
     OTHERS_STAY_OVER_120S = 'Someone stay over 120s'
         
 class BotWarnning(Enum):
+    RUNE_INTERACT_FAILED = 'Rune Interact Failed'
     RUNE_FAILED = 'Rune Failed'
     OTHERS_COMMING = 'Someone\'s comming'
     OTHERS_STAY_OVER_30S = 'Someone stay over 30s'
