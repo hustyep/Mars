@@ -101,10 +101,6 @@ class Notifier(Subject, Observer):
                 self.check_rune_status(frame, minimap)
             time.sleep(0.05)
 
-    def notify_boss_appear(self):
-        config.elite_boss_detected = True
-        self._notify(BotInfo.BOSS_APPEAR)
-
     def check_exception(self, frame):
         if frame is None:
             return
@@ -118,9 +114,8 @@ class Notifier(Subject, Observer):
             if np.count_nonzero(gray < 15) / height / width > self.black_screen_threshold:
                 self._notify(BotError.BLACK_SCREEN)
             elif np.count_nonzero(gray == 0) / height / width > 0.7 and not config.lost_minimap:
-                last_time = self.notice_time_record.get(BotInfo.BOSS_APPEAR, 0)
-                if last_time == 0 or time.time() - last_time >= 120:
-                    threading.Timer(5, self.notify_boss_appear).start()
+                # blind
+                self._notify(BotInfo.BLIND)
 
         # Check for white room
         if config.started_time and np.count_nonzero(gray == 255) / height / width >= self.white_room_threshold:
@@ -244,6 +239,9 @@ class Notifier(Subject, Observer):
             self.notifyRuneError(now - self.rune_active_time)
             
     
+    def notify_boss_appear(self):
+        config.elite_boss_detected = True
+        
     def _notify(self, event: Enum, arg=None, info: str = '') -> None:
         now = time.time()
         noticed_time = self.notice_time_record.get(event, 0)
@@ -273,6 +271,9 @@ class Notifier(Subject, Observer):
                 image_path = utils.save_screenshot(frame=capture.frame)
                 self.send_message(text=text, image_path=image_path)
             elif event_type == BotInfo:
+                if event == BotInfo.BOSS_APPEAR:
+                    threading.Timer(5, self.notify_boss_appear).start()
+                
                 if config.notice_level < 4:
                     return
                 text = f'💡[{event.value}] {info}'

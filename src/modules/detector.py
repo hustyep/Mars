@@ -47,11 +47,20 @@ class Detector():
             minimap = capture.minimap
 
             if config.enabled and frame is not None and minimap is not None:
+                self.check_boss(frame)
                 self.check_mineral(frame, minimap)
                 self.check_skull(frame)
                 self.check_dead(frame)
             time.sleep(0.2)
         
+
+    def check_boss(self, frame):
+        height, width, _ = frame.shape
+        elite_frame = frame[height // 4:3 * height // 4, width // 4:3 * width // 4]
+        elite = utils.multi_match(elite_frame, ELITE_TEMPLATE, threshold=0.9)
+        if len(elite) > 0:
+            notifier._notify(BotInfo.BOSS_APPEAR)
+
 
     def check_mineral(self, frame, minimap):
         if not config.mining_enable:

@@ -27,6 +27,7 @@ class BotInfo(Enum):
     OTHERS_LEAVED = 'Someone\'s gone'
     MINE_ACTIVE = 'Mine Active'
     BOSS_APPEAR = 'Boss Appear'
+    BLIND = 'Blind'
     
 class BotDebug(Enum):
     SCREENSHOT_FAILED = 'Screenshot Failed'
