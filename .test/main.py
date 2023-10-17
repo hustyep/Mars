@@ -67,8 +67,9 @@ def multi_match(frame, template, threshold=0.95):
 
         cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
                       p[1]+template.shape[0]), (0, 0, 225), 2)
-    cv2.imshow("result", src_copy)
-    cv2.waitKey()
+    if len(results) > 0:
+        cv2.imshow("result", src_copy)
+        cv2.waitKey()
     return results
 
 def filter_color(img, ranges):
@@ -101,20 +102,20 @@ if __name__ == "__main__":
     #     threading.Thread(target=run).start()
     # while True:
     #     time.sleep(1)
-    frame = cv2.imread(".test/maple_231002195626467.png")
+    frame = cv2.imread(".test/maple_231014141810005.png")
     
     # PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/roles/player_sllee_template.png', 0)
     # player_match = multi_match(frame, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
     # player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
     # crop = frame[player_pos[1]-200:player_pos[1]+100, player_pos[0]-300:player_pos[0]+300]
     
-    MOB_TEMPLATE_L = cv2.imread('assets/mobs/FloraFooterSoldier.png', 0)
+    MOB_TEMPLATE_L = cv2.imread('assets/mobs/Sandblade_elite.png', 0)
     MOB_TEMPLATE_R = cv2.flip(MOB_TEMPLATE_L, 1)
-    h, w = MOB_TEMPLATE_L.shape
-    MOB_TEMPLATE_ELITE = cv2.resize(MOB_TEMPLATE_L, (w * 2, h * 2))
+    # h, w = MOB_TEMPLATE_L.shape
+    # MOB_TEMPLATE_ELITE = cv2.resize(MOB_TEMPLATE_L, (w * 2, h * 2))
     start = time.time()
-    mobs = multi_match(frame, MOB_TEMPLATE_ELITE, threshold=0.94)
-    # mobs = multi_match(frame, MOB_TEMPLATE_R, threshold=0.9)
+    mobs = multi_match(frame, MOB_TEMPLATE_L, threshold=0.95)
+    mobs = multi_match(frame, MOB_TEMPLATE_R, threshold=0.95)
     print(f'{time.time() - start}')
     # cv2.imshow("123", crop)
     # cv2.waitKey()
