@@ -364,7 +364,12 @@ class SolveRune(Command):
         Adjust(*config.rune_pos).execute()
         time.sleep(0.5)
         press('space', 1, down_time=0.2, up_time=0.8)        # Inherited from Configurable
-        interact_result = rune.rune_interact_result(capture.frame)
+        interact_result = False
+        for _ in range(3):
+            time.sleep(0.3)
+            interact_result = rune.rune_interact_result(capture.frame)
+            if interact_result:
+                break
         if interact_result:
             self.__class__.castedTime = time.time()
         elif not self.retry:
