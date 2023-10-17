@@ -87,9 +87,9 @@ def pre_detect(direction):
 
 def detect_next_mob(direction, type):
     if direction == 'right':
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=-400,right=900,type=type).execute()
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=type).execute()
     else:
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-400,type=type).execute()
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=type).execute()
     return has_elite is not None and len(has_elite) > 0
 
 def point_check(target, direction):
