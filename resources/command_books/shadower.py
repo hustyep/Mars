@@ -87,9 +87,9 @@ def step(direction, target):
         
 def detect_elite(direction):
     if direction == 'right':
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=MobType.ELITE).execute()
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=-300,right=900,type=MobType.BOSS).execute()
     else:
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.ELITE).execute()
+        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-300,type=MobType.BOSS).execute()
     has_elite = has_elite is not None and len(has_elite) > 0
     if has_elite:
         config.elite_detected = True
@@ -136,13 +136,14 @@ class HitAndRun(Command):
                     mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
                 key_down(self.direction)
             
-            # threading.Thread(target=detect_elite, args=(self.direction,)).start()
+            threading.Thread(target=detect_elite, args=(self.direction,)).start()
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
             sleep_while_move_y(interval=0.015, n=5)
-            # if config.elite_detected:
-            #     SonicBlow().execute()
+            if config.elite_detected:
+                SonicBlow().execute()
+                config.elite_detected = False
         else:
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
