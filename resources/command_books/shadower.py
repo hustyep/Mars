@@ -531,7 +531,7 @@ class SonicBlow(Command):
 class PhaseDash(Command):
     key = 't'
     cooldown = 0
-    backswing = 2
+    backswing = 1
 
 
 ###################

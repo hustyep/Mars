@@ -7,20 +7,19 @@ $, target=role_name, value=sllee
     SlashShadowFormation
 *, x=95, y=56, frequency=4, interval=0, skip=False, adjust=False
     ShadowVeil
-    Arachnid
 *, x=177, y=56, frequency=1, interval=0, skip=False, adjust=False
     SlashShadowFormation
 
 @, label=Summoning
 *, x=154, y=56, frequency=4, interval=0, skip=False, adjust=True
     ShadowAssault, direction=upleft, jump=True, distance=80
-    Wait, duration=0.05
 *, x=128, y=19, frequency=4, interval=0, skip=False, adjust=True
-    Wait, duration=0.1
     SuddenRaid
     DarkFlare, direction=left
+    SuddenRaid
 *, x=80, y=26, frequency=4, interval=0, skip=False, adjust=True
     TrickBlade, direction=left
     ErdaShower, direction=left
     TrickBlade, direction=left
+    Arachnid
     ShadowAssault, direction=downleft, jump=True, distance=80
