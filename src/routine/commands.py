@@ -366,10 +366,12 @@ class SolveRune(Command):
         press('space', 1, down_time=0.2, up_time=0.8)        # Inherited from Configurable
         interact_result = False
         for _ in range(3):
-            time.sleep(0.3)
             interact_result = rune.rune_interact_result(capture.frame)
             if interact_result:
                 break
+            else:
+                time.sleep(0.2)
+
         if interact_result:
             self.__class__.castedTime = time.time()
         elif not self.retry:
@@ -399,8 +401,7 @@ class SolveRune(Command):
         time.sleep(0.2)
 
         if find_solution:
-            threading.Timer(0.001, self.check_rune_solve_result,
-                            (used_frame, )).start()
+            self.check_rune_solve_result(used_frame)
         else:
             self.on_rune_solve_failed(used_frame)
         

@@ -85,7 +85,7 @@ class Bot(Configurable, Observer):
                     elif  config.player_direction == 'right' and element.location == config.routine.guard_point_r:
                         pass
                     else:
-                        print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{config.routine.guard_point_l}, guard_point_r:{config.routine.guard_point_r}")
+                        # print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{config.routine.guard_point_l}, guard_point_r:{config.routine.guard_point_r}")
                         config.command_book.potion.main()
                         config.command_book.buff.main()
 

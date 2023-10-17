@@ -477,13 +477,16 @@ def located_arrows(frame):
 
 
 def rune_interact_result(frame):
-    image = frame[130:160, 400:480]
+    image = frame[100:200, 400:500]
+    # cv2.imshow("", image)
+    # cv2.waitKey()
     image_success = filter_color(image, WHITE_RANGES)
     image_rgb = cv2.cvtColor(image_success, cv2.COLOR_BGR2RGB)
     text = tess.image_to_string(image_rgb, lang="eng")
     content = text.replace("\f", "").split("\n")
     for c in content:
         if len(c) > 0 and 'tap the' in c.lower():
+            print('rune interacted')
             return True
     return False
 
