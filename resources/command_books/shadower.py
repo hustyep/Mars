@@ -79,6 +79,15 @@ def step(direction, target):
     else:
         time.sleep(0.05)
         
+    if edge_reached():
+        key_up(direction)
+        if config.player_direction == 'left':
+            has_elite = Detect_Mobs(top=100,bottom=80,left=300,right=0,type=type).execute()
+        else:
+            has_elite = Detect_Mobs(top=100,bottom=80,left=0,right=3000,type=type).execute()
+        if has_elite is not None and len(has_elite) > 0:
+            CruelStabRandomDirection().execute()
+        
 def pre_detect(direction):
     result = detect_next_mob(direction, MobType.ELITE)
     if not result:
@@ -132,7 +141,7 @@ class HitAndRun(Command):
                     mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
                     if mobs is not None and len(mobs) >= 2:
                         break
-                key_down(self.direction)
+                key_down(self.direction)                
             
             threading.Thread(target=pre_detect, args=(self.direction,)).start()
             FlashJump(dx=abs(d_x)).execute()

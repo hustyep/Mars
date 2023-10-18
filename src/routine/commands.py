@@ -596,8 +596,14 @@ def sleep_before_y(target_y, tolorance=0):
         if count == 20:
             break
 
-def direction_changed():
+def direction_changed() -> bool:
     if config.player_direction == 'left':
         return abs(config.routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
     else:
         return abs(config.routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+
+def edge_reached() -> bool:
+    if config.player_direction == 'left':
+        return abs(config.routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+    else:
+        return abs(config.routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
