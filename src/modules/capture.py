@@ -39,7 +39,7 @@ class Capture(Subject):
         self.lost_minimap_time = 0
         self.lost_player_time = 0
 
-        self.lost_time_threshold = 5
+        self.lost_time_threshold = 1.5
 
         self.ready = False
         self.thread = threading.Thread(target=self._main)
@@ -121,11 +121,12 @@ class Capture(Subject):
                 if self.lost_minimap_time == 0:
                     self.lost_minimap_time = now
                 if now - self.lost_minimap_time >= self.lost_time_threshold:
-                    self.notify(BotError.LOST_MINI_MAP,
+                    self.notify(BotFatal.LOST_MINI_MAP,
                                 now - self.lost_minimap_time)
             return False
 
         config.lost_minimap = False
+        self.lost_minimap_time = 0
         mm_tl = (
             tl[0] - x1 - 2,
             tl[1] - y1 + 2
@@ -190,7 +191,7 @@ class Capture(Subject):
             if self.lost_player_time == 0:
                 self.lost_player_time = now
             if now - self.lost_player_time >= self.lost_time_threshold:
-                self.notify(BotError.LOST_PLAYER, now - self.lost_player_time)
+                self.notify(BotFatal.LOST_PLAYER, now - self.lost_player_time)
 
     def screenshot(self, delay=1, sct=None):
         try:

@@ -22,4 +22,5 @@ $, target=role_name, value=sllee
     ErdaShower, direction=left
     TrickBlade, direction=left
     Arachnid
+*, x=52, y=25, frequency=4, interval=0, skip=False, adjust=False
     ShadowAssault, direction=downleft, jump=True, distance=80
