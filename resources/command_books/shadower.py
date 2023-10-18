@@ -83,9 +83,9 @@ def step(direction, target):
         print("edge reached")
         key_up(direction)
         if config.player_direction == 'left':
-            has_elite = Detect_Mobs(top=100,bottom=80,left=300,right=0,type=type).execute()
+            has_elite = Detect_Mobs(top=100,bottom=80,left=300,right=0).execute()
         else:
-            has_elite = Detect_Mobs(top=100,bottom=80,left=0,right=3000,type=type).execute()
+            has_elite = Detect_Mobs(top=100,bottom=80,left=0,right=300).execute()
         if has_elite is not None and len(has_elite) > 0:
             CruelStabRandomDirection().execute()
         
