@@ -19,6 +19,9 @@ SKULL_TEMPLATE = cv2.imread(f'{ASSETS_PATH}skull_template.png', 0)
 # The Elite Boss's warning sign
 ELITE_TEMPLATE = cv2.imread(f'{ASSETS_PATH}elite_template.jpg', 0)
 
+# White Room
+WHITE_ROOM_TEMPLATE = cv2.imread(f'{ASSETS_PATH}white_room_template.png', 0)
+
 #####################
 #      mineral      #
 #####################

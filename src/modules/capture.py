@@ -121,7 +121,7 @@ class Capture(Subject):
                 if self.lost_minimap_time == 0:
                     self.lost_minimap_time = now
                 if now - self.lost_minimap_time >= self.lost_time_threshold:
-                    self.notify(BotFatal.LOST_MINI_MAP,
+                    self.notify(BotError.LOST_MINI_MAP,
                                 now - self.lost_minimap_time)
             return False
 
@@ -191,7 +191,7 @@ class Capture(Subject):
             if self.lost_player_time == 0:
                 self.lost_player_time = now
             if now - self.lost_player_time >= self.lost_time_threshold:
-                self.notify(BotFatal.LOST_PLAYER, now - self.lost_player_time)
+                self.notify(BotError.LOST_PLAYER, now - self.lost_player_time)
 
     def screenshot(self, delay=1, sct=None):
         try:

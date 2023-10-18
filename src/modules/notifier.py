@@ -71,7 +71,7 @@ class Notifier(Subject, Observer):
         self.rune_alert_delay = 300         # 5 minutes
 
         self.black_screen_threshold = 0.9
-        self.white_room_threshold = 0.6
+        self.white_room_threshold = 0.5
 
         self.notice_time_record = {}
 
@@ -118,7 +118,9 @@ class Notifier(Subject, Observer):
                 self._notify(BotInfo.BLIND)
 
         # Check for white room
-        if config.started_time and np.count_nonzero(gray == 255) / height / width >= self.white_room_threshold:
+        gray_crop = gray[100:-100, 50:-50]
+        height, width = gray.shape
+        if config.started_time and np.count_nonzero(gray_crop == 255) / height / width >= self.white_room_threshold:
             self._notify(BotFatal.WHITE_ROOM)
         else:
             self.notice_time_record[BotFatal.WHITE_ROOM] = 0

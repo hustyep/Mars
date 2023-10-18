@@ -67,9 +67,9 @@ def multi_match(frame, template, threshold=0.95):
 
         cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
                       p[1]+template.shape[0]), (0, 0, 225), 2)
-    if len(results) > 0:
-        cv2.imshow("result", src_copy)
-        cv2.waitKey()
+    # if len(results) > 0:
+    #     cv2.imshow("result", src_copy)
+    #     cv2.waitKey()
     return results
 
 def filter_color(img, ranges):
@@ -95,13 +95,8 @@ def filter_color(img, ranges):
     return result
 
 
-if __name__ == "__main__":
-    # dll_helper.start()
-    # time.sleep(1)
-    # for i in range(3):
-    #     threading.Thread(target=run).start()
-    # while True:
-    #     time.sleep(1)
+def mob_detect_test():
+    frame = cv2.imread(".test/maple_231015185516027.png")
     frame = cv2.imread(".test/maple_231015185516027.png")
     
     # PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/roles/player_sllee_template.png', 0)
@@ -117,5 +112,25 @@ if __name__ == "__main__":
     mobs = multi_match(frame, MOB_TEMPLATE_L, threshold=0.95)
     mobs = multi_match(frame, MOB_TEMPLATE_R, threshold=0.95)
     print(f'{time.time() - start}')
-    # cv2.imshow("123", crop)
+    
+def white_room_test():
+    frame = cv2.imread(".test/Maple_230919_051849.png")
+
+    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # gray = gray[100:-100, 50:-50]
+    # cv2.imshow('', gray)
     # cv2.waitKey()
+    # height, width = gray.shape
+
+    # # Check for white room
+    # percent = np.count_nonzero(gray == 255) / height / width
+    # print(percent)
+    start = time.time()
+    TEMPLATE = cv2.imread('assets/white_room_template.png', 0)
+    result = multi_match(frame, TEMPLATE, 1)
+    print(f'{time.time() - start}')
+    # print(result)
+
+if __name__ == "__main__":
+    white_room_test()
+    
