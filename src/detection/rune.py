@@ -487,7 +487,7 @@ def rune_interact_result(frame):
     keywords = ['tap', 'arrow', 'keys', 'correct', 'order', 'activate', 'rune']
     if len(content) > 0:
         for keyword in keywords:
-            if keyword in keywords:
+            if keyword in content:
                 print(content)
                 return True
     return False
