@@ -68,9 +68,9 @@ def multi_match(frame, template, threshold=0.95):
 
         cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
                       p[1]+template.shape[0]), (0, 0, 225), 2)
-    # if len(results) > 0:
-    #     cv2.imshow("result", src_copy)
-    #     cv2.waitKey()
+    if len(results) > 0:
+        cv2.imshow("result", src_copy)
+        cv2.waitKey()
     return results
 
 def filter_color(img, ranges):
@@ -102,8 +102,7 @@ def rune_test():
 
 
 def mob_detect_test():
-    frame = cv2.imread(".test/maple_231015185516027.png")
-    frame = cv2.imread(".test/maple_231015185516027.png")
+    frame = cv2.imread(".test/maple_231015235452192.png")
     
     # PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/roles/player_sllee_template.png', 0)
     # player_match = multi_match(frame, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
@@ -138,5 +137,5 @@ def white_room_test():
     # print(result)
 
 if __name__ == "__main__":
-    rune_test()
-    
+    # rune_test()
+    mob_detect_test()
