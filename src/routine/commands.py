@@ -553,7 +553,7 @@ class Detect_Mobs(Command):
         player_match = utils.multi_match(
             capture.frame, config.routine.role_template, threshold=0.9)
         if len(player_match) == 0:
-            print("lost player")
+            # print("lost player")
             if self.type != MobType.NORMAL:
                 return []
             else:

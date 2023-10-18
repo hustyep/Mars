@@ -11,16 +11,16 @@ $, target=role_name, value=sllee
     SlashShadowFormation
 
 @, label=Summoning
-*, x=154, y=56, frequency=4, interval=0, skip=False, adjust=True
+*, x=159, y=56, frequency=4, interval=0, skip=False, adjust=True
     ShadowAssault, direction=upleft, jump=True, distance=80
-*, x=128, y=19, frequency=4, interval=0, skip=False, adjust=True
     SuddenRaid
+*, x=128, y=19, frequency=4, interval=0, skip=False, adjust=True
     DarkFlare, direction=left
     SuddenRaid
-*, x=80, y=26, frequency=4, interval=0, skip=False, adjust=True
+*, x=85, y=12, frequency=4, interval=0, skip=False, adjust=True
+*, x=68, y=18, frequency=4, interval=0, skip=False, adjust=True
     TrickBlade, direction=left
     ErdaShower, direction=left
     TrickBlade, direction=left
     Arachnid
-*, x=52, y=25, frequency=4, interval=0, skip=False, adjust=False
     ShadowAssault, direction=downleft, jump=True, distance=80
