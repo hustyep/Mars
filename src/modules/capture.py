@@ -39,7 +39,7 @@ class Capture(Subject):
         self.lost_minimap_time = 0
         self.lost_player_time = 0
 
-        self.lost_time_threshold = 1.5
+        self.lost_time_threshold = 3
 
         self.ready = False
         self.thread = threading.Thread(target=self._main)
