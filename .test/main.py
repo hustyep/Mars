@@ -102,20 +102,22 @@ def rune_test():
 
 
 def mob_detect_test():
-    frame = cv2.imread(".test/maple_231015235452192.png")
+    frame = cv2.imread(".test/maple_231004121116575.png")
     
-    # PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/roles/player_sllee_template.png', 0)
-    # player_match = multi_match(frame, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
-    # player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
-    # crop = frame[player_pos[1]-200:player_pos[1]+100, player_pos[0]-300:player_pos[0]+300]
+    PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/roles/player_sllee_template.png', 0)
+    player_match = multi_match(frame, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
+    player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
+    crop = frame[player_pos[1]-180:player_pos[1]-20, player_pos[0]-300:player_pos[0]+300]
+    cv2.imshow('', crop)
+    cv2.waitKey()
     
-    MOB_TEMPLATE_L = cv2.imread('assets/mobs/Sandblade_elite.png', 0)
+    MOB_TEMPLATE_L = cv2.imread('assets/mobs/FloraFooterSoldier.png', 0)
     MOB_TEMPLATE_R = cv2.flip(MOB_TEMPLATE_L, 1)
     # h, w = MOB_TEMPLATE_L.shape
     # MOB_TEMPLATE_ELITE = cv2.resize(MOB_TEMPLATE_L, (w * 2, h * 2))
     start = time.time()
-    mobs = multi_match(frame, MOB_TEMPLATE_L, threshold=0.95)
-    mobs = multi_match(frame, MOB_TEMPLATE_R, threshold=0.95)
+    mobs = multi_match(crop, MOB_TEMPLATE_L, threshold=0.95)
+    mobs = multi_match(crop, MOB_TEMPLATE_R, threshold=0.95)
     print(f'{time.time() - start}')
     
 def white_room_test():
@@ -138,4 +140,4 @@ def white_room_test():
 
 if __name__ == "__main__":
     # rune_test()
-    white_room_test()
+    mob_detect_test()

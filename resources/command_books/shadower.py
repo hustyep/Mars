@@ -97,9 +97,9 @@ def pre_detect(direction):
 
 def detect_next_mob(direction, type):
     if direction == 'right':
-        has_elite = Detect_Mobs(top=200,bottom=-50,left=-300,right=900,type=type).execute()
+        has_elite = Detect_Mobs(top=180,bottom=-20,left=-300,right=900,type=type).execute()
     else:
-        has_elite = Detect_Mobs(top=200,bottom=-50,left=900,right=-300,type=type).execute()
+        has_elite = Detect_Mobs(top=180,bottom=-20,left=900,right=-300,type=type).execute()
     return has_elite is not None and len(has_elite) > 0
 
 def point_check(target, direction):
@@ -136,10 +136,10 @@ class HitAndRun(Command):
                 count = 0
                 while count < 80:
                     count += 1
-                    has_boss = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.BOSS).execute()
+                    has_boss = Detect_Mobs(top=180,bottom=-20,left=300,right=300,type=MobType.BOSS).execute()
                     if has_boss is not None and len(has_boss) > 0:
                         SonicBlow().execute()
-                    mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
+                    mobs = Detect_Mobs(top=350,bottom=50,left=1000,right=1000).execute()
                     if mobs is not None and len(mobs) >= 2:
                         break
                 key_down(self.direction)                
