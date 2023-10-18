@@ -7,6 +7,7 @@ import numpy as np
 import time
 # from dll_helper import dll_helper
 # from usb import usb
+from rune import *
 
 def image_equal(image, template):
     height, width, channel = image.shape
@@ -95,6 +96,11 @@ def filter_color(img, ranges):
     return result
 
 
+def rune_test():
+    frame = cv2.imread(".test/maple_231003174903228.png")
+    rune_interact_result(frame)
+
+
 def mob_detect_test():
     frame = cv2.imread(".test/maple_231015185516027.png")
     frame = cv2.imread(".test/maple_231015185516027.png")
@@ -132,5 +138,5 @@ def white_room_test():
     # print(result)
 
 if __name__ == "__main__":
-    white_room_test()
+    rune_test()
     

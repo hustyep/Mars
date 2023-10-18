@@ -477,17 +477,19 @@ def located_arrows(frame):
 
 
 def rune_interact_result(frame):
-    image = frame[100:200, 400:500]
-    # cv2.imshow("", image)
+    image = frame[130:200, 400:-400]
+    # image_success = filter_color(image, WHITE_RANGES)
+    # cv2.imshow('', image_success)
     # cv2.waitKey()
-    image_success = filter_color(image, WHITE_RANGES)
-    image_rgb = cv2.cvtColor(image_success, cv2.COLOR_BGR2RGB)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     text = tess.image_to_string(image_rgb, lang="eng")
-    content = text.replace("\f", "").split("\n")
-    for c in content:
-        if len(c) > 0 and 'tap the' in c.lower():
-            print('rune interacted')
-            return True
+    content = text.replace("\f", "").lower()
+    keywords = ['tap', 'arrow', 'keys', 'correct', 'order', 'activate', 'rune']
+    if len(content) > 0:
+        for keyword in keywords:
+            if keyword in keywords:
+                print(content)
+                return True
     return False
 
 def rune_liberate_result(frame):

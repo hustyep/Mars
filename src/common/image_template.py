@@ -110,5 +110,8 @@ BLUE_RANGES = (
 GRAY_RANGES = (
     ((0, 0, 46), (180, 43, 220)),
 )
+ORANGE_RANGES = (
+    ((11, 43, 46), (25, 255, 255)),
+)
 
 # https://blog.csdn.net/weixin_45946270/article/details/124827045
