@@ -3,12 +3,12 @@ from enum import Enum, auto
 class BotFatal(Enum):
     WHITE_ROOM = 'White Room'
     CRASH = 'Crash'
+    LOST_MINI_MAP = 'Lost Minimap'
+    LOST_PLAYER = 'Lost Player'
     
 class BotError(Enum):
     DEAD = 'Dead'
     LOST_WINDOW = 'Lost Window'
-    LOST_MINI_MAP = 'Lost Minimap'
-    LOST_PLAYER = 'Lost Player'
     BLACK_SCREEN = 'Black Screen'
     NO_MOVEMENT = 'No Movement'
     RUNE_ERROR = 'Rune Error'

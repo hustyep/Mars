@@ -368,10 +368,6 @@ class Bot(Configurable, Observer):
             match (event_type):
                 case BotError.LOST_WINDOW:
                     self.toggle(False, event_type.value)
-                case BotError.LOST_MINI_MAP:
-                    self.toggle(False, event_type.value)
-                case BotError.LOST_PLAYER:
-                    self.toggle(False, event_type.value)
                 case BotError.BLACK_SCREEN:
                     if arg >= 10:
                         self.toggle(False, event_type.value)
