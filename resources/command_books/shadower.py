@@ -87,9 +87,9 @@ def pre_detect(direction):
 
 def detect_next_mob(direction, type):
     if direction == 'right':
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=-50,right=900,type=type).execute()
+        has_elite = Detect_Mobs(top=200,bottom=-50,left=-300,right=900,type=type).execute()
     else:
-        has_elite = Detect_Mobs(top=150,bottom=-50,left=900,right=-50,type=type).execute()
+        has_elite = Detect_Mobs(top=200,bottom=-50,left=900,right=-300,type=type).execute()
     return has_elite is not None and len(has_elite) > 0
 
 def point_check(target, direction):
@@ -123,15 +123,15 @@ class HitAndRun(Command):
                 time.sleep(0.08)
                 key_up(self.direction)
                 time.sleep(0.9)
-                has_boss = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.BOSS).execute()
-                if has_boss is not None and len(has_boss) > 0:
-                    SonicBlow().execute()
                 count = 0
-                mobs = Detect_Mobs(top=30*15,bottom=60,left=800,right=800).execute()
-                while count < 80 and mobs is not None and len(mobs) < 2:
+                while count < 80:
                     count += 1
-                    time.sleep(0.01)
+                    has_boss = Detect_Mobs(top=200,bottom=-50,left=300,right=300,type=MobType.BOSS).execute()
+                    if has_boss is not None and len(has_boss) > 0:
+                        SonicBlow().execute()
                     mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
+                    if mobs is not None and len(mobs) >= 2:
+                        break
                 key_down(self.direction)
             
             threading.Thread(target=pre_detect, args=(self.direction,)).start()
