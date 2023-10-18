@@ -80,6 +80,7 @@ def step(direction, target):
         time.sleep(0.05)
         
     if edge_reached():
+        print("edge reached")
         key_up(direction)
         if config.player_direction == 'left':
             has_elite = Detect_Mobs(top=100,bottom=80,left=300,right=0,type=type).execute()
