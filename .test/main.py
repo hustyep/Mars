@@ -119,23 +119,23 @@ def mob_detect_test():
     print(f'{time.time() - start}')
     
 def white_room_test():
-    frame = cv2.imread(".test/Maple_230919_051849.png")
+    frame = cv2.imread(".test/uuUCOUC0W25Gu0pgl8YNNQcBS9H8v0XD5SU2rfMnQxY.png")
 
-    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # gray = gray[100:-100, 50:-50]
-    # cv2.imshow('', gray)
-    # cv2.waitKey()
-    # height, width = gray.shape
+    cv2.imshow('', gray)
+    cv2.waitKey()
+    height, width = gray.shape
 
-    # # Check for white room
-    # percent = np.count_nonzero(gray == 255) / height / width
-    # print(percent)
-    start = time.time()
-    TEMPLATE = cv2.imread('assets/white_room_template.png', 0)
-    result = multi_match(frame, TEMPLATE, 1)
-    print(f'{time.time() - start}')
+    # Check for white room
+    percent = np.count_nonzero(gray == 255) / height / width
+    print(percent)
+    # start = time.time()
+    # TEMPLATE = cv2.imread('assets/white_room_template.png', 0)
+    # result = multi_match(frame, TEMPLATE, 1)
+    # print(f'{time.time() - start}')
     # print(result)
 
 if __name__ == "__main__":
     # rune_test()
-    mob_detect_test()
+    white_room_test()
