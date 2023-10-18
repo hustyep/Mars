@@ -104,6 +104,12 @@ class ActionSimulator:
             time.sleep(0.2)
 
     @staticmethod
+    def open_boss_box():
+        USB().key_press('4')
+        time.sleep(0.1)
+        USB().key_press('4')
+
+    @staticmethod
     def go_to_msroom(num: int):
         ActionSimulator.click_key('f8')
 

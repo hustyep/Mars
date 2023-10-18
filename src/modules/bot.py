@@ -392,6 +392,8 @@ class Bot(Configurable, Observer):
                     pass
         elif isinstance(event_type, BotInfo):
             match event_type:
+                case BotInfo.BOSS_APPEAR:
+                    threading.Timer(180, ActionSimulator.open_boss_box).start()
                 case BotInfo.RUNE_ACTIVE:
                     pass
         elif isinstance(event_type, BotDebug):
