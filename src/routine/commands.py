@@ -403,7 +403,8 @@ class SolveRune(Command):
         time.sleep(0.2)
 
         if find_solution:
-            self.check_rune_solve_result(used_frame)
+            threading.Timer(0.001, self.check_rune_solve_result,
+                            (used_frame, )).start()
         else:
             self.on_rune_solve_failed(used_frame)
         

@@ -128,7 +128,7 @@ class HitAndRun(Command):
                     SonicBlow().execute()
                 count = 0
                 mobs = Detect_Mobs(top=30*15,bottom=60,left=800,right=800).execute()
-                while count < 60 and mobs is not None and len(mobs) < 2:
+                while count < 80 and mobs is not None and len(mobs) < 2:
                     count += 1
                     time.sleep(0.01)
                     mobs = Detect_Mobs(top=300,bottom=100,left=1100,right=1100).execute()
