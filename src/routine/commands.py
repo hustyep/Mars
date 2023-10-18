@@ -554,12 +554,15 @@ class Detect_Mobs(Command):
             capture.frame, config.routine.role_template, threshold=0.9)
         if len(player_match) == 0:
             print("lost player")
-            return [(0,0)] if self.type == MobType.NORMAL else []
-        
-        player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
-        y_start = max(0, player_pos[1]-self.top)
-        x_start = max(0, player_pos[0]-self.left)
-        crop = frame[y_start:player_pos[1]+self.bottom, x_start:player_pos[0]+self.right]
+            if self.type != MobType.NORMAL:
+                return []
+            else:
+                crop = frame[50:-100,]
+        else:     
+            player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
+            y_start = max(0, player_pos[1]-self.top)
+            x_start = max(0, player_pos[0]-self.left)
+            crop = frame[y_start:player_pos[1]+self.bottom, x_start:player_pos[0]+self.right]
         
         mobs = []
         for mob_template in mob_templates:
