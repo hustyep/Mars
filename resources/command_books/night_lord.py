@@ -5,6 +5,7 @@ import time
 import math
 from src.routine.components import Command
 from src.common.vkeys import press, key_down, key_up, releaseAll, press_acc
+from src.routine.commands import *
 
 
 # List of key mappings
@@ -84,9 +85,7 @@ def step(direction, target):
         return
 
     if d_x >= 28:
-        press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
-        press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
-        ShowDown().execute()
+        HitAndRun(direction, target).execute()
     elif d_x >= 10:
         # time.sleep(0.05)
         if not ShadowSurge().execute():
@@ -94,6 +93,38 @@ def step(direction, target):
     else:
         time.sleep(0.02)
 
+class HitAndRun(Command):
+    def __init__(self, direction, target):
+        super().__init__(locals())
+        self.direction = direction
+        self.target = target
+
+    def main(self):
+        d_x = self.target[0] - config.player_pos[0]
+        if config.mob_detect:
+            if direction_changed():
+                print("direction_changed")
+                time.sleep(0.08)
+                key_up(self.direction)
+                time.sleep(0.9)
+                count = 0
+                while count < 80:
+                    count += 1
+                    # has_boss = Detect_Mobs(top=180,bottom=-20,left=300,right=300,type=MobType.BOSS).execute()
+                    # if has_boss is not None and len(has_boss) > 0:
+                    #     SonicBlow().execute()
+                    mobs = Detect_Mobs(top=350,bottom=50,left=1100,right=1100).execute()
+                    if mobs is not None and len(mobs) >= 2:
+                        break
+                    time.sleep(0.1)
+                key_down(self.direction)                
+            press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
+            press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
+            ShowDown().execute()
+        else:
+            press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
+            press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
+            ShowDown().execute()
 
 #########################
 #        Y轴移动         #

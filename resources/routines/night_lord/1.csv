@@ -1,0 +1,8 @@
+
+@, label=Bottom mobbing
+*, x=10, y=70, frequency=1, interval=0, skip=False, adjust=False
+    Arachnid
+*, x=80, y=70, frequency=4, interval=0, skip=False, adjust=False
+    Omen
+*, x=130, y=70, frequency=1, interval=0, skip=False, adjust=False
+    Arachnid

@@ -335,6 +335,7 @@ class ShadowAssault(Command):
         key_up(self.direction)
         time.sleep(self.backswing)
         sleep_while_move_y(interval=0.04)
+        MesoExplosion().execute()
         
         if settings.record_layout:
             config.layout.add(*config.player_pos)
@@ -493,6 +494,11 @@ class SuddenRaid(Command):
         else:
             return False
             
+    def main(self):
+        used = super().main()
+        if used:
+            MesoExplosion().execute()
+        return used
 
 class Arachnid(Command):
     key = Key.ARACHNID
@@ -519,6 +525,12 @@ class TrickBlade(Command):
             return mobs is None or len(mobs) > 0
         else:
             return False
+    
+    def main(self):
+        used = super().main()
+        if used:
+            MesoExplosion().execute()
+        return used
 
 
 class SlashShadowFormation(Command):
