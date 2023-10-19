@@ -139,7 +139,7 @@ class HitAndRun(Command):
                     has_boss = Detect_Mobs(top=180,bottom=-20,left=300,right=300,type=MobType.BOSS).execute()
                     if has_boss is not None and len(has_boss) > 0:
                         SonicBlow().execute()
-                    mobs = Detect_Mobs(top=350,bottom=50,left=1000,right=1000).execute()
+                    mobs = Detect_Mobs(top=350,bottom=50,left=1100,right=1100).execute()
                     if mobs is not None and len(mobs) >= 2:
                         break
                 key_down(self.direction)                
@@ -473,7 +473,7 @@ class ErdaShower(Command):
             time.sleep(0.1)
         self.print_debug_info()
         if self.direction:
-            press(self.direction)
+            press_acc(self.direction, down_time=0.03, up_time=0.03)
         key_down('down')
         press(Key.ERDA_SHOWER)
         key_up('down')

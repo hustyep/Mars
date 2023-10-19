@@ -18,9 +18,9 @@ $, target=role_name, value=sllee
     DarkFlare, direction=left
     SuddenRaid
 *, x=85, y=12, frequency=4, interval=0, skip=False, adjust=True
-*, x=68, y=18, frequency=4, interval=0, skip=False, adjust=True
+*, x=63, y=18, frequency=4, interval=0, skip=False, adjust=True
     TrickBlade, direction=left
-    ErdaShower, direction=left
+    ErdaShower, direction=right
     TrickBlade, direction=left
     Arachnid
     ShadowAssault, direction=downleft, jump=True, distance=80
