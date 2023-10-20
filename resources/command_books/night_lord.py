@@ -3,7 +3,7 @@
 from src.common import config, settings, utils
 import time
 import math
-from src.routine.components import Command
+from src.routine.components import *
 from src.common.vkeys import press, key_down, key_up, releaseAll, press_acc
 from src.routine.commands import *
 
