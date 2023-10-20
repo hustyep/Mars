@@ -20,6 +20,7 @@ $, target=role_name, value=sllee
 *, x=85, y=12, frequency=4, interval=0, skip=False, adjust=True
 *, x=63, y=18, frequency=4, interval=0, skip=False, adjust=True
     TrickBlade, direction=left
+    Wait, duration=0.1
     ErdaShower, direction=right
     TrickBlade, direction=left
     Arachnid
