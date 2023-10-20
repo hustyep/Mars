@@ -225,8 +225,6 @@ class Notifier(Subject, Observer):
         filtered = utils.filter_color(minimap, RUNE_RANGES)
         matches = utils.multi_match(filtered, RUNE_TEMPLATE, threshold=0.9)
         if len(matches) == 0:
-            config.rune_pos = None
-            self.rune_active_time = 0
             return
               
         now = time.time()  
