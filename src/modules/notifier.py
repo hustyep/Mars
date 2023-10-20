@@ -218,8 +218,6 @@ class Notifier(Subject, Observer):
         if len(rune_buff) == 0:
             rune_buff = utils.multi_match(frame[:200, :], RUNE_BUFF_GRAY_TEMPLATE, threshold=0.9)
         if len(rune_buff) > 0:
-            config.rune_pos = None
-            self.rune_active_time = 0
             return
 
         filtered = utils.filter_color(minimap, RUNE_RANGES)
