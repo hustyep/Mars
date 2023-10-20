@@ -474,7 +474,7 @@ class ErdaShower(Command):
             time.sleep(0.1)
         self.print_debug_info()
         if self.direction:
-            press_acc(self.direction, down_time=0.03, up_time=0.03)
+            press_acc(self.direction, down_time=0.03, up_time=0.05)
         key_down('down')
         press(Key.ERDA_SHOWER)
         key_up('down')
