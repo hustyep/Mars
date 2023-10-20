@@ -11,9 +11,8 @@ import numpy as np
 import cv2
 from src.common.usb import USB
 from src.modules.capture import capture
+from src.common.image_template import WECHAT_CALL_TEMPLATE, WECHAT_CALL_TEMPLATE_2X
 
-WECHAT_CALL_TEMPLATE = cv2.imread('assets/wechat_call.png', 0)
-WECHAT_CALL_TEMPLATE_2X = cv2.imread('assets/wechat_call@2x.png', 0)
 
 WECHAT_BOT_COMMAND_INFO = '/info'
 WECHAT_BOT_COMMAND_START = '/start'
@@ -221,9 +220,9 @@ class WechatBot:
             return
         # cv2.imshow("", frame)
         # cv2.waitKey()
-        location = utils.multi_match(frame, WECHAT_CALL_TEMPLATE, threshold=0.9)
+        location = utils.multi_match(frame, WECHAT_CALL_TEMPLATE_2X, threshold=0.9)
         if location is None:
-            location = utils.multi_match(frame, WECHAT_CALL_TEMPLATE_2X, threshold=0.9)
+            location = utils.multi_match(frame, WECHAT_CALL_TEMPLATE, threshold=0.9)
         if location:
             self.click(location[0][0], location[0][1])
         

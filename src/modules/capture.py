@@ -132,8 +132,8 @@ class Capture(Subject):
             tl[1] - y1 + 2
         )
         mm_br = (
-            max(mm_tl[0] + PT_WIDTH, br[0] - x1 + 16),
-            max(mm_tl[1] + PT_HEIGHT, br[1] - y1)
+            br[0] - x1 + 16,
+            br[1] - y1
         )
 
         if operator.eq(mm_tl, self.mm_tl) and operator.eq(mm_br, self.mm_br):
