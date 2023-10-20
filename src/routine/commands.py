@@ -554,7 +554,7 @@ class Detect_Mobs(Command):
             capture.frame, config.routine.role_template, threshold=0.9)
         if len(player_match) == 0:
             # print("lost player")
-            if self.type != MobType.NORMAL:
+            if self.type != MobType.NORMAL or abs(self.left) > 300 or abs(self.right) > 300:
                 return []
             else:
                 crop = frame[50:-100,]
