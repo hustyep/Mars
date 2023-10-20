@@ -201,9 +201,9 @@ def press(key, n: int = 1, down_time=0.05, up_time=0.05):
 
     for _ in range(n):
         key_down(key)
-        time.sleep(down_time * (1 + 0.2 * random()))
+        time.sleep(down_time * (1 + 0.1 * random()))
         key_up(key)
-        time.sleep(up_time * (1 + 0.2 * random()))
+        time.sleep(up_time * (1 + 0.1 * random()))
 
 
 @utils.run_if_enabled

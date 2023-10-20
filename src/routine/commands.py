@@ -554,7 +554,7 @@ class Detect_Mobs(Command):
             capture.frame, config.routine.role_template, threshold=0.9)
         if len(player_match) == 0:
             # print("lost player")
-            if self.type != MobType.NORMAL and abs(self.left) <= 300 and abs(self.right) <= 300:
+            if self.type != MobType.NORMAL or abs(self.left) <= 300 and abs(self.right) <= 300:
                 return []
             else:
                 crop = frame[50:-100,]
@@ -566,7 +566,7 @@ class Detect_Mobs(Command):
         
         mobs = []
         for mob_template in mob_templates:
-            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.95, debug=self.debug)
+            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.98, debug=self.debug)
             if len(mobs_tmp) > 0:
                 for mob in mobs_tmp:
                     mobs.append(mob)
