@@ -6,6 +6,7 @@ ASSETS_PATH = 'assets/'
 
 # The rune's buff 
 RUNE_BUFF_TEMPLATE = cv2.imread(f'{ASSETS_PATH}rune/rune_buff_template.jpg', 0)
+RUNE_BUFF_GRAY_TEMPLATE = cv2.imread(f'{ASSETS_PATH}rune/rune_buff_gray_template.png', 0)
 
 ########################
 #      exceptions      #

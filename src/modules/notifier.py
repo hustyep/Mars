@@ -213,31 +213,35 @@ class Notifier(Subject, Observer):
             config.rune_pos = None
             self.rune_active_time = 0
             return
+        
+        rune_buff = utils.multi_match(frame[:200, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
+        if len(rune_buff) == 0:
+            rune_buff = utils.multi_match(frame[:200, :], RUNE_BUFF_GRAY_TEMPLATE, threshold=0.9)
+        if len(rune_buff) > 0:
+            config.rune_pos = None
+            self.rune_active_time = 0
+            return
 
-        now = time.time()
         filtered = utils.filter_color(minimap, RUNE_RANGES)
-        matches = utils.multi_match(
-            filtered, RUNE_TEMPLATE, threshold=0.9)
-        # TODO rune buff bottom
-        rune_buff = utils.multi_match(
-            frame[:200, :], RUNE_BUFF_TEMPLATE, threshold=0.9)
-
-        if not config.rune_pos:
-            if matches and config.routine.sequence and len(rune_buff) == 0:
+        matches = utils.multi_match(filtered, RUNE_TEMPLATE, threshold=0.9)
+        if len(matches) == 0:
+            config.rune_pos = None
+            self.rune_active_time = 0
+            return
+              
+        now = time.time()  
+        if self.rune_active_time == 0:
+            self.rune_active_time = now
+            self._notify(BotInfo.RUNE_ACTIVE)
+            if config.routine.sequence:
                 abs_rune_pos = (matches[0][0], matches[0][1])
                 config.rune_pos = abs_rune_pos
                 distances = list(
                     map(distance_to_rune, config.routine.sequence))
                 index = np.argmin(distances)
                 config.rune_closest_pos = config.routine[index].location
-                if self.rune_active_time == 0:
-                    self.rune_active_time = now
-                    self._notify(BotInfo.RUNE_ACTIVE)
-        elif len(rune_buff) > 1:
-            config.rune_pos = None
-            self.rune_active_time = 0
         # Alert if rune hasn't been solved
-        elif len(rune_buff) == 0 and now - self.rune_active_time > self.rune_alert_delay and self.rune_active_time != 0:
+        elif now - self.rune_active_time > self.rune_alert_delay:
             self.notifyRuneError(now - self.rune_active_time)
             
     
@@ -321,6 +325,8 @@ class Notifier(Subject, Observer):
         self._notify(BotInfo.RUNE_LIBERATED, info=rune_type)
 
     def notifyRuneResolveFailed(self):
+        if self.rune_active_time == 0:
+            return
         duration = int(time.time() - self.rune_active_time)
         text_notice = f"{duration}s"
         self._notify(BotWarnning.RUNE_FAILED, arg=duration, info=text_notice)
