@@ -97,9 +97,9 @@ def pre_detect(direction):
 
 def detect_next_mob(direction, type):
     if direction == 'right':
-        has_elite = Detect_Mobs(top=180,bottom=-20,left=-300,right=900,type=type).execute()
+        has_elite = Detect_Mobs(top=180,bottom=-20,left=-500,right=950,type=type).execute()
     else:
-        has_elite = Detect_Mobs(top=180,bottom=-20,left=900,right=-300,type=type).execute()
+        has_elite = Detect_Mobs(top=180,bottom=-20,left=950,right=-500,type=type).execute()
     return has_elite is not None and len(has_elite) > 0
 
 def point_check(target, direction):
@@ -132,7 +132,7 @@ class HitAndRun(Command):
                 print("direction_changed")
                 time.sleep(0.08)
                 key_up(self.direction)
-                time.sleep(0.5)
+                time.sleep(0.3)
                 count = 0
                 while count < 80:
                     count += 1
@@ -148,7 +148,7 @@ class HitAndRun(Command):
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
-            sleep_while_move_y(interval=0.013, n=5)
+            sleep_while_move_y(interval=0.012, n=6)
             if config.elite_detected:
                 SonicBlow().execute()
                 config.elite_detected = False
@@ -335,7 +335,7 @@ class ShadowAssault(Command):
         key_up(self.direction)
         time.sleep(self.backswing)
         sleep_while_move_y(interval=0.04)
-        MesoExplosion().execute()
+        # MesoExplosion().execute()
         
         if settings.record_layout:
             config.layout.add(*config.player_pos)
@@ -474,7 +474,7 @@ class ErdaShower(Command):
             time.sleep(0.1)
         self.print_debug_info()
         if self.direction:
-            press_acc(self.direction, down_time=0.03, up_time=0.05)
+            press_acc(self.direction, down_time=0.03, up_time=0.1)
         key_down('down')
         press(Key.ERDA_SHOWER)
         key_up('down')
@@ -494,11 +494,11 @@ class SuddenRaid(Command):
         else:
             return False
             
-    def main(self):
-        used = super().main()
-        if used:
-            MesoExplosion().execute()
-        return used
+    # def main(self):
+    #     used = super().main()
+    #     if used:
+    #         MesoExplosion().execute()
+    #     return used
 
 class Arachnid(Command):
     key = Key.ARACHNID
@@ -526,11 +526,11 @@ class TrickBlade(Command):
         else:
             return False
     
-    def main(self):
-        used = super().main()
-        if used:
-            MesoExplosion().execute()
-        return used
+    # def main(self):
+    #     used = super().main()
+    #     if used:
+    #         MesoExplosion().execute()
+    #     return used
 
 
 class SlashShadowFormation(Command):

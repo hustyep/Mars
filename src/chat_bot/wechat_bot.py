@@ -220,9 +220,9 @@ class WechatBot:
             return
         # cv2.imshow("", frame)
         # cv2.waitKey()
-        location = utils.multi_match(frame, WECHAT_CALL_TEMPLATE_2X, threshold=0.9)
-        if location is None:
-            location = utils.multi_match(frame, WECHAT_CALL_TEMPLATE, threshold=0.9)
+        location = utils.multi_match(frame, WECHAT_CALL_TEMPLATE, threshold=0.9)
+        if not location:
+            location = utils.multi_match(frame, WECHAT_CALL_TEMPLATE_2X, threshold=0.9)
         if location:
             self.click(location[0][0], location[0][1])
         
