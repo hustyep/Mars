@@ -3,12 +3,15 @@ $, target=mob_name, value=Sandblade
 $, target=role_name, value=sllee
 
 @, label=Bottom mobbing
-*, x=24, y=56, frequency=1, interval=0, skip=False, adjust=False
+*, x=26, y=56, frequency=1, interval=0, skip=False, adjust=False
     SlashShadowFormation
 *, x=95, y=56, frequency=4, interval=0, skip=False, adjust=False
     ShadowVeil
 *, x=176, y=56, frequency=1, interval=0, skip=False, adjust=False
     SlashShadowFormation
+*, x=156, y=24, frequency=10, interval=0, skip=True, adjust=True
+*, x=95, y=26, frequency=10, interval=0, skip=True, adjust=True
+    TrickBlade, direction=left
 
 @, label=Summoning
 *, x=159, y=56, frequency=4, interval=0, skip=False, adjust=True
@@ -19,7 +22,7 @@ $, target=role_name, value=sllee
     SuddenRaid
 *, x=89, y=12, frequency=4, interval=0, skip=False, adjust=True
     ShadowAssault, direction=left, jump=True, distance=80
-*, x=63, y=18, frequency=4, interval=0, skip=False, adjust=True
+*, x=64, y=18, frequency=4, interval=0, skip=False, adjust=True
     TrickBlade, direction=left
     ErdaShower, direction=right
     TrickBlade, direction=left
