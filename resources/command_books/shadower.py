@@ -97,9 +97,9 @@ def pre_detect(direction):
 
 def detect_next_mob(direction, type):
     if direction == 'right':
-        has_elite = Detect_Mobs(top=180,bottom=-20,left=-500,right=950,type=type).execute()
+        has_elite = Detect_Mobs(top=180,bottom=-20,left=-500,right=1000,type=type).execute()
     else:
-        has_elite = Detect_Mobs(top=180,bottom=-20,left=950,right=-500,type=type).execute()
+        has_elite = Detect_Mobs(top=180,bottom=-20,left=1000,right=-500,type=type).execute()
     return has_elite is not None and len(has_elite) > 0
 
 def point_check(target, direction):
@@ -514,7 +514,7 @@ class Arachnid(Command):
 class TrickBlade(Command):
     key = Key.TRICKBLADE
     cooldown = 14
-    backswing = 0.8
+    backswing = 0.7
 
     def __init__(self, direction=None):
         super().__init__(locals())
@@ -546,6 +546,7 @@ class SlashShadowFormation(Command):
 class SonicBlow(Command):
     key = Key.SONIC_BLOW
     cooldown = 45
+    precast = 0.3
     backswing = 3
 
 class PhaseDash(Command):
