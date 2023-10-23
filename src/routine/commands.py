@@ -319,7 +319,7 @@ class Walk(Command):
                 direction = new_direction
             time.sleep(self.interval)
             walk_counter += 1
-            d_x = self.target[0] - config.player_pos[0]
+            d_x = self.target_x - config.player_pos[0]
         key_up(direction)
 
 
