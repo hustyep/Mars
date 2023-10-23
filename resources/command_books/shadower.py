@@ -131,7 +131,7 @@ class HitAndRun(Command):
             if direction_changed():
                 print("direction_changed")
                 
-                if time.time() - ErdaShower.castedTime > 5:
+                if time.time() - ErdaShower.castedTime > 6:
                     time.sleep(0.08)
                     key_up(self.direction)
                     time.sleep(0.3)

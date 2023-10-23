@@ -3,7 +3,7 @@ $, target=mob_name, value=Sandblade
 $, target=role_name, value=sllee
 
 @, label=Bottom mobbing
-*, x=26, y=56, frequency=1, interval=0, skip=False, adjust=False
+*, x=28, y=56, frequency=1, interval=0, skip=False, adjust=False
 *, x=95, y=56, frequency=4, interval=0, skip=False, adjust=False
     ShadowVeil
 *, x=176, y=56, frequency=1, interval=0, skip=False, adjust=False
