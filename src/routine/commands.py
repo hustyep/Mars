@@ -140,7 +140,11 @@ class Move(Command):
                     threshold -= 1
                 local_error = utils.distance(config.player_pos, point)
                 global_error = utils.distance(config.player_pos, self.target)
-                toggle = not toggle
+                if toggle:
+                    if d_y > threshold and global_d_y > threshold:
+                        toggle = False
+                else:
+                    toggle = True
                 # print(f"counter={counter}, global_error={global_error}")
             if self.prev_direction:
                 key_up(self.prev_direction)
