@@ -128,7 +128,7 @@ class HitAndRun(Command):
     def main(self):
         d_x = self.target[0] - config.player_pos[0]
         if config.mob_detect:
-            if direction_changed():
+            if direction_changed() and time.time() - ErdaShower.castedTime <= 5:
                 print("direction_changed")
                 time.sleep(0.08)
                 key_up(self.direction)
