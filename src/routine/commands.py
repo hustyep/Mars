@@ -141,6 +141,8 @@ class Move(Command):
                 local_error = utils.distance(config.player_pos, point)
                 global_error = utils.distance(config.player_pos, self.target)
                 if toggle:
+                    global_d_y = self.target[1] - config.player_pos[1]
+                    d_y = point[1] - config.player_pos[1]
                     if d_y > threshold and global_d_y > threshold:
                         toggle = False
                 else:
