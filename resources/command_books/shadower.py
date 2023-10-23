@@ -77,7 +77,7 @@ def step(direction, target):
     elif abs(d_x) >= 26:
         HitAndRun(direction, target).execute()
     else:
-        time.sleep(0.05)
+        Walk(target_x=target[0]).execute()
         
     if edge_reached():
         print("edge reached")

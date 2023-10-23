@@ -1,3 +1,4 @@
+from enum import Enum, auto
 from src.routine.components import *
 from src.common.vkeys import key_down, key_up, press, releaseAll, press_acc
 from src.modules.capture import capture
@@ -13,6 +14,8 @@ import math
 #############################
 #       Shared Commands     #
 #############################
+
+
 class Command(Component):
     id = 'Command Superclass'
     key: str = None
@@ -78,7 +81,7 @@ class Move(Command):
 
     def main(self):
         # self.print_debug_info()
-        
+
         counter = self.max_steps
         # path = config.layout.shortest_path(config.player_pos, self.target)
         path = [config.player_pos, self.target]
@@ -99,11 +102,12 @@ class Move(Command):
             global_error = utils.distance(config.player_pos, self.target)
 
             # if config.notice_level == 5 and not (config.player_pos[0] == point[0] and config.player_pos[1] == point[1]):
-            print(f'[move] from {config.player_pos} to {point}, target:{self.target}')
+            print(
+                f'[move] from {config.player_pos} to {point}, target:{self.target}')
 
             while config.enabled and counter > 0 and \
-                   local_error > settings.move_tolerance and \
-                     global_error > settings.move_tolerance:
+                    local_error > settings.move_tolerance and \
+                    global_error > settings.move_tolerance:
                 d_x = point[0] - config.player_pos[0]
                 if abs(d_x) > threshold:
                     print(f"counter={counter}, d_x={d_x}")
@@ -121,7 +125,8 @@ class Move(Command):
                 else:
                     global_d_y = self.target[1] - config.player_pos[1]
                     d_y = point[1] - config.player_pos[1]
-                    print(f"counter={counter}, global_d_y={global_d_y}, d_y={d_y}")
+                    print(
+                        f"counter={counter}, global_d_y={global_d_y}, d_y={d_y}")
                     if abs(global_d_y) > threshold and \
                             abs(d_y) > threshold:
                         if d_y < 0:
@@ -152,14 +157,14 @@ class Adjust(Command):
 
     def main(self):
         # self.print_debug_info()
-        
+
         # print(f'[Adjust] from {config.player_pos} to {self.target}')
 
         counter = self.max_steps
         d_x = self.target[0] - config.player_pos[0]
         d_y = self.target[1] - config.player_pos[1]
         threshold = settings.adjust_tolerance / math.sqrt(2)
-        
+
         while config.enabled and counter > 0 and (abs(d_x) > threshold or abs(d_y) > threshold):
             if abs(d_x) > settings.move_tolerance:
                 Move(*self.target)
@@ -199,7 +204,7 @@ class AdjustX(Command):
 
     def main(self):
         print(f'[AdjustX] from {config.player_pos} to {self.target}')
-        
+
         counter = self.max_steps
         d_x = self.target[0] - config.player_pos[0]
         d_y = self.target[1] - config.player_pos[1]
@@ -213,14 +218,14 @@ class AdjustX(Command):
                 walk_counter = 0
                 if d_x < 0:
                     key_down('left')
-                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 120:
+                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 600:
                         time.sleep(0.005)
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
                     key_up('left')
                 else:
                     key_down('right')
-                    while config.enabled and d_x > threshold_x and walk_counter < 120:
+                    while config.enabled and d_x > threshold_x and walk_counter < 600:
                         time.sleep(0.005)
                         walk_counter += 1
                         d_x = self.target[0] - config.player_pos[0]
@@ -291,16 +296,31 @@ class Wait(Command):
 class Walk(Command):
     """Walks in the given direction for a set amount of time."""
 
-    def __init__(self, direction, duration):
+    def __init__(self, target_x, tolerance=5, interval=0.005, max_steps=400):
         super().__init__(locals())
-        self.direction = settings.validate_horizontal_arrows(direction)
-        self.duration = float(duration)
+        self.tolerance = settings.validate_nonnegative_int(tolerance)
+        self.target_x = settings.validate_nonnegative_int(target_x)
+        self.interval = settings.validate_nonnegative_float(interval)
+        self.max_steps = settings.validate_nonnegative_int(max_steps)
 
     def main(self):
-        key_down(self.direction)
-        time.sleep(self.duration)
-        key_up(self.direction)
-        time.sleep(0.05)
+        d_x = self.target_x - config.player_pos[0]
+        if abs(d_x) <= self.tolerance:
+            return
+
+        walk_counter = 0
+        direction = 'left' if d_x < 0 else 'right'
+        key_down(direction)
+        while config.enabled and abs(d_x) > self.tolerance and walk_counter < self.max_steps:
+            new_direction = 'left' if d_x < 0 else 'right'
+            if new_direction != direction:
+                key_up(direction)
+                key_down(new_direction)
+                direction = new_direction
+            time.sleep(self.interval)
+            walk_counter += 1
+            d_x = self.target[0] - config.player_pos[0]
+        key_up(direction)
 
 
 class Fall(Command):
@@ -351,6 +371,7 @@ class Potion(Command):
             "\n[!] 'potion' command not implemented in current command book, aborting process.")
         config.enabled = False
 
+
 class SolveRune(Command):
     """
     Moves to the position of the rune and solves the arrow-key puzzle.
@@ -358,22 +379,23 @@ class SolveRune(Command):
     :return:        None
     """
     cooldown = 8
-    
+
     def __init__(self, retry=False):
         super().__init__(locals())
         self.retry = retry
-    
+
     def canUse(self, next_t: float = 0) -> bool:
         return super().canUse(next_t) and config.rune_pos is not None
 
     def main(self):
         if not self.canUse():
             return False
-        
+
         Move(*config.rune_pos).execute()
         Adjust(*config.rune_pos).execute()
         time.sleep(0.5)
-        press('space', 1, down_time=0.2, up_time=0.8)        # Inherited from Configurable
+        # Inherited from Configurable
+        press('space', 1, down_time=0.2, up_time=0.8)
         interact_result = False
         for _ in range(3):
             interact_result = rune.rune_interact_result(capture.frame)
@@ -417,8 +439,7 @@ class SolveRune(Command):
                             (used_frame, )).start()
         else:
             self.on_rune_solve_failed(used_frame)
-        
-    
+
     def check_rune_solve_result(self, used_frame):
         for _ in range(4):
             rune_type = rune.rune_liberate_result(capture.frame)
@@ -441,12 +462,14 @@ class SolveRune(Command):
         utils.save_screenshot(
             frame=used_frame, file_path=file_path, compress=False)
 
+
 class Mining(Command):
     """
     Moves to the position of the rune and solves the arrow-key puzzle.
     :param sct:     The mss instance object with which to take screenshots.
     :return:        None
     """
+
     def main(self):
         if config.hide_start > 0 and time.time() - config.hide_start <= 35:
             return
@@ -499,7 +522,8 @@ class Mining(Command):
                 press('right')
         time.sleep(0.3)
 
-        press('space', 1, down_time=0.2, up_time=0.8)        # Inherited from Configurable
+        # Inherited from Configurable
+        press('space', 1, down_time=0.2, up_time=0.8)
 
         print('\n mining:')
         frame = capture.frame
@@ -514,15 +538,15 @@ class Mining(Command):
         config.minal_pos = None
         config.minal_closest_pos = None
 
-from enum import Enum, auto
 
 class MobType(Enum):
     NORMAL = 'normal mob'
     ELITE = 'elite mob'
     BOSS = 'boss mob'
 
+
 class Detect_Mobs(Command):
-    def __init__(self, top=0, left=0, right=0, bottom=0, type:MobType=MobType.NORMAL, debug=False):
+    def __init__(self, top=0, left=0, right=0, bottom=0, type: MobType = MobType.NORMAL, debug=False):
         super().__init__(locals())
         self.top = top
         self.bottom = bottom
@@ -553,13 +577,13 @@ class Detect_Mobs(Command):
                 mob_templates = config.routine.elite_template
             case (_):
                 mob_templates = config.routine.mob_template
-                
+
         if len(mob_templates) == 0:
             raise ValueError(f"Miss {self.type.value} template")
-        
+
         if config.routine.role_template is None:
             raise ValueError('Miss Role template')
-                  
+
         player_match = utils.multi_match(
             capture.frame, config.routine.role_template, threshold=0.9)
         if len(player_match) == 0:
@@ -568,24 +592,27 @@ class Detect_Mobs(Command):
                 return []
             else:
                 crop = frame[50:-100,]
-        else:     
+        else:
             player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
             y_start = max(0, player_pos[1]-self.top)
             x_start = max(0, player_pos[0]-self.left)
-            crop = frame[y_start:player_pos[1]+self.bottom, x_start:player_pos[0]+self.right]
-        
+            crop = frame[y_start:player_pos[1]+self.bottom,
+                         x_start:player_pos[0]+self.right]
+
         mobs = []
         for mob_template in mob_templates:
-            mobs_tmp = utils.multi_match(crop, mob_template, threshold=0.98, debug=self.debug)
+            mobs_tmp = utils.multi_match(
+                crop, mob_template, threshold=0.98, debug=self.debug)
             if len(mobs_tmp) > 0:
                 for mob in mobs_tmp:
                     mobs.append(mob)
 
         return mobs
-    
+
 #############################
 #      Shared Functions     #
 #############################
+
 
 def sleep_while_move_y(interval=0.02, n=6):
     player_y = config.player_pos[1]
@@ -599,7 +626,8 @@ def sleep_while_move_y(interval=0.02, n=6):
             player_y = config.player_pos[1]
         if count == n:
             break
-        
+
+
 def sleep_before_y(target_y, tolorance=0):
     count = 0
     while abs(config.player_pos[1] - target_y) > tolorance:
@@ -608,11 +636,13 @@ def sleep_before_y(target_y, tolorance=0):
         if count == 20:
             break
 
+
 def direction_changed() -> bool:
     if config.player_direction == 'left':
         return abs(config.routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
     else:
         return abs(config.routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+
 
 def edge_reached() -> bool:
     if abs(config.routine.guard_point_l[1] - config.player_pos[1]) > 1:
