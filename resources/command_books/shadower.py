@@ -479,8 +479,9 @@ class ErdaShower(Command):
         key_down('down')
         press(Key.ERDA_SHOWER)
         key_up('down')
-        super().main()
-
+        self.__class__.castedTime = time.time()
+        time.sleep(self.__class__.backswing)
+        
 
 class SuddenRaid(Command):
     key = Key.SUDDEN_RAID
