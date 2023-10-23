@@ -87,6 +87,12 @@ class Move(Command):
         if config.notice_level == 5:
             print(f"[move]path: {path}")
 
+# [move] from (177, 55) to (177, 55), target:(156, 24)
+# [move] from (177, 55) to (156, 24), target:(156, 24)
+# [move] from (163, 56) to (163, 56), target:(95, 26)
+# [move] from (163, 56) to (95, 26), target:(95, 26)
+# moveup dy=29
+
         for i, point in enumerate(path):
             self.prev_direction = ''
             local_error = utils.distance(config.player_pos, point)
@@ -100,6 +106,7 @@ class Move(Command):
                      global_error > settings.move_tolerance:
                 d_x = point[0] - config.player_pos[0]
                 if abs(d_x) > threshold:
+                    print(f"counter={counter}, d_x={d_x}")
                     if d_x < 0:
                         key = 'left'
                     else:
@@ -114,6 +121,7 @@ class Move(Command):
                 else:
                     global_d_y = self.target[1] - config.player_pos[1]
                     d_y = point[1] - config.player_pos[1]
+                    print(f"counter={counter}, global_d_y={global_d_y}, d_y={d_y}")
                     if abs(global_d_y) > threshold and \
                             abs(d_y) > threshold:
                         if d_y < 0:
@@ -131,6 +139,7 @@ class Move(Command):
                     threshold -= 1
                 local_error = utils.distance(config.player_pos, point)
                 global_error = utils.distance(config.player_pos, self.target)
+                print(f"counter={counter}, global_error={global_error}")
             if self.prev_direction:
                 key_up(self.prev_direction)
 
