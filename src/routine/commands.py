@@ -85,48 +85,44 @@ class Move(Command):
         counter = self.max_steps
         # path = config.layout.shortest_path(config.player_pos, self.target)
         path = [config.player_pos, self.target]
-        threshold = settings.move_tolerance / math.sqrt(2)
 
         if config.notice_level == 5:
             print(f"[move]path: {path}")
 
-# [move] from (177, 55) to (177, 55), target:(156, 24)
-# [move] from (177, 55) to (156, 24), target:(156, 24)
-# [move] from (163, 56) to (163, 56), target:(95, 26)
-# [move] from (163, 56) to (95, 26), target:(95, 26)
-# moveup dy=29
-
         for i, point in enumerate(path):
+            toggle = True
             self.prev_direction = ''
+            threshold = settings.move_tolerance / math.sqrt(2)
             local_error = utils.distance(config.player_pos, point)
             global_error = utils.distance(config.player_pos, self.target)
 
-            # if config.notice_level == 5 and not (config.player_pos[0] == point[0] and config.player_pos[1] == point[1]):
-            print(
-                f'[move] from {config.player_pos} to {point}, target:{self.target}')
+            if config.notice_level == 5 and not (config.player_pos[0] == point[0] and config.player_pos[1] == point[1]):
+                print(f'[move] from {config.player_pos} to {point}, target:{self.target}')
 
             while config.enabled and counter > 0 and \
                     local_error > settings.move_tolerance and \
                     global_error > settings.move_tolerance:
-                d_x = point[0] - config.player_pos[0]
-                if abs(d_x) > threshold:
-                    print(f"counter={counter}, d_x={d_x}")
-                    if d_x < 0:
-                        key = 'left'
-                    else:
-                        key = 'right'
-                    self._new_direction(key)
-                    step(key, point)
-                    if settings.record_layout:
-                        config.layout.add(*config.player_pos)
-                    if i < len(path) - 1:
-                        time.sleep(0.15)
-                    counter -= 1
+                if toggle:
+                    global_d_x = self.target[0] - config.player_pos[0]
+                    d_x = point[0] - config.player_pos[0]
+                    if abs(global_d_x) > threshold and \
+                        abs(d_x)> threshold:
+                        print(f"counter={counter}, d_x={d_x}")
+                        if d_x < 0:
+                            key = 'left'
+                        else:
+                            key = 'right'
+                        self._new_direction(key)
+                        step(key, point)
+                        if settings.record_layout:
+                            config.layout.add(*config.player_pos)
+                        if i < len(path) - 1:
+                            time.sleep(0.15)
+                        counter -= 1
                 else:
                     global_d_y = self.target[1] - config.player_pos[1]
                     d_y = point[1] - config.player_pos[1]
-                    print(
-                        f"counter={counter}, global_d_y={global_d_y}, d_y={d_y}")
+                    # print(f"counter={counter}, global_d_y={global_d_y}, d_y={d_y}")
                     if abs(global_d_y) > threshold and \
                             abs(d_y) > threshold:
                         if d_y < 0:
@@ -144,7 +140,8 @@ class Move(Command):
                     threshold -= 1
                 local_error = utils.distance(config.player_pos, point)
                 global_error = utils.distance(config.player_pos, self.target)
-                print(f"counter={counter}, global_error={global_error}")
+                toggle = not toggle
+                # print(f"counter={counter}, global_error={global_error}")
             if self.prev_direction:
                 key_up(self.prev_direction)
 
@@ -167,24 +164,10 @@ class Adjust(Command):
 
         while config.enabled and counter > 0 and (abs(d_x) > threshold or abs(d_y) > threshold):
             if abs(d_x) > settings.move_tolerance:
-                Move(*self.target)
+                Move(*self.target).execute()
                 return
             elif abs(d_x) > threshold:
-                walk_counter = 0
-                if d_x < 0:
-                    key_down('left')
-                    while config.enabled and d_x < -1 * threshold and walk_counter < 120:
-                        time.sleep(0.005)
-                        walk_counter += 1
-                        d_x = self.target[0] - config.player_pos[0]
-                    key_up('left')
-                else:
-                    key_down('right')
-                    while config.enabled and d_x > threshold and walk_counter < 120:
-                        time.sleep(0.005)
-                        walk_counter += 1
-                        d_x = self.target[0] - config.player_pos[0]
-                    key_up('right')
+                Walk(target_x=self.target[0], tolerance=threshold, interval=0.005, max_steps=400).execute()
                 counter -= 1
             elif abs(d_y) > threshold:
                 if d_y < 0:
@@ -212,24 +195,10 @@ class AdjustX(Command):
         threshold_y = 5
         while config.enabled and counter > 0 and (abs(d_x) > threshold_x or abs(d_y) > threshold_y):
             if abs(d_x) > settings.move_tolerance:
-                Move(*self.target)
+                Move(*self.target).execute()
                 return
             elif abs(d_x) > threshold_x:
-                walk_counter = 0
-                if d_x < 0:
-                    key_down('left')
-                    while config.enabled and d_x < -1 * threshold_x and walk_counter < 600:
-                        time.sleep(0.005)
-                        walk_counter += 1
-                        d_x = self.target[0] - config.player_pos[0]
-                    key_up('left')
-                else:
-                    key_down('right')
-                    while config.enabled and d_x > threshold_x and walk_counter < 600:
-                        time.sleep(0.005)
-                        walk_counter += 1
-                        d_x = self.target[0] - config.player_pos[0]
-                    key_up('right')
+                Walk(target_x=self.target[0], tolerance=threshold_x, interval=0.005, max_steps=200).execute()
                 counter -= 1
             elif abs(d_y) > threshold_y:
                 if d_y < 0:
@@ -296,7 +265,7 @@ class Wait(Command):
 class Walk(Command):
     """Walks in the given direction for a set amount of time."""
 
-    def __init__(self, target_x, tolerance=5, interval=0.005, max_steps=400):
+    def __init__(self, target_x, tolerance=5, interval=0.005, max_steps=600):
         super().__init__(locals())
         self.tolerance = settings.validate_nonnegative_int(tolerance)
         self.target_x = settings.validate_nonnegative_int(target_x)
