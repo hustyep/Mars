@@ -90,7 +90,6 @@ class Move(Command):
             print(f"[move]path: {path}")
 
         for i, point in enumerate(path):
-            toggle = True
             self.prev_direction = ''
             threshold = settings.move_tolerance / math.sqrt(2)
             local_error = utils.distance(config.player_pos, point)
@@ -102,23 +101,22 @@ class Move(Command):
             while config.enabled and counter > 0 and \
                     local_error > settings.move_tolerance and \
                     global_error > settings.move_tolerance:
-                if toggle:
-                    global_d_x = self.target[0] - config.player_pos[0]
-                    d_x = point[0] - config.player_pos[0]
-                    if abs(global_d_x) > threshold and \
-                        abs(d_x)> threshold:
-                        # print(f"counter={counter}, d_x={d_x}")
-                        if d_x < 0:
-                            key = 'left'
-                        else:
-                            key = 'right'
-                        self._new_direction(key)
-                        step(key, point)
-                        if settings.record_layout:
-                            config.layout.add(*config.player_pos)
-                        if i < len(path) - 1:
-                            time.sleep(0.15)
-                        counter -= 1
+                global_d_x = self.target[0] - config.player_pos[0]
+                d_x = point[0] - config.player_pos[0]
+                if abs(global_d_x) > threshold and \
+                    abs(d_x)> threshold:
+                    # print(f"counter={counter}, d_x={d_x}")
+                    if d_x < 0:
+                        key = 'left'
+                    else:
+                        key = 'right'
+                    self._new_direction(key)
+                    step(key, point)
+                    if settings.record_layout:
+                        config.layout.add(*config.player_pos)
+                    if i < len(path) - 1:
+                        time.sleep(0.15)
+                    counter -= 1
                 else:
                     global_d_y = self.target[1] - config.player_pos[1]
                     d_y = point[1] - config.player_pos[1]
@@ -140,13 +138,6 @@ class Move(Command):
                     threshold -= 1
                 local_error = utils.distance(config.player_pos, point)
                 global_error = utils.distance(config.player_pos, self.target)
-                if toggle:
-                    global_d_y = self.target[1] - config.player_pos[1]
-                    d_y = point[1] - config.player_pos[1]
-                    if d_y > threshold and global_d_y > threshold:
-                        toggle = False
-                else:
-                    toggle = True
                 # print(f"counter={counter}, global_error={global_error}")
             if self.prev_direction:
                 key_up(self.prev_direction)
