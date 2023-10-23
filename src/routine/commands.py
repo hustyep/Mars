@@ -80,7 +80,8 @@ class Move(Command):
         # self.print_debug_info()
         
         counter = self.max_steps
-        path = config.layout.shortest_path(config.player_pos, self.target)
+        # path = config.layout.shortest_path(config.player_pos, self.target)
+        path = [config.player_pos, self.target]
         threshold = settings.move_tolerance / math.sqrt(2)
 
         if config.notice_level == 5:
@@ -95,8 +96,8 @@ class Move(Command):
                 print(f'[move] from {config.player_pos} to {point}, target:{self.target}')
 
             while config.enabled and counter > 0 and \
-                    local_error > settings.move_tolerance and \
-                    global_error > settings.move_tolerance:
+                   local_error > settings.move_tolerance and \
+                     global_error > settings.move_tolerance:
                 d_x = point[0] - config.player_pos[0]
                 if abs(d_x) > threshold:
                     if d_x < 0:
