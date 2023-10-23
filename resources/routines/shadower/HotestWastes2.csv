@@ -9,8 +9,8 @@ $, target=role_name, value=sllee
     ShadowVeil
 *, x=176, y=56, frequency=1, interval=0, skip=False, adjust=False
     SlashShadowFormation
-*, x=156, y=24, frequency=10, interval=0, skip=True, adjust=True
-*, x=95, y=26, frequency=10, interval=0, skip=True, adjust=True
+*, x=156, y=24, frequency=10, interval=0, skip=True, adjust=False
+*, x=95, y=26, frequency=10, interval=0, skip=True, adjust=False
     TrickBlade, direction=left
 
 @, label=Summoning

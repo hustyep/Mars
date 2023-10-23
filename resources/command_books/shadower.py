@@ -148,7 +148,7 @@ class HitAndRun(Command):
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
-            sleep_while_move_y(interval=0.012, n=6)
+            sleep_while_move_y(interval=0.01, n=8)
             if config.elite_detected:
                 SonicBlow().execute()
                 config.elite_detected = False
