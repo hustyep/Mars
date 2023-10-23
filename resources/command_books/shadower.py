@@ -220,7 +220,7 @@ class JumpUp(Command):
         time.sleep(0.06 if self.dy >= 20 else 0.1)
         press(Key.FLASH_JUMP, 1)
         key_up('up')
-        sleep_while_move_y(interval=0.05, n=6)
+        sleep_while_move_y(interval=0.02, n=15)
         # time.sleep(1.5)
 
 
@@ -309,7 +309,7 @@ class ShadowAssault(Command):
         if self.distance == 0:
             return
 
-        time.sleep(0.2)
+        # time.sleep(0.2)
 
         if self.direction.endswith('left'):
             if config.player_direction != 'left':
@@ -338,7 +338,7 @@ class ShadowAssault(Command):
         press(Key.SHADOW_ASSAULT)
         key_up(self.direction)
         time.sleep(self.backswing)
-        sleep_while_move_y(interval=0.04)
+        sleep_while_move_y()
         # MesoExplosion().execute()
         
         if settings.record_layout:
@@ -362,7 +362,7 @@ class RopeLift(Command):
         elif self.dy >= 32:
             press(Key.JUMP, up_time=0.1)
         press(self.__class__.key)
-        sleep_while_move_y(interval=0.05, n=6)
+        sleep_while_move_y()
         # press(self.__class__.key, up_time=self.dy * 0.07)
         # if self.dy >= 32:
         #     time.sleep((self.dy - 32) * 0.01)
