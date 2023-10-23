@@ -107,7 +107,7 @@ class Move(Command):
                     d_x = point[0] - config.player_pos[0]
                     if abs(global_d_x) > threshold and \
                         abs(d_x)> threshold:
-                        print(f"counter={counter}, d_x={d_x}")
+                        # print(f"counter={counter}, d_x={d_x}")
                         if d_x < 0:
                             key = 'left'
                         else:
