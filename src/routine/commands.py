@@ -92,8 +92,8 @@ class Move(Command):
             local_error = utils.distance(config.player_pos, point)
             global_error = utils.distance(config.player_pos, self.target)
 
-            if config.notice_level == 5 and not (config.player_pos[0] == point[0] and config.player_pos[1] == point[1]):
-                print(f'[move] from {config.player_pos} to {point}, target:{self.target}')
+            # if config.notice_level == 5 and not (config.player_pos[0] == point[0] and config.player_pos[1] == point[1]):
+            print(f'[move] from {config.player_pos} to {point}, target:{self.target}')
 
             while config.enabled and counter > 0 and \
                    local_error > settings.move_tolerance and \

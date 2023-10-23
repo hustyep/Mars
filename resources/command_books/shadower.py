@@ -169,6 +169,7 @@ class MoveUp(Command):
         self.dy = abs(dy)
 
     def main(self):
+        print(f"moveup dy={self.dy}")
         self.print_debug_info()
 
         if self.dy <= 6:
