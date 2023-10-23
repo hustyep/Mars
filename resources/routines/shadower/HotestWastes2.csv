@@ -4,11 +4,9 @@ $, target=role_name, value=sllee
 
 @, label=Bottom mobbing
 *, x=26, y=56, frequency=1, interval=0, skip=False, adjust=False
-    SlashShadowFormation
 *, x=95, y=56, frequency=4, interval=0, skip=False, adjust=False
     ShadowVeil
 *, x=176, y=56, frequency=1, interval=0, skip=False, adjust=False
-    SlashShadowFormation
 *, x=156, y=24, frequency=10, interval=0, skip=True, adjust=False
 *, x=95, y=26, frequency=10, interval=0, skip=True, adjust=False
     TrickBlade, direction=left

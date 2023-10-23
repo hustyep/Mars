@@ -128,21 +128,24 @@ class HitAndRun(Command):
     def main(self):
         d_x = self.target[0] - config.player_pos[0]
         if config.mob_detect:
-            if direction_changed() and time.time() - ErdaShower.castedTime > 4:
+            if direction_changed():
                 print("direction_changed")
-                time.sleep(0.08)
-                key_up(self.direction)
-                time.sleep(0.3)
-                count = 0
-                while count < 80:
-                    count += 1
-                    has_boss = Detect_Mobs(top=180,bottom=-20,left=300,right=300,type=MobType.BOSS).execute()
-                    if has_boss is not None and len(has_boss) > 0:
-                        SonicBlow().execute()
-                    mobs = Detect_Mobs(top=350,bottom=50,left=1100,right=1100).execute()
-                    if mobs is not None and len(mobs) >= 2:
-                        break
-                key_down(self.direction)                
+                SlashShadowFormation().execute()
+                
+                if time.time() - ErdaShower.castedTime > 4:
+                    time.sleep(0.08)
+                    key_up(self.direction)
+                    time.sleep(0.3)
+                    count = 0
+                    while count < 80:
+                        count += 1
+                        has_boss = Detect_Mobs(top=180,bottom=-20,left=300,right=300,type=MobType.BOSS).execute()
+                        if has_boss is not None and len(has_boss) > 0:
+                            SonicBlow().execute()
+                        mobs = Detect_Mobs(top=350,bottom=50,left=1100,right=1100).execute()
+                        if mobs is not None and len(mobs) >= 2:
+                            break
+                    key_down(self.direction)                
             
             threading.Thread(target=pre_detect, args=(self.direction,)).start()
             FlashJump(dx=abs(d_x)).execute()
