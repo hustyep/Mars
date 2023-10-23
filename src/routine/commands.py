@@ -164,7 +164,7 @@ class Adjust(Command):
                 Move(*self.target).execute()
                 return
             elif abs(d_x) > threshold:
-                Walk(target_x=self.target[0], tolerance=threshold, interval=0.005, max_steps=400).execute()
+                Walk(target_x=self.target[0], tolerance=2, interval=0.005, max_steps=400).execute()
                 counter -= 1
             elif abs(d_y) > threshold:
                 if d_y < 0:

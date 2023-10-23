@@ -18,7 +18,7 @@ $, target=role_name, value=sllee
 *, x=128, y=19, frequency=4, interval=0, skip=False, adjust=True
     DarkFlare, direction=left
     SuddenRaid
-*, x=89, y=12, frequency=4, interval=0, skip=False, adjust=True
+*, x=90, y=12, frequency=4, interval=0, skip=False, adjust=True
     ShadowAssault, direction=left, jump=True, distance=80
 *, x=64, y=18, frequency=4, interval=0, skip=False, adjust=True
     TrickBlade, direction=left
