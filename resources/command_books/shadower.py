@@ -130,12 +130,12 @@ class HitAndRun(Command):
         if config.mob_detect:
             if direction_changed():
                 print("direction_changed")
-                SlashShadowFormation().execute()
                 
-                if time.time() - ErdaShower.castedTime > 4:
+                if time.time() - ErdaShower.castedTime > 5:
                     time.sleep(0.08)
                     key_up(self.direction)
                     time.sleep(0.3)
+                    SlashShadowFormation().execute()
                     count = 0
                     while count < 80:
                         count += 1
