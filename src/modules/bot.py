@@ -367,7 +367,7 @@ class Bot(Configurable, Observer):
         elif isinstance(event_type, BotError):
             match (event_type):
                 case BotError.BLACK_SCREEN:
-                    if arg >= 10:
+                    if arg >= 5:
                         self.toggle(False, event_type.value)
                 case BotError.NO_MOVEMENT:
                     pass

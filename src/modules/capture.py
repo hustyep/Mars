@@ -39,7 +39,7 @@ class Capture(Subject):
         self.lost_minimap_time = 0
         self.lost_player_time = 0
 
-        self.lost_time_threshold = 3
+        self.lost_time_threshold = 5
 
         self.ready = False
         self.thread = threading.Thread(target=self._main)
@@ -55,7 +55,7 @@ class Capture(Subject):
         """Constantly monitors the player's position and in-game events."""
 
         mss.windows.CAPTUREBLT = 0
-        self.start_auto_calibrate()
+        # self.start_auto_calibrate()
         while True:
             self.calibrated = self.recalibrate()
             if not self.calibrated:

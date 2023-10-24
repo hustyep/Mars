@@ -131,10 +131,10 @@ class HitAndRun(Command):
             if direction_changed():
                 print("direction_changed")
                 
-                if time.time() - ErdaShower.castedTime > 6:
+                if time.time() - ErdaShower.castedTime > 5:
                     time.sleep(0.08)
                     key_up(self.direction)
-                    time.sleep(0.3)
+                    time.sleep(0.5)
                     SlashShadowFormation().execute()
                     count = 0
                     while count < 80:
@@ -437,7 +437,7 @@ class DarkFlare(Command):
         while not self.canUse():
             time.sleep(0.1)
         if self.direction is not None:
-            press(self.direction)
+            press_acc(self.direction, down_time=0.03, up_time=0.03)
         super().main()
 
 
@@ -546,7 +546,7 @@ class SlashShadowFormation(Command):
 class SonicBlow(Command):
     key = Key.SONIC_BLOW
     cooldown = 45
-    precast = 0.3
+    precast = 0.1
     backswing = 3
 
 class PhaseDash(Command):
