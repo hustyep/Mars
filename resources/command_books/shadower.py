@@ -338,7 +338,7 @@ class ShadowAssault(Command):
         press(Key.SHADOW_ASSAULT)
         key_up(self.direction)
         time.sleep(self.backswing)
-        sleep_while_move_y(interval=0.04, n=8)
+        sleep_while_move_y(interval=0.04, n=6)
         # MesoExplosion().execute()
         
         if settings.record_layout:
