@@ -112,7 +112,7 @@ class Notifier(Subject, Observer):
         # Check for unexpected black screen
         if config.enabled:
             if np.count_nonzero(gray < 15) / height / width > self.black_screen_threshold:
-                self._notify(BotError.BLACK_SCREEN)
+                self._notify(BotFatal.BLACK_SCREEN)
             elif np.count_nonzero(gray == 0) / height / width > 0.7 and not config.lost_minimap:
                 # blind
                 self._notify(BotInfo.BLIND)
@@ -128,7 +128,7 @@ class Notifier(Subject, Observer):
         # Check for no movement
         if config.enabled and operator.eq(config.player_pos, self.player_pos):
             interval = int(time.time() - self.player_pos_updated_time)
-            if interval >= 30 and self.player_pos_updated_time:
+            if interval >= 10 and self.player_pos_updated_time:
                 self._notify(BotError.NO_MOVEMENT, arg=interval,
                              info=f'duration:{interval}s')
         else:
