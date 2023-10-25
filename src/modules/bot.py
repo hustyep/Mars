@@ -12,7 +12,6 @@ from src.common.action_simulator import ActionSimulator
 from src.common.bot_notification import *
 from src.common.vkeys import press, releaseAll
 from src.common.interfaces import Configurable
-from src.common.image_template import *
 from src.common.common import Observer, Subject
 from src.modules.notifier import notifier
 from src.modules.capture import capture

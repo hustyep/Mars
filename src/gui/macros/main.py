@@ -1,12 +1,9 @@
 """Displays Mars's current settings and allows the user to edit them."""
 
 import tkinter as tk
-from src.gui.interfaces import KeyBindings
 from src.gui.macros.misc import Misc
 from src.gui.macros.shadower import Shadower
-from src.gui.interfaces import Tab, Frame
-from src.common import config
-from src.modules.bot import bot
+from src.gui.interfaces import Tab
 
 class Macros(Tab):
     def __init__(self, parent, **kwargs):
