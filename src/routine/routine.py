@@ -9,6 +9,7 @@ from src.routine.components import Point, Label, Jump, Setting, SYMBOLS
 from src.routine.commands import Command
 from src.routine.layout import layout
 from src.modules.gui import gui
+from src.command_book.command_book import command_book
 
 def update(func):
     """
@@ -279,8 +280,8 @@ class Routine:
 
             if first in SYMBOLS:
                 c = SYMBOLS[first]
-            elif first in config.command_book:
-                c = config.command_book[first]
+            elif first in command_book:
+                c = command_book[first]
             else:
                 print(line_error + f"Command '{first}' does not exist.")
                 return
@@ -329,7 +330,7 @@ class Routine:
     def get_all_components():
         """Returns a dictionary mapping all creatable Components to their names."""
 
-        options = config.command_book.dict.copy()
+        options = command_book.dict.copy()
         for e in (Point, Label, Jump, Setting):
             options[e.__name__.lower()] = e
         return options

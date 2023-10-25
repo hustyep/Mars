@@ -13,18 +13,23 @@ CB_KEYBINDING_DIR = os.path.join('resources', 'keybindings')
 
 
 class CommandBook(Configurable):
-    def __init__(self, file):
-        self.name = splitext(basename(file))[0]
+    def __init__(self):
+        self.name = ''
         self.buff = commands.Buff()
         self.potion = commands.Potion()
         self.DEFAULT_CONFIG = {}
-        result = self.load_commands(file)
-        if result is None:
-            raise ValueError(f"Invalid command book at '{file}'")
-        self.dict, self.module = result
+        self.dict = None
+        self.module = None
         super().__init__(self.name, directory=CB_KEYBINDING_DIR)
         
     def load_commands(self, file):
+        self.name = splitext(basename(file))[0]
+        result = self._load_commands(file)
+        if result is None:
+            raise ValueError(f"Invalid command book at '{file}'")
+        self.dict, self.module = result
+        
+    def _load_commands(self, file):
         """Prompts the user to select a command module to import. Updates config's command book."""
 
         utils.print_separator()
@@ -128,3 +133,6 @@ class CommandBook(Configurable):
     def _set_keybinds(self):
         for k, v in self.config.items():
             setattr(self.module.Key, k, v)
+
+
+command_book = CommandBook()

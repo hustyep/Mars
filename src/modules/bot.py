@@ -3,12 +3,11 @@
 import threading
 import time
 import random
-from src.command_book.command_book import CommandBook
+from src.command_book.command_book import command_book
 from src.chat_bot.chat_bot_entity import ChatBotCommand
-from src.detection import rune
 from src.routine.routine import routine
 from src.routine.components import Point
-from src.common import config, utils, settings
+from src.common import config, utils
 from src.common.action_simulator import ActionSimulator
 from src.common.bot_notification import *
 from src.common.vkeys import press, releaseAll
@@ -18,10 +17,8 @@ from src.common.common import Observer, Subject
 from src.modules.notifier import notifier
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
-from src.modules.detector import MineralType
 from src.modules.listener import listener
 from src.modules.gui import gui
-
 
 class Bot(Configurable, Observer):
     """A class that interprets and executes user-defined routines."""
@@ -86,199 +83,25 @@ class Bot(Configurable, Observer):
                         pass
                     else:
                         # print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{routine.guard_point_l}, guard_point_r:{routine.guard_point_r}")
-                        config.command_book.potion.main()
-                        config.command_book.buff.main()
+                        command_book.potion.main()
+                        command_book.buff.main()
 
                 # Highlight the current Point
                 gui.view.routine.select(routine.index)
                 gui.view.details.display_info(routine.index)
-                
-                # first check rune and mineral
-                # self._point_check(element)
 
                 # Execute next Point in the routine
                 element.execute()
-                
-                # double check rune and mineral
-                # self._point_check(element)
                 
                 # go next
                 routine.step()
             else:
                 time.sleep(0.01)
-
-    @utils.run_if_enabled
-    def _point_check(self, element):
-        if config.rune_pos is not None and isinstance(element, Point) \
-            and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or config.rune_closest_pos == element.location):
-            self._solve_rune()
-        if config.minal_active and isinstance(element, Point) \
-            and (utils.distance(config.minal_pos, config.player_pos) <= settings.move_tolerance * 2 or config.minal_closest_pos == element.location):
-            self._mining()
-
-    @utils.run_if_enabled
-    def _solve_rune(self, retry=True):
-        """
-        Moves to the position of the rune and solves the arrow-key puzzle.
-        :param sct:     The mss instance object with which to take screenshots.
-        :return:        None
-        """
-
-        move = config.command_book['move']
-        move(*config.rune_pos).execute()
-        adjust = config.command_book['adjust']
-        adjust(*config.rune_pos).execute()
-        # adjustx = config.command_book['adjustx']
-        # adjustx(*config.rune_pos).execute()
-        time.sleep(0.5)
-        if config.rune_pos is None:
-            return
-        press(self.config['Interact'], 1, down_time=0.2,
-              up_time=0.8)        # Inherited from Configurable
-
-        print('\nSolving rune:')
-        used_frame = None
-        find_solution = False
-        for i in range(4):
-            if config.rune_pos is None:
-                return
-            frame = capture.frame
-            solution = rune.show_magic(frame)
-            if solution is None:
-                return
-            if len(solution) == 4:
-                print('Solution found, entering result')
-                print(', '.join(solution))
-                used_frame = frame
-                find_solution = True
-                for arrow in solution:
-                    press(arrow, 1, down_time=0.1)
-                break
-            time.sleep(0.1)
-        time.sleep(0.2)
-
-        if find_solution:
-            threading.Timer(0.001, self.check_rune_solve_result,
-                            (used_frame, )).start()
-        else:
-            self.on_rune_solve_failed(used_frame)
-
-    def check_rune_solve_result(self, used_frame):
-        for _ in range(4):
-            rune_type = rune.rune_liberate_result(capture.frame)
-            if rune_type is not None:
-                break
-            time.sleep(0.1)
-        if rune_type is None:
-            self.on_rune_solve_failed(used_frame)
-        else:
-            notifier.notifyRuneResolved(rune_type)
-            # file_path = 'screenshot/rune_solved'
-            # utils.save_screenshot(
-            #     frame=used_frame, file_path=file_path, compress=False)
-
-            if rune_type == 'Rune of Might':
-                ActionSimulator.cancel_rune_buff()
-
-    def on_rune_solve_failed(self, used_frame):
-        notifier.notifyRuneResolveFailed()
-        file_path = 'screenshot/rune_failed'
-        utils.save_screenshot(
-            frame=used_frame, file_path=file_path, compress=False)
-
-    @utils.run_if_enabled
-    def _mining(self):
-        """
-        Moves to the position of the rune and solves the arrow-key puzzle.
-        :param sct:     The mss instance object with which to take screenshots.
-        :return:        None
-        """
-
-        if config.hide_start > 0 and time.time() - config.hide_start <= 35:
-            return
-
-        move = config.command_book['move']
-        move(*config.minal_pos).execute()
-        adjust = config.command_book['adjustx']
-        adjust(*config.minal_pos).execute()
-        time.sleep(0.2)
-
-        mineral_template = MINAL_HEART_TEMPLATE
-        if config.mineral_type == MineralType.CRYSTAL:
-            mineral_template = MINAL_CRYSTAL_TEMPLATE
-        elif config.mineral_type == MineralType.HERB_YELLOW:
-            mineral_template = HERB_YELLOW_TEMPLATE
-        elif config.mineral_type == MineralType.HERB_PURPLE:
-            mineral_template = HERB_PURPLE_TEMPLATE
-
-        frame = capture.frame
-        matches = utils.multi_match(frame, mineral_template)
-        player_template = routine.role_template
-        player = utils.multi_match(
-            frame, player_template, threshold=0.9)
-        if len(matches) > 0 and len(player) > 0:
-            player_x = player[0][0]
-            mineral_x = matches[0][0]
-            if config.mineral_type == MineralType.HERB_YELLOW or config.mineral_type == MineralType.HERB_PURPLE:
-                mineral_x -= 18
-            if mineral_x > player_x:
-                if config.player_direction == 'left':
-                    press('right')
-                if mineral_x - player_x >= 50:
-                    press('right', (mineral_x - player_x)//50)
-            elif mineral_x < player_x:
-                if config.player_direction == 'right':
-                    press('left')
-                if player_x - mineral_x >= 50:
-                    press('left', (player_x - mineral_x)//50)
-            else:
-                if config.player_direction == 'right':
-                    press('right')
-                    press('left')
-                else:
-                    press('left')
-                    press('right')
-        else:
-            if config.player_direction == 'right':
-                press('right', 2)
-                press('left')
-            else:
-                press('left', 2)
-                press('right')
-        time.sleep(0.3)
-        # if config.minal_pos[0] > config.player_pos[0]:
-        #     if config.player_direction == 'left':
-        #         press('right')
-        # elif config.minal_pos[0] < config.player_pos[0]:
-        #     if config.player_direction == 'right':
-        #         press('left')
-        # else:
-        #     if config.player_direction == 'right':
-        #         press('right', 2)
-        #         press('left')
-        #     else:
-        #         press('left', 2)
-        #         press('right')
-
-        press(self.config['Interact'], 1, down_time=0.2,
-              up_time=0.8)        # Inherited from Configurable
-
-        print('\n mining:')
-        frame = capture.frame
-        solution = rune.show_magic(frame)
-        if solution is not None:
-            print(', '.join(solution))
-            print('Solution found, entering result')
-            for arrow in solution:
-                press(arrow, 1, down_time=0.1)
-        time.sleep(3.5)
-        config.minal_active = False
-        config.minal_pos = None
-        config.minal_closest_pos = None
+                
 
     def load_commands(self, file):
         try:
-            config.command_book = CommandBook(file)
+            command_book.load_commands(file)
             gui.settings.update_class_bindings()
         except ValueError:
             pass    # TODO: UI warning popup, say check cmd for errors

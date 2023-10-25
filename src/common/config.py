@@ -45,8 +45,6 @@ telegram_chat_id = '805381440'
 
 file_setting = None
 
-command_book = None
-
 # Rune status
 rune_pos = None
 rune_closest_pos = None

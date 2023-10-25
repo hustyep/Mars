@@ -3,7 +3,7 @@
 import time
 from src.common import config, utils, settings
 from src.routine.routine import routine
-
+from src.command_book.command_book import command_book
 
 #################################
 #       Routine Components      #
@@ -103,11 +103,11 @@ class Point(Component):
             
             
     def _main(self):
-        move = config.command_book['move']
+        move = command_book['move']
         move(*self.location).execute()
         if self.adjust:
             # TODO: adjust using step('up')?
-            adjust = config.command_book['adjust']
+            adjust = command_book['adjust']
             adjust(*self.location).execute()
         for command in self.commands:
             command.execute()

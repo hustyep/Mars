@@ -8,9 +8,9 @@ from src.gui.settings.buffs import Buffs
 from src.gui.settings.auto import Auto
 from src.gui.settings.notification import Notification
 from src.gui.interfaces import Tab, Frame
-from src.common import config
 from src.modules.bot import bot
 from src.modules.listener import listener
+from src.command_book.command_book import command_book
 
 class Settings(Tab):
     def __init__(self, parent, **kwargs):
@@ -44,6 +44,6 @@ class Settings(Tab):
         
     def update_class_bindings(self):
         self.class_bindings.destroy()
-        class_name = config.command_book.name.capitalize()
-        self.class_bindings = KeyBindings(self.column2, f'{class_name} Keybindings', config.command_book)
+        class_name = command_book.name.capitalize()
+        self.class_bindings = KeyBindings(self.column2, f'{class_name} Keybindings', command_book)
         self.class_bindings.pack(side=tk.TOP, fill='x', expand=True)
