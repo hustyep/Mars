@@ -7,8 +7,8 @@ from os.path import splitext, basename
 from src.common import config, settings, utils
 from src.routine.components import Point, Label, Jump, Setting, SYMBOLS
 from src.routine.commands import Command
-from src.routine.layout import Layout
-
+from src.routine.layout import layout
+from src.modules.gui import gui
 
 def update(func):
     """
@@ -18,8 +18,8 @@ def update(func):
 
     def f(self, *args, **kwargs):
         result = func(self, *args, **kwargs)
-        config.gui.set_routine(self.display)
-        config.gui.view.details.update_details()
+        gui.set_routine(self.display)
+        gui.view.details.update_details()
         return result
     return f
 
@@ -201,10 +201,10 @@ class Routine:
         self.role_template = None
         self.guard_point_l = (100, 0)
         self.guard_point_r = (0, 0)
-        config.layout = None
+        layout.clear()
         settings.reset()
 
-        config.gui.clear_routine_info()
+        gui.clear_routine_info()
 
     def load(self, file=None):
         """
@@ -242,9 +242,9 @@ class Routine:
 
         self.dirty = False
         self.path = file
-        config.layout = Layout.load(file)
-        config.gui.view.status.set_routine(basename(file))
-        config.gui.edit.minimap.draw_default()
+        layout.load(file)
+        gui.view.status.set_routine(basename(file))
+        gui.edit.minimap.draw_default()
         print(f" ~  Finished loading routine '{basename(splitext(file)[0])}'.")
 
     def compile(self, file):

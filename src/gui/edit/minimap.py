@@ -1,8 +1,9 @@
 import tkinter as tk
 import cv2
 from PIL import ImageTk, Image
-from src.common import config, utils
+from src.common import utils
 from src.routine.routine import routine
+from src.routine.layout import layout
 from src.routine.components import Point
 from src.gui.interfaces import LabelFrame
 from src.modules.capture import capture
@@ -68,8 +69,8 @@ class Minimap(LabelFrame):
     def draw(self, img):
         """Draws IMG onto the Canvas."""
 
-        if config.layout:
-            config.layout.draw(img)     # Display the current Layout
+        if layout:
+            layout.draw(img)     # Display the current Layout
 
         img = ImageTk.PhotoImage(Image.fromarray(img))
         if self.container is None:

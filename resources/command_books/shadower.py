@@ -6,7 +6,9 @@ import math
 import threading
 from src.routine.components import *
 from src.routine.commands import *
+from src.routine.layout import layout
 from src.common.vkeys import press, key_down, key_up, releaseAll
+from src.modules.gui import gui
 
 # List of key mappings
 class Key:
@@ -342,7 +344,7 @@ class ShadowAssault(Command):
         # MesoExplosion().execute()
         
         if settings.record_layout:
-            config.layout.add(*config.player_pos)
+            layout.add(*config.player_pos)
 
 
 # 绳索
@@ -623,7 +625,7 @@ class FOR_THE_GUILD(Command):
     backswing = 0.1
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Guild Buff')
+        enabled = gui.settings.buffs.buff_settings.get('Guild Buff')
         if not enabled:
             return False
 
@@ -639,7 +641,7 @@ class HARD_HITTER(Command):
     backswing = 0.1
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Guild Buff')
+        enabled = gui.settings.buffs.buff_settings.get('Guild Buff')
         if not enabled:
             return False
 
@@ -683,7 +685,7 @@ class EXP_POTION(Command):
     backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Exp Potion')
+        enabled = gui.settings.buffs.buff_settings.get('Exp Potion')
         if not enabled:
             return False
         return super().canUse(next_t)
@@ -695,7 +697,7 @@ class WEALTH_POTION(Command):
     backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Wealthy Potion')
+        enabled = gui.settings.buffs.buff_settings.get('Wealthy Potion')
         if not enabled:
             return False
         return super().canUse(next_t)
@@ -707,7 +709,7 @@ class GOLD_POTION(Command):
     backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Gold Potion')
+        enabled = gui.settings.buffs.buff_settings.get('Gold Potion')
         if not enabled:
             return False
         return super().canUse(next_t)
@@ -719,7 +721,7 @@ class GUILD_POTION(Command):
     backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Guild Potion')
+        enabled = gui.settings.buffs.buff_settings.get('Guild Potion')
         if not enabled:
             return False
         return super().canUse(next_t)
@@ -731,7 +733,7 @@ class CANDIED_APPLE(Command):
     backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Candied Apple')
+        enabled = gui.settings.buffs.buff_settings.get('Candied Apple')
         if not enabled:
             return False
         return super().canUse(next_t)
@@ -743,7 +745,7 @@ class LEGION_WEALTHY(Command):
     backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Legion Wealthy')
+        enabled = gui.settings.buffs.buff_settings.get('Legion Wealthy')
         if not enabled:
             return False
         return super().canUse(next_t)
@@ -755,7 +757,7 @@ class EXP_COUPON(Command):
     backswing = 0.5
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = config.gui.settings.buffs.buff_settings.get('Exp Coupon')
+        enabled = gui.settings.buffs.buff_settings.get('Exp Coupon')
         if not enabled:
             return False
         return super().canUse(next_t)

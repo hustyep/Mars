@@ -4,9 +4,9 @@ import os
 import cv2
 import math
 import pickle
-from src.common import config, settings, utils
 from os.path import join, isfile, splitext, basename
 from heapq import heappush, heappop
+from src.common import config, settings, utils
 
 
 class Node:
@@ -255,8 +255,7 @@ class Layout:
 
         draw_helper(self.root)
 
-    @staticmethod
-    def load(routine):
+    def load(self, routine):
         """
         Loads the Layout object associated with ROUTINE. Creates and returns a
         new Layout if the specified Layout does not exist.
@@ -269,12 +268,14 @@ class Layout:
         if isfile(target):
             print(f" -  Found existing Layout file at '{target}'.")
             with open(target, 'rb') as file:
-                return pickle.load(file)
+                existing_layout = pickle.load(file)
+                self.name = layout_name
+                self.root = existing_layout.root
         else:
             print(f" -  Created new Layout file at '{target}'.")
-            new_layout = Layout(layout_name)
-            new_layout.save()
-            return new_layout
+            self.name = layout_name
+            self.root = None
+            self.save()
 
     @utils.run_if_enabled
     def save(self):
@@ -290,6 +291,12 @@ class Layout:
         with open(join(layouts_dir, self.name), 'wb') as file:
             pickle.dump(self, file)
 
+    def clear(self):
+        self.name = ''
+        self.root = None
 
 def get_layouts_dir():
     return os.path.join(config.RESOURCES_DIR, 'layouts', config.command_book.name)
+
+
+layout = Layout()

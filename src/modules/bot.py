@@ -19,6 +19,7 @@ from src.modules.notifier import notifier
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
 from src.modules.detector import MineralType
+from src.modules.gui import gui
 
 
 class Bot(Configurable, Observer):
@@ -68,7 +69,7 @@ class Bot(Configurable, Observer):
                 element = routine[routine.index]
                 
                 # feed pets
-                pet_settings = config.gui.settings.pets
+                pet_settings = gui.settings.pets
                 auto_feed = pet_settings.auto_feed.get()
                 num_pets = pet_settings.num_pets.get()
                 now = time.time()
@@ -88,8 +89,8 @@ class Bot(Configurable, Observer):
                         config.command_book.buff.main()
 
                 # Highlight the current Point
-                config.gui.view.routine.select(routine.index)
-                config.gui.view.details.display_info(routine.index)
+                gui.view.routine.select(routine.index)
+                gui.view.details.display_info(routine.index)
                 
                 # first check rune and mineral
                 # self._point_check(element)
@@ -277,7 +278,7 @@ class Bot(Configurable, Observer):
     def load_commands(self, file):
         try:
             config.command_book = CommandBook(file)
-            config.gui.settings.update_class_bindings()
+            gui.settings.update_class_bindings()
         except ValueError:
             pass    # TODO: UI warning popup, say check cmd for errors
 
@@ -335,8 +336,8 @@ class Bot(Configurable, Observer):
             case ChatBotCommand.LEVEL:
                 level = int(args[0])
                 config.notice_level = level
-                config.gui.settings.notification.notice_level.set(level)
-                config.gui.settings.notification.notification_settings.save_config()
+                gui.settings.notification.notice_level.set(level)
+                gui.settings.notification.notification_settings.save_config()
                 return "done", None
             case ChatBotCommand.SAY:
                 ActionSimulator.say_to_all(args[0])

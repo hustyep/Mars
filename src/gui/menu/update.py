@@ -1,9 +1,9 @@
 import git
 import tkinter as tk
-from src.common import config
 from src.gui.interfaces import MenuBarItem, LabelFrame, Frame
 from tkinter.messagebox import askyesno
 from src.modules.bot import bot
+from src.modules.gui import gui
 
 class Update(MenuBarItem):
     def __init__(self, parent, **kwargs):
@@ -69,7 +69,7 @@ class UpdatePrompt(tk.Toplevel):
         )
         self.force_update.pack(side=tk.BOTTOM, pady=(0, 5))
 
-        self.listbox.bindtags((self.listbox, config.gui.root, "all"))       # Unbind all events
+        self.listbox.bindtags((self.listbox, gui.root, "all"))       # Unbind all events
         self.bind('<FocusIn>', lambda *_: self._refresh_display())
         self.focus()
 

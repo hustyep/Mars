@@ -40,15 +40,8 @@ telegram_apiToken = '6683915847:AAH1iOECS1y394jkvDCD2YhHLxIDIAmGGac'
 telegram_chat_id = '805381440'
 
 #############################
-#       Shared Modules      #
+#       status              #
 #############################
-
-# Stores the Layout object associated with the current routine
-layout = None
-
-# Shares the gui to all modules
-gui = None
-
 
 file_setting = None
 

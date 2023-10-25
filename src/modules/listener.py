@@ -9,6 +9,7 @@ from src.common import config, utils
 from datetime import datetime
 from src.modules.capture import capture
 from src.modules.notifier import notifier
+from src.modules.gui import gui
 
 class Listener(Configurable):
     DEFAULT_CONFIG = {
@@ -105,13 +106,13 @@ class Listener(Configurable):
         capture.calibrated = False
         # while not capture.calibrated:
         #     time.sleep(0.01)
-        # config.gui.edit.minimap.redraw()
+        # gui.edit.minimap.redraw()
 
     @staticmethod
     def record_position():
         pos = config.player_pos
         now = datetime.now().strftime('%I:%M:%S %p')
-        config.gui.edit.record.add_entry(now, pos)
+        gui.edit.record.add_entry(now, pos)
         print(f'\n[~] Recorded position ({pos[0]}, {pos[1]}) at {now}')
         time.sleep(0.6)
 

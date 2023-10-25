@@ -4,8 +4,9 @@ import time
 import threading
 import tkinter as tk
 from tkinter import ttk
-from src.common import config, settings
+from src.common import settings
 from src.gui import Menu, View, Edit, Settings, Macros
+from src.routine.layout import layout
 
 
 class GUI:
@@ -16,8 +17,6 @@ class GUI:
     }
 
     def __init__(self):
-        config.gui = self
-
         self.root = tk.Tk()
         self.root.title('Mars')
         icon = tk.PhotoImage(file='assets/icon.png')
@@ -96,10 +95,11 @@ class GUI:
         """Periodically saves the current Layout object."""
 
         while True:
-            if config.layout is not None and settings.record_layout:
-                config.layout.save()
+            if layout is not None and settings.record_layout:
+                layout.save()
             time.sleep(5)
 
+gui = GUI()
 
 if __name__ == '__main__':
     gui = GUI()

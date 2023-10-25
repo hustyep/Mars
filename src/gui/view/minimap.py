@@ -5,6 +5,7 @@ from src.gui.interfaces import LabelFrame
 from src.common import config, utils
 from src.routine.components import Point
 from src.routine.routine import routine
+from src.routine.layout import layout
 from src.modules.capture import capture
 
 class Minimap(LabelFrame):
@@ -74,8 +75,8 @@ class Minimap(LabelFrame):
                                         p.adjust)
 
             # Display the current Layout
-            if config.layout:
-                config.layout.draw(img)
+            if layout:
+                layout.draw(img)
 
             # Draw the player's position on top of everything
             cv2.circle(img,

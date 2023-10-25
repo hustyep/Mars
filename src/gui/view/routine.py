@@ -1,6 +1,6 @@
 import tkinter as tk
 from src.gui.interfaces import LabelFrame
-from src.common import config
+from src.modules.gui import gui
 
 
 class Routine(LabelFrame):
@@ -11,7 +11,7 @@ class Routine(LabelFrame):
         self.scroll.pack(side=tk.RIGHT, fill='both', pady=5)
 
         self.listbox = tk.Listbox(self, width=25,
-                                  listvariable=config.gui.routine_var,
+                                  listvariable=gui.routine_var,
                                   exportselection=False,
                                   activestyle='none',
                                   yscrollcommand=self.scroll.set)

@@ -11,6 +11,7 @@ from src.modules.capture import capture
 from src.modules.notifier import notifier
 from src.routine.components import *
 from src.routine.routine import routine
+from src.routine.layout import layout
 from src.detection import rune
 
 
@@ -87,7 +88,7 @@ class Move(Command):
         # self.print_debug_info()
 
         counter = self.max_steps
-        # path = config.layout.shortest_path(config.player_pos, self.target)
+        # path = layout.shortest_path(config.player_pos, self.target)
         path = [config.player_pos, self.target]
 
         if config.notice_level == 5:
@@ -117,7 +118,7 @@ class Move(Command):
                     self._new_direction(key)
                     step(key, point)
                     if settings.record_layout:
-                        config.layout.add(*config.player_pos)
+                        layout.add(*config.player_pos)
                     if i < len(path) - 1:
                         time.sleep(0.15)
                     counter -= 1
@@ -134,7 +135,7 @@ class Move(Command):
                         self._new_direction(key)
                         step(key, point)
                         if settings.record_layout:
-                            config.layout.add(*config.player_pos)
+                            layout.add(*config.player_pos)
                         if i < len(path) - 1:
                             time.sleep(0.05)
                         counter -= 1

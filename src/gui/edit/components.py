@@ -1,10 +1,9 @@
 import tkinter as tk
 
-from src.common import config
 from src.routine.routine import routine
 from src.routine.components import Point
 from src.gui.interfaces import Frame
-
+from src.modules.gui import gui
 
 class Components(Frame):
     def __init__(self, parent, **kwargs):
@@ -17,7 +16,7 @@ class Components(Frame):
         self.scroll.pack(side=tk.RIGHT, fill='y', pady=(0, 5))
 
         self.listbox = tk.Listbox(self, width=25,
-                                  listvariable=config.gui.routine_var,
+                                  listvariable=gui.routine_var,
                                   exportselection=False,
                                   activestyle='none',
                                   yscrollcommand=self.scroll.set)
