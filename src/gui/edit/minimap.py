@@ -2,6 +2,7 @@ import tkinter as tk
 import cv2
 from PIL import ImageTk, Image
 from src.common import config, utils
+from src.routine.routine import routine
 from src.routine.components import Point
 from src.gui.interfaces import LabelFrame
 from src.modules.capture import capture
@@ -44,7 +45,7 @@ class Minimap(LabelFrame):
         selects = self.parent.routine.components.listbox.curselection()
         if len(selects) > 0:
             index = int(selects[0])
-            obj = config.routine[index]
+            obj = routine[index]
             if isinstance(obj, Point):
                 self.draw_point(obj)
                 self.parent.record.clear_selection()

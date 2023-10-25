@@ -1,12 +1,14 @@
 import os
 import tkinter as tk
-from src.common import config, utils
-from src.gui.interfaces import MenuBarItem
+import threading
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesno
+
+from src.common import config, utils
 from src.common.interfaces import Configurable
-import threading
+from src.gui.interfaces import MenuBarItem
 from src.modules.bot import bot
+from src.routine.routine import routine
 
 
 class File(MenuBarItem):
@@ -61,7 +63,7 @@ class File(MenuBarItem):
     def loadDefault(self):
 
         bot.load_commands(config.file_setting.get('command_book_path'))
-        config.routine.load(config.file_setting.get("routine_path"))
+        routine.load(config.file_setting.get("routine_path"))
 
     def enable_routine_state(self):
         self.entryconfig('New Routine', state=tk.NORMAL)
@@ -80,13 +82,13 @@ class File(MenuBarItem):
     @staticmethod
     @utils.run_if_disabled('\n[!] Cannot create a new routine while Mars is enabled')
     def _new_routine():
-        if config.routine.dirty:
+        if routine.dirty:
             if not askyesno(title='New Routine',
                             message='The current routine has unsaved changes. '
                                     'Would you like to proceed anyways?',
                             icon='warning'):
                 return
-        config.routine.clear()
+        routine.clear()
 
     @staticmethod
     @utils.run_if_disabled('\n[!] Cannot save routines while Mars is enabled')
@@ -96,12 +98,12 @@ class File(MenuBarItem):
                                       filetypes=[('*.csv', '*.csv')],
                                       defaultextension='*.csv')
         if file_path:
-            config.routine.save(file_path)
+            routine.save(file_path)
 
     @staticmethod
     @utils.run_if_disabled('\n[!] Cannot load routines while Mars is enabled')
     def _load_routine():
-        if config.routine.dirty:
+        if routine.dirty:
             if not askyesno(title='Load Routine',
                             message='The current routine has unsaved changes. '
                                     'Would you like to proceed anyways?',
@@ -113,12 +115,12 @@ class File(MenuBarItem):
         if file_path:
             config.file_setting.set('routine_path', file_path)
             config.file_setting.save_config()
-            config.routine.load(file_path)
+            routine.load(file_path)
 
     @staticmethod
     @utils.run_if_disabled('\n[!] Cannot load command books while Mars is enabled')
     def _load_commands():
-        if config.routine.dirty:
+        if routine.dirty:
             if not askyesno(title='Load Command Book',
                             message='Loading a new command book will discard the current routine, '
                                     'which has unsaved changes. Would you like to proceed anyways?',
@@ -149,7 +151,7 @@ class File(MenuBarItem):
                               'routines', command_name, name + '.csv')
         config.file_setting.set('routine_path', target)
         config.file_setting.save_config()
-        config.routine.load(target)
+        routine.load(target)
 
 
 def get_command_books_dir() -> str:

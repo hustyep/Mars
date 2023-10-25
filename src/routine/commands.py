@@ -1,15 +1,19 @@
-from enum import Enum, auto
-from src.routine.components import *
-from src.common.vkeys import key_down, key_up, press, releaseAll, press_acc
-from src.modules.capture import capture
-from src.common.image_template import *
-from src.detection import rune
-from src.modules.notifier import notifier
-from src.common.action_simulator import ActionSimulator
-from src.modules.detector import MineralType
-from src.common.bot_notification import BotWarnning
+from enum import Enum
 import threading
 import math
+
+from src.common.vkeys import key_down, key_up, press, releaseAll, press_acc
+from src.common.image_template import *
+from src.common.action_simulator import ActionSimulator
+from src.common.bot_notification import BotWarnning
+from src.modules.detector import MineralType
+from src.modules.capture import capture
+from src.modules.notifier import notifier
+from src.routine.components import *
+from src.routine.routine import routine
+from src.detection import rune
+
+
 
 #############################
 #       Shared Commands     #
@@ -454,7 +458,7 @@ class Mining(Command):
 
         frame = capture.frame
         matches = utils.multi_match(frame, mineral_template)
-        player_template = config.routine.role_template
+        player_template = routine.role_template
         player = utils.multi_match(
             frame, player_template, threshold=0.9)
         if len(matches) > 0 and len(player) > 0:
@@ -538,20 +542,20 @@ class Detect_Mobs(Command):
 
         match (self.type):
             case (MobType.BOSS):
-                mob_templates = config.routine.boss_template
+                mob_templates = routine.boss_template
             case (MobType.ELITE):
-                mob_templates = config.routine.elite_template
+                mob_templates = routine.elite_template
             case (_):
-                mob_templates = config.routine.mob_template
+                mob_templates = routine.mob_template
 
         if len(mob_templates) == 0:
             raise ValueError(f"Miss {self.type.value} template")
 
-        if config.routine.role_template is None:
+        if routine.role_template is None:
             raise ValueError('Miss Role template')
 
         player_match = utils.multi_match(
-            capture.frame, config.routine.role_template, threshold=0.9)
+            capture.frame, routine.role_template, threshold=0.9)
         if len(player_match) == 0:
             # print("lost player")
             if self.type != MobType.NORMAL or abs(self.left) <= 300 and abs(self.right) <= 300:
@@ -605,15 +609,15 @@ def sleep_before_y(target_y, tolorance=0):
 
 def direction_changed() -> bool:
     if config.player_direction == 'left':
-        return abs(config.routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+        return abs(routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
     else:
-        return abs(config.routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+        return abs(routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
 
 
 def edge_reached() -> bool:
-    if abs(config.routine.guard_point_l[1] - config.player_pos[1]) > 1:
+    if abs(routine.guard_point_l[1] - config.player_pos[1]) > 1:
         return
     if config.player_direction == 'left':
-        return abs(config.routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+        return abs(routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
     else:
-        return abs(config.routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+        return abs(routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance

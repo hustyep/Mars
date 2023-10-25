@@ -1,8 +1,8 @@
 """Allows the user to edit routines while viewing each Point's location on the minimap."""
 
-from src.common import config
 import inspect
 import tkinter as tk
+from src.routine.routine import routine
 from src.routine.components import Point
 from src.routine.commands import Command
 from src.gui.edit.minimap import Minimap
@@ -142,7 +142,7 @@ class Editor(LabelFrame):
         title.insert(0, f"Creating new ...")
         title.config(state=tk.DISABLED)
 
-        options = config.routine.get_all_components()
+        options = routine.get_all_components()
         var = tk.StringVar(value=tuple(options.keys()))
 
         def update_search(*_):
@@ -289,8 +289,8 @@ class Editor(LabelFrame):
                 if isinstance(obj, Command):
                     if len(selects) > 0:
                         index = int(selects[0])
-                        if isinstance(config.routine[index], Point):
-                            config.routine.append_command(index, obj)
+                        if isinstance(routine[index], Point):
+                            routine.append_command(index, obj)
                             self.parent.routine.commands.update_display()
                             self.cancel()
                         else:
@@ -298,7 +298,7 @@ class Editor(LabelFrame):
                     else:
                         print(f"\n[!] Error while adding Command: no Point is currently selected.")
                 else:
-                    config.routine.append_component(obj)
+                    routine.append_component(obj)
                     self.cancel()
             except (ValueError, TypeError) as e:
                 print(f"\n[!] Found invalid arguments for '{component.__name__}':")
@@ -319,10 +319,10 @@ class Editor(LabelFrame):
             p_index = int(components[0])
             if len(commands) > 0:
                 c_index = int(commands[0])
-                self.create_edit_ui(config.routine[p_index].commands, c_index,
+                self.create_edit_ui(routine[p_index].commands, c_index,
                                     routine.commands.update_obj)
             else:
-                self.create_edit_ui(config.routine, p_index,
+                self.create_edit_ui(routine, p_index,
                                     routine.components.update_obj)
         else:
             self.contents.destroy()

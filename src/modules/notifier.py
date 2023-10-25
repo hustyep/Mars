@@ -14,7 +14,6 @@ import win32com.client as client
 import keyboard as kb
 from enum import Enum
 
-from src.routine.components import Point
 from src.common import config, utils
 from src.common.usb import USB
 from src.common.common import Subject, Observer
@@ -22,6 +21,8 @@ from src.common.image_template import *
 from src.common.bot_notification import *
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
+from src.routine.routine import routine
+from src.routine.components import Point
 
     
 def exception_hook(exc_type, exc_value, tb):
@@ -229,13 +230,13 @@ class Notifier(Subject, Observer):
         if self.rune_active_time == 0:
             self.rune_active_time = now
             self._notify(BotInfo.RUNE_ACTIVE)
-            if config.routine.sequence:
+            if routine.sequence:
                 abs_rune_pos = (matches[0][0], matches[0][1])
                 config.rune_pos = abs_rune_pos
                 distances = list(
-                    map(distance_to_rune, config.routine.sequence))
+                    map(distance_to_rune, routine.sequence))
                 index = np.argmin(distances)
-                config.rune_closest_pos = config.routine[index].location
+                config.rune_closest_pos = routine[index].location
         # Alert if rune hasn't been solved
         elif now - self.rune_active_time > self.rune_alert_delay:
             self.notifyRuneError(now - self.rune_active_time)

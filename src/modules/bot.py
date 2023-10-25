@@ -6,19 +6,19 @@ import random
 from src.command_book.command_book import CommandBook
 from src.chat_bot.chat_bot_entity import ChatBotCommand
 from src.detection import rune
-from src.routine.routine import Routine
+from src.routine.routine import routine
 from src.routine.components import Point
 from src.common import config, utils, settings
 from src.common.action_simulator import ActionSimulator
 from src.common.bot_notification import *
 from src.common.vkeys import press, releaseAll
 from src.common.interfaces import Configurable
+from src.common.image_template import *
 from src.common.common import Observer, Subject
 from src.modules.notifier import notifier
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
 from src.modules.detector import MineralType
-from src.common.image_template import *
 
 
 class Bot(Configurable, Observer):
@@ -39,8 +39,6 @@ class Bot(Configurable, Observer):
         notifier.attach(self)
 
         self.submodules = []
-
-        config.routine = Routine()
 
         self.ready = False
         self.thread = threading.Thread(target=self._main)
@@ -65,9 +63,9 @@ class Bot(Configurable, Observer):
         config.listener.enabled = True
         last_fed = 0
         while True:
-            if config.enabled and len(config.routine) > 0:
+            if config.enabled and len(routine) > 0:
                 # current element
-                element = config.routine[config.routine.index]
+                element = routine[routine.index]
                 
                 # feed pets
                 pet_settings = config.gui.settings.pets
@@ -80,18 +78,18 @@ class Bot(Configurable, Observer):
 
                 # Use Buff and Potion
                 if isinstance(element, Point):
-                    if config.player_direction == 'left' and element.location == config.routine.guard_point_l:
+                    if config.player_direction == 'left' and element.location == routine.guard_point_l:
                         pass
-                    elif  config.player_direction == 'right' and element.location == config.routine.guard_point_r:
+                    elif  config.player_direction == 'right' and element.location == routine.guard_point_r:
                         pass
                     else:
-                        # print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{config.routine.guard_point_l}, guard_point_r:{config.routine.guard_point_r}")
+                        # print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{routine.guard_point_l}, guard_point_r:{routine.guard_point_r}")
                         config.command_book.potion.main()
                         config.command_book.buff.main()
 
                 # Highlight the current Point
-                config.gui.view.routine.select(config.routine.index)
-                config.gui.view.details.display_info(config.routine.index)
+                config.gui.view.routine.select(routine.index)
+                config.gui.view.details.display_info(routine.index)
                 
                 # first check rune and mineral
                 # self._point_check(element)
@@ -103,7 +101,7 @@ class Bot(Configurable, Observer):
                 # self._point_check(element)
                 
                 # go next
-                config.routine.step()
+                routine.step()
             else:
                 time.sleep(0.01)
 
@@ -213,7 +211,7 @@ class Bot(Configurable, Observer):
 
         frame = capture.frame
         matches = utils.multi_match(frame, mineral_template)
-        player_template = config.routine.role_template
+        player_template = routine.role_template
         player = utils.multi_match(
             frame, player_template, threshold=0.9)
         if len(matches) > 0 and len(player) > 0:

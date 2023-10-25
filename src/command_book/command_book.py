@@ -4,9 +4,9 @@ import importlib
 import traceback
 from os.path import basename, splitext
 from src.common import config, utils
-from src.routine import components
-from src.routine import commands
 from src.common.interfaces import Configurable
+from src.routine.routine import routine
+from src.routine import commands
 
 
 CB_KEYBINDING_DIR = os.path.join('resources', 'keybindings')
@@ -105,7 +105,7 @@ class CommandBook(Configurable):
             commands.MoveDown = new_cb['movedown']
             config.gui.menu.file.enable_routine_state()
             config.gui.view.status.set_cb(basename(file))
-            config.routine.clear()
+            routine.clear()
             print(f" ~  Successfully loaded command book '{self.name}'")
             return new_cb, module
         else:

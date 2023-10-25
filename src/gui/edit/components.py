@@ -1,5 +1,7 @@
 import tkinter as tk
+
 from src.common import config
+from src.routine.routine import routine
 from src.routine.components import Point
 from src.gui.interfaces import Frame
 
@@ -48,7 +50,7 @@ class Components(Frame):
             selections = e.widget.curselection()
             if len(selections) > 0:
                 index = int(selections[0])
-                obj = config.routine[index]
+                obj = routine[index]
 
                 if isinstance(obj, Point):
                     routine.commands_var.set([c.id for c in obj.commands])
@@ -59,13 +61,13 @@ class Components(Frame):
                 edit.record.clear_selection()
 
                 if create_ui:
-                    edit.editor.create_edit_ui(config.routine, index, self.update_obj)
+                    edit.editor.create_edit_ui(routine, index, self.update_obj)
         return callback
 
     def update_obj(self, arr, i, stringvars):
         def f():
             new_kwargs = {k: v.get() for k, v in stringvars.items()}
-            config.routine.update_component(i, new_kwargs)
+            routine.update_component(i, new_kwargs)
 
             edit = self.parent.parent.parent
             edit.minimap.redraw()

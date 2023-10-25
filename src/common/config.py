@@ -42,8 +42,6 @@ telegram_chat_id = '805381440'
 #############################
 #       Shared Modules      #
 #############################
-# A Routine object that manages the 'machine code' of the current routine
-routine = None
 
 # Stores the Layout object associated with the current routine
 layout = None

@@ -94,7 +94,7 @@ class Listener(Configurable):
     def reload_routine():
         Listener.recalibrate_minimap()
 
-        config.routine.load(config.routine.path)
+        routine.load(routine.path)
 
         winsound.Beep(523, 200)     # C5
         winsound.Beep(659, 200)     # E5

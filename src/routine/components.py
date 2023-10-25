@@ -2,6 +2,7 @@
 
 import time
 from src.common import config, utils, settings
+from src.routine.routine import routine
 
 
 #################################
@@ -133,7 +134,7 @@ class Label(Component):
     def __init__(self, label):
         super().__init__(locals())
         self.label = str(label)
-        if self.label in config.routine.labels:
+        if self.label in routine.labels:
             raise ValueError
         self.links = set()
         self.index = None
@@ -151,7 +152,7 @@ class Label(Component):
 
     def __delete__(self, instance):
         del self.links
-        config.routine.labels.pop(self.label)
+        routine.labels.pop(self.label)
 
     def __str__(self):
         return f'{self.label}:'
@@ -174,7 +175,7 @@ class Jump(Component):
             print(f"\n[!] Label '{self.label}' does not exist.")
         else:
             if self.counter == 0:
-                config.routine.index = self.link.index
+                routine.index = self.link.index
             self._increment_counter()
 
     @utils.run_if_enabled
@@ -188,8 +189,8 @@ class Jump(Component):
         :return:    Whether the binding was successful
         """
 
-        if self.label in config.routine.labels:
-            self.link = config.routine.labels[self.label]
+        if self.label in routine.labels:
+            self.link = routine.labels[self.label]
             self.link.links.add(self)
             return True
         return False

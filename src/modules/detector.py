@@ -6,7 +6,8 @@ import numpy as np
 from enum import Enum
 
 from src.routine.components import Point
-from src.common import config, utils, settings
+from src.common import config, utils
+from src.routine.routine import routine
 from src.common.usb import USB
 from src.common.image_template import *
 from src.common.bot_notification import *
@@ -92,7 +93,7 @@ class Detector():
             mineral_type = MineralType.CRYSTAL
         if len(matches) > 0:
             notifier._notify(BotInfo.MINE_ACTIVE, info=mineral_type.value)
-            player_template = config.routine.role_template
+            player_template = routine.role_template
             player = utils.multi_match(
                 frame, player_template, threshold=0.9)
             if len(player) > 0:
@@ -118,13 +119,13 @@ class Detector():
                     player_pos[0] + round(dx_full / 15.0), player_pos[1] + round(dy_full / 15.0))
                 config.minal_pos = minal_pos
                 distances = list(
-                    map(distance_to_minal, config.routine.sequence))
+                    map(distance_to_minal, routine.sequence))
                 index = np.argmin(distances)
-                config.minal_closest_pos = config.routine[index].location
+                config.minal_closest_pos = routine[index].location
                 config.minal_active = True
 
     def check_skull(self, frame):
-        player_template = config.routine.role_template
+        player_template = routine.role_template
         player = utils.multi_match(
             frame, player_template, threshold=0.9)
         if len(player) == 0:

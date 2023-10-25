@@ -1,7 +1,6 @@
 import tkinter as tk
 from src.gui.interfaces import LabelFrame
-from src.common import config
-
+from src.routine.routine import routine
 
 class Details(LabelFrame):
     def __init__(self, parent, **kwargs):
@@ -43,7 +42,7 @@ class Details(LabelFrame):
 
         self.text.config(state=tk.NORMAL)
 
-        info = config.routine[index].info()
+        info = routine[index].info()
         self.name_var.set(info['name'])
         arr = []
         for key, value in info['vars'].items():

@@ -1,9 +1,8 @@
 import tkinter as tk
 
-from src.common import config
 from src.routine.components import Point
 from src.gui.interfaces import Frame
-
+from src.routine.routine import routine
 
 class Commands(Frame):
     def __init__(self, parent, **kwargs):
@@ -43,7 +42,7 @@ class Commands(Frame):
         if len(selections) > 0 and len(pt_selects) > 0:
             c_index = int(selections[0])
             pt_index = int(pt_selects[0])
-            routine.parent.editor.create_edit_ui(config.routine[pt_index].commands,
+            routine.parent.editor.create_edit_ui(routine[pt_index].commands,
                                                  c_index, self.update_obj)
         else:
             routine.parent.editor.reset()
@@ -54,7 +53,7 @@ class Commands(Frame):
             if len(pt_selects) > 0:
                 index = int(pt_selects[0])
                 new_kwargs = {k: v.get() for k, v in stringvars.items()}
-                config.routine.update_command(index, i, new_kwargs)
+                routine.update_command(index, i, new_kwargs)
             self.parent.parent.parent.editor.create_edit_ui(arr, i, self.update_obj)
         return f
 
@@ -63,7 +62,7 @@ class Commands(Frame):
         pt_selects = parent.components.listbox.curselection()
         if len(pt_selects) > 0:
             index = int(pt_selects[0])
-            obj = config.routine[index]
+            obj = routine[index]
             if isinstance(obj, Point):
                 parent.commands_var.set([c.id for c in obj.commands])
             else:
