@@ -6,11 +6,11 @@ from src.common.vkeys import key_down, key_up, press, releaseAll, press_acc
 from src.common.image_template import *
 from src.common.action_simulator import ActionSimulator
 from src.common.bot_notification import BotWarnning
-from src.modules.detector import MineralType
+# from src.modules.detector import MineralType
 from src.modules.capture import capture
 from src.modules.notifier import notifier
 from src.routine.components import *
-from src.routine.routine import routine
+# from src.routine.routine import routine
 from src.routine.layout import layout
 from src.detection import rune
 
@@ -449,65 +449,65 @@ class Mining(Command):
         Adjust(*config.minal_pos).execute()
         time.sleep(0.2)
 
-        mineral_template = MINAL_HEART_TEMPLATE
-        if config.mineral_type == MineralType.CRYSTAL:
-            mineral_template = MINAL_CRYSTAL_TEMPLATE
-        elif config.mineral_type == MineralType.HERB_YELLOW:
-            mineral_template = HERB_YELLOW_TEMPLATE
-        elif config.mineral_type == MineralType.HERB_PURPLE:
-            mineral_template = HERB_PURPLE_TEMPLATE
+        # mineral_template = MINAL_HEART_TEMPLATE
+        # if config.mineral_type == MineralType.CRYSTAL:
+        #     mineral_template = MINAL_CRYSTAL_TEMPLATE
+        # elif config.mineral_type == MineralType.HERB_YELLOW:
+        #     mineral_template = HERB_YELLOW_TEMPLATE
+        # elif config.mineral_type == MineralType.HERB_PURPLE:
+        #     mineral_template = HERB_PURPLE_TEMPLATE
 
-        frame = capture.frame
-        matches = utils.multi_match(frame, mineral_template)
-        player_template = routine.role_template
-        player = utils.multi_match(
-            frame, player_template, threshold=0.9)
-        if len(matches) > 0 and len(player) > 0:
-            player_x = player[0][0]
-            mineral_x = matches[0][0]
-            if config.mineral_type == MineralType.HERB_YELLOW or config.mineral_type == MineralType.HERB_PURPLE:
-                mineral_x -= 18
-            if mineral_x > player_x:
-                if config.player_direction == 'left':
-                    press('right')
-                if mineral_x - player_x >= 50:
-                    press('right', (mineral_x - player_x)//50)
-            elif mineral_x < player_x:
-                if config.player_direction == 'right':
-                    press('left')
-                if player_x - mineral_x >= 50:
-                    press('left', (player_x - mineral_x)//50)
-            else:
-                if config.player_direction == 'right':
-                    press('right')
-                    press('left')
-                else:
-                    press('left')
-                    press('right')
-        else:
-            if config.player_direction == 'right':
-                press('right', 2)
-                press('left')
-            else:
-                press('left', 2)
-                press('right')
-        time.sleep(0.3)
+        # frame = capture.frame
+        # matches = utils.multi_match(frame, mineral_template)
+        # player_template = routine.role_template
+        # player = utils.multi_match(
+        #     frame, player_template, threshold=0.9)
+        # if len(matches) > 0 and len(player) > 0:
+        #     player_x = player[0][0]
+        #     mineral_x = matches[0][0]
+        #     if config.mineral_type == MineralType.HERB_YELLOW or config.mineral_type == MineralType.HERB_PURPLE:
+        #         mineral_x -= 18
+        #     if mineral_x > player_x:
+        #         if config.player_direction == 'left':
+        #             press('right')
+        #         if mineral_x - player_x >= 50:
+        #             press('right', (mineral_x - player_x)//50)
+        #     elif mineral_x < player_x:
+        #         if config.player_direction == 'right':
+        #             press('left')
+        #         if player_x - mineral_x >= 50:
+        #             press('left', (player_x - mineral_x)//50)
+        #     else:
+        #         if config.player_direction == 'right':
+        #             press('right')
+        #             press('left')
+        #         else:
+        #             press('left')
+        #             press('right')
+        # else:
+        #     if config.player_direction == 'right':
+        #         press('right', 2)
+        #         press('left')
+        #     else:
+        #         press('left', 2)
+        #         press('right')
+        # time.sleep(0.3)
 
-        # Inherited from Configurable
-        press('space', 1, down_time=0.2, up_time=0.8)
+        # # Inherited from Configurable
+        # press('space', 1, down_time=0.2, up_time=0.8)
 
-        print('\n mining:')
-        frame = capture.frame
-        solution = rune.show_magic(frame)
-        if solution is not None:
-            print(', '.join(solution))
-            print('Solution found, entering result')
-            for arrow in solution:
-                press(arrow, 1, down_time=0.1)
-        time.sleep(3.5)
-        config.minal_active = False
-        config.minal_pos = None
-        config.minal_closest_pos = None
+        # print('\n mining:')
+        # frame = capture.frame
+        # solution = rune.show_magic(frame)
+        # if solution is not None:
+        #     print(', '.join(solution))
+        #     print('Solution found, entering result')
+        #     for arrow in solution:
+        #         press(arrow, 1, down_time=0.1)
+        # time.sleep(3.5)
+        # config.minal_active = False
+        # config.minal_pos = None
+        # config.minal_closest_pos = None
 
 
 class MobType(Enum):
@@ -541,44 +541,44 @@ class Detect_Mobs(Command):
         if frame is None or minimap is None:
             return []
 
-        match (self.type):
-            case (MobType.BOSS):
-                mob_templates = routine.boss_template
-            case (MobType.ELITE):
-                mob_templates = routine.elite_template
-            case (_):
-                mob_templates = routine.mob_template
+        # match (self.type):
+        #     case (MobType.BOSS):
+        #         mob_templates = routine.boss_template
+        #     case (MobType.ELITE):
+        #         mob_templates = routine.elite_template
+        #     case (_):
+        #         mob_templates = routine.mob_template
 
-        if len(mob_templates) == 0:
-            raise ValueError(f"Miss {self.type.value} template")
+        # if len(mob_templates) == 0:
+        #     raise ValueError(f"Miss {self.type.value} template")
 
-        if routine.role_template is None:
-            raise ValueError('Miss Role template')
+        # if routine.role_template is None:
+        #     raise ValueError('Miss Role template')
 
-        player_match = utils.multi_match(
-            capture.frame, routine.role_template, threshold=0.9)
-        if len(player_match) == 0:
-            # print("lost player")
-            if self.type != MobType.NORMAL or abs(self.left) <= 300 and abs(self.right) <= 300:
-                return []
-            else:
-                crop = frame[50:-100,]
-        else:
-            player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
-            y_start = max(0, player_pos[1]-self.top)
-            x_start = max(0, player_pos[0]-self.left)
-            crop = frame[y_start:player_pos[1]+self.bottom,
-                         x_start:player_pos[0]+self.right]
+        # player_match = utils.multi_match(
+        #     capture.frame, routine.role_template, threshold=0.9)
+        # if len(player_match) == 0:
+        #     # print("lost player")
+        #     if self.type != MobType.NORMAL or abs(self.left) <= 300 and abs(self.right) <= 300:
+        #         return []
+        #     else:
+        #         crop = frame[50:-100,]
+        # else:
+        #     player_pos = (player_match[0][0] - 5, player_match[0][1] - 55)
+        #     y_start = max(0, player_pos[1]-self.top)
+        #     x_start = max(0, player_pos[0]-self.left)
+        #     crop = frame[y_start:player_pos[1]+self.bottom,
+        #                  x_start:player_pos[0]+self.right]
 
-        mobs = []
-        for mob_template in mob_templates:
-            mobs_tmp = utils.multi_match(
-                crop, mob_template, threshold=0.98, debug=self.debug)
-            if len(mobs_tmp) > 0:
-                for mob in mobs_tmp:
-                    mobs.append(mob)
+        # mobs = []
+        # for mob_template in mob_templates:
+        #     mobs_tmp = utils.multi_match(
+        #         crop, mob_template, threshold=0.98, debug=self.debug)
+        #     if len(mobs_tmp) > 0:
+        #         for mob in mobs_tmp:
+        #             mobs.append(mob)
 
-        return mobs
+        # return mobs
 
 #############################
 #      Shared Functions     #
@@ -609,16 +609,18 @@ def sleep_before_y(target_y, tolorance=0):
 
 
 def direction_changed() -> bool:
-    if config.player_direction == 'left':
-        return abs(routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
-    else:
-        return abs(routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+    return False
+    # if config.player_direction == 'left':
+    #     return abs(routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+    # else:
+    #     return abs(routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
 
 
 def edge_reached() -> bool:
-    if abs(routine.guard_point_l[1] - config.player_pos[1]) > 1:
-        return
-    if config.player_direction == 'left':
-        return abs(routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
-    else:
-        return abs(routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+    return False
+    # if abs(routine.guard_point_l[1] - config.player_pos[1]) > 1:
+    #     return
+    # if config.player_direction == 'left':
+    #     return abs(routine.guard_point_l[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance
+    # else:
+    #     return abs(routine.guard_point_r[0] - config.player_pos[0]) <= 1.3 * settings.move_tolerance

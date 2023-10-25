@@ -2,8 +2,6 @@
 
 import time
 from src.common import config, utils, settings
-from src.routine.routine import routine
-from src.command_book.command_book import command_book
 
 #################################
 #       Routine Components      #
@@ -103,12 +101,6 @@ class Point(Component):
             
             
     def _main(self):
-        move = command_book['move']
-        move(*self.location).execute()
-        if self.adjust:
-            # TODO: adjust using step('up')?
-            adjust = command_book['adjust']
-            adjust(*self.location).execute()
         for command in self.commands:
             command.execute()
             
@@ -134,8 +126,8 @@ class Label(Component):
     def __init__(self, label):
         super().__init__(locals())
         self.label = str(label)
-        if self.label in routine.labels:
-            raise ValueError
+        # if self.label in routine.labels:
+        #     raise ValueError
         self.links = set()
         self.index = None
 
@@ -152,7 +144,7 @@ class Label(Component):
 
     def __delete__(self, instance):
         del self.links
-        routine.labels.pop(self.label)
+        # routine.labels.pop(self.label)
 
     def __str__(self):
         return f'{self.label}:'
@@ -174,8 +166,8 @@ class Jump(Component):
         if self.link is None:
             print(f"\n[!] Label '{self.label}' does not exist.")
         else:
-            if self.counter == 0:
-                routine.index = self.link.index
+            # if self.counter == 0:
+            #     routine.index = self.link.index
             self._increment_counter()
 
     @utils.run_if_enabled
@@ -189,10 +181,10 @@ class Jump(Component):
         :return:    Whether the binding was successful
         """
 
-        if self.label in routine.labels:
-            self.link = routine.labels[self.label]
-            self.link.links.add(self)
-            return True
+        # if self.label in routine.labels:
+        #     self.link = routine.labels[self.label]
+        #     self.link.links.add(self)
+        #     return True
         return False
 
     def __delete__(self, instance):

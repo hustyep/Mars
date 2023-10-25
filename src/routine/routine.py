@@ -4,7 +4,7 @@ import csv
 import cv2
 from os.path import splitext, basename
 
-from src.common import config, settings, utils
+from src.common import settings, utils
 from src.routine.components import Point, Label, Jump, Setting, SYMBOLS
 from src.routine.commands import Command
 from src.routine.layout import layout

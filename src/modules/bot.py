@@ -65,6 +65,10 @@ class Bot(Configurable, Observer):
                 # current element
                 element = routine[routine.index]
                 
+                # Highlight the current Point
+                gui.view.routine.select(routine.index)
+                gui.view.details.display_info(routine.index)
+                
                 # feed pets
                 pet_settings = gui.settings.pets
                 auto_feed = pet_settings.auto_feed.get()
@@ -74,20 +78,15 @@ class Bot(Configurable, Observer):
                     press(self.config['Feed pet'], 1)
                     last_fed = now
 
-                # Use Buff and Potion
+                # Use Buff and Potion then move to the point
                 if isinstance(element, Point):
-                    if config.player_direction == 'left' and element.location == routine.guard_point_l:
-                        pass
-                    elif  config.player_direction == 'right' and element.location == routine.guard_point_r:
-                        pass
-                    else:
-                        # print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{routine.guard_point_l}, guard_point_r:{routine.guard_point_r}")
-                        command_book.potion.main()
-                        command_book.buff.main()
-
-                # Highlight the current Point
-                gui.view.routine.select(routine.index)
-                gui.view.details.display_info(routine.index)
+                    # print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{routine.guard_point_l}, guard_point_r:{routine.guard_point_r}")
+                    command_book.potion.execute()
+                    command_book.buff.execute()
+                    
+                    command_book.move(*element.location).execute()
+                    if element.adjust:
+                        command_book.adjust(*element.location).execute()
 
                 # Execute next Point in the routine
                 element.execute()

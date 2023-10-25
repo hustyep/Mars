@@ -8,7 +8,7 @@ from src.common.interfaces import Configurable
 from src.common import config, utils
 from datetime import datetime
 from src.modules.capture import capture
-from src.modules.notifier import notifier
+# from src.modules.notifier import notifier
 from src.modules.gui import gui
 
 class Listener(Configurable):
@@ -72,7 +72,7 @@ class Listener(Configurable):
         """Resumes or pauses the current routine. Plays a sound to notify the user."""
 
         config.rune_pos = None
-        notifier.notice_time_record.clear()
+        # notifier.notice_time_record.clear()
 
         if not config.enabled:
             Listener.recalibrate_minimap()      # Recalibrate only when being enabled.

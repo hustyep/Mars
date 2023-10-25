@@ -5,7 +5,7 @@ import traceback
 from os.path import basename, splitext
 from src.common import utils
 from src.common.interfaces import Configurable
-from src.routine.routine import routine
+# from src.routine.routine import routine
 from src.routine import commands
 from src.modules.gui import gui
 
@@ -17,6 +17,10 @@ class CommandBook(Configurable):
         self.name = ''
         self.buff = commands.Buff()
         self.potion = commands.Potion()
+        self.move = commands.Move
+        self.adjust = commands.Adjust
+        self.adjustx = commands.AdjustX
+        
         self.DEFAULT_CONFIG = {}
         self.dict = None
         self.module = None
@@ -105,12 +109,15 @@ class CommandBook(Configurable):
         if required_found and (step_found or movement_found):
             self.buff = new_cb['buff']()
             self.potion = new_cb["potion"]()
+            self.move = new_cb["move"]
+            self.adjust = new_cb["adjust"]
+            self.adjustx = new_cb["adjustx"]
             commands.step = new_step
             commands.MoveUp = new_cb['moveup']
             commands.MoveDown = new_cb['movedown']
             gui.menu.file.enable_routine_state()
             gui.view.status.set_cb(basename(file))
-            routine.clear()
+            # routine.clear()
             print(f" ~  Successfully loaded command book '{self.name}'")
             return new_cb, module
         else:
