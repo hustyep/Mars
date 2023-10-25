@@ -365,11 +365,8 @@ class Bot(Configurable, Observer):
             chat_bot.voice_call()
 
         elif isinstance(event_type, BotError):
+            chat_bot.voice_call()
             match (event_type):
-                case BotError.NO_MOVEMENT:
-                    ActionSimulator.jump_down()
-                case BotError.RUNE_ERROR:
-                    ActionSimulator.go_home()
                 case BotError.OTHERS_STAY_OVER_120S:
                     ActionSimulator.go_home()
                 case (_):
@@ -377,6 +374,8 @@ class Bot(Configurable, Observer):
             # end match
         elif isinstance(event_type, BotWarnning):
             match event_type:
+                case BotWarnning.NO_MOVEMENT:
+                    ActionSimulator.jump_down()
                 case BotWarnning.OTHERS_STAY_OVER_30S:
                     words = ['cc plz', 'cc plz ', ' cc plz']
                     random_word = random.choice(words)

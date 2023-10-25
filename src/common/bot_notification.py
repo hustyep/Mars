@@ -10,8 +10,6 @@ class BotError(Enum):
     LOST_PLAYER = 'Lost Player'
     LOST_WINDOW = 'Lost Window'
     LOST_MINI_MAP = 'Lost Minimap'
-    NO_MOVEMENT = 'No Movement'
-    RUNE_ERROR = 'Rune Error'
     OTHERS_STAY_OVER_120S = 'Someone stay over 120s'
         
 class BotWarnning(Enum):
@@ -21,6 +19,8 @@ class BotWarnning(Enum):
     OTHERS_STAY_OVER_30S = 'Someone stay over 30s'
     OTHERS_STAY_OVER_60S = 'Someone stay over 60s'
     BINDED = 'Binded'
+    NO_MOVEMENT = 'No Movement'
+    RUNE_ERROR = 'Rune Error'
 
 class BotInfo(Enum):
     RUNE_ACTIVE = 'Rune Active'
