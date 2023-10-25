@@ -220,7 +220,7 @@ class JumpUp(Command):
         time.sleep(0.06 if self.dy >= 20 else 0.1)
         press(Key.FLASH_JUMP, 1)
         key_up('up')
-        sleep_while_move_y(interval=0.05, n=10)
+        sleep_while_move_y(interval=0.05, n=15)
         # time.sleep(1.5)
 
 

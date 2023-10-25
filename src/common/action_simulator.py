@@ -61,7 +61,7 @@ class ActionSimulator:
         ActionSimulator.press_key('left', 0.1)
         ActionSimulator.click_key('s', 0.5)
         ActionSimulator.click_key('s', 0.5)
-        ActionSimulator.release_key('s', 0.5)
+        ActionSimulator.release_key('left', 0.5)
         config.enabled = True
 
     @staticmethod
