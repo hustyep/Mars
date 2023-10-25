@@ -19,6 +19,7 @@ from src.modules.notifier import notifier
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
 from src.modules.detector import MineralType
+from src.modules.listener import listener
 from src.modules.gui import gui
 
 
@@ -61,7 +62,7 @@ class Bot(Configurable, Observer):
         """
 
         self.ready = True
-        config.listener.enabled = True
+        listener.enabled = True
         last_fed = 0
         while True:
             if config.enabled and len(routine) > 0:

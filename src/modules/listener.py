@@ -23,8 +23,6 @@ class Listener(Configurable):
         """Initializes this Listener object's main thread."""
 
         super().__init__('controls')
-        config.listener = self
-
         self.enabled = False
         self.ready = False
         self.block_time = 0

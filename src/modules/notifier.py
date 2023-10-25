@@ -21,6 +21,7 @@ from src.common.image_template import *
 from src.common.bot_notification import *
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
+from src.modules.listener import listener
 from src.routine.routine import routine
 from src.routine.components import Point
 
@@ -342,15 +343,15 @@ class Notifier(Subject, Observer):
         once the key bound to 'Start/stop' is pressed.
         """
         config.enabled = False
-        config.listener.enabled = False
+        listener.enabled = False
         self.mixer.load(get_alert_path(name))
         self.mixer.set_volume(volume)
         self.mixer.play(-1)
-        while not kb.is_pressed(config.listener.config['Start/stop']):
+        while not kb.is_pressed(listener.config['Start/stop']):
             time.sleep(0.1)
         self.mixer.stop()
         time.sleep(2)
-        config.listener.enabled = True
+        listener.enabled = True
 
     def _ping(self, name, volume=0.5):
         """A quick notification for non-dangerous events."""

@@ -10,6 +10,7 @@ from src.gui.settings.notification import Notification
 from src.gui.interfaces import Tab, Frame
 from src.common import config
 from src.modules.bot import bot
+from src.modules.listener import listener
 
 class Settings(Tab):
     def __init__(self, parent, **kwargs):
@@ -34,7 +35,7 @@ class Settings(Tab):
 
         self.column2 = Frame(self)
         self.column2.grid(row=0, column=2, sticky=tk.N, padx=10, pady=10)
-        self.controls = KeyBindings(self.column2, 'Mars Controls', config.listener)
+        self.controls = KeyBindings(self.column2, 'Mars Controls', listener)
         self.controls.pack(side=tk.TOP, fill='x', expand=True)
         self.class_bindings = KeyBindings(self.column2, f'No Command Book Selected', None)
         self.class_bindings.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
