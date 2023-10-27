@@ -20,8 +20,8 @@ from src.detection import rune
 class DefaultKeybindings:
     INTERACT = 'space'
     FEED_PET = 'L'
-    # Change_Channel = 'PageDn'
-    # Attack = 'insert'
+    Change_Channel = 'PageDn'
+    Attack = 'insert'
     JUMP = 's'
     FLASH_JUMP = ';'
     ROPE_LIFT = 'b'

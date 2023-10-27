@@ -8,7 +8,7 @@ import keyboard as kb
 from src.common.interfaces import Configurable, Subject
 from src.common import config, utils
 from src.modules.capture import capture
-from src.modules.notifier import notifier
+# from src.modules.notifier import notifier
 from src.routine.routine import routine
 
 class Listener(Configurable, Subject):
@@ -28,6 +28,7 @@ class Listener(Configurable, Subject):
         self.block_time = 0
         self.thread = threading.Thread(target=self._main)
         self.thread.daemon = True
+        self._observers = []
 
     def start(self):
         """
@@ -72,7 +73,7 @@ class Listener(Configurable, Subject):
         """Resumes or pauses the current routine. Plays a sound to notify the user."""
 
         config.rune_pos = None
-        notifier.notice_time_record.clear()
+        # notifier.notice_time_record.clear()
 
         if not config.enabled:
             Listener.recalibrate_minimap()      # Recalibrate only when being enabled.

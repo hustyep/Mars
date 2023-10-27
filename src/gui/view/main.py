@@ -10,7 +10,7 @@ from src.gui.interfaces import Tab
 
 class View(Tab):
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, 'View', **kwargs)
+        super().__init__(parent, 'View')
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(3, weight=1)
@@ -24,5 +24,5 @@ class View(Tab):
         self.details = Details(self)
         self.details.grid(row=2, column=2, sticky=tk.NSEW, padx=10, pady=10)
 
-        self.routine = Routine(self)
+        self.routine = Routine(self, routine_var=kwargs['routine_var'])
         self.routine.grid(row=0, column=1, rowspan=3, sticky=tk.NSEW, padx=10, pady=10)

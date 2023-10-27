@@ -69,6 +69,8 @@ class Configurable:
             self.save_config()
 
     def save_config(self):
+        if not self.TARGET:
+            return
         path = os.path.join(self.DIRECTORY, self.TARGET)
         directory = os.path.dirname(path)
         if not os.path.exists(directory):

@@ -7,6 +7,7 @@ from src.common import utils, config
 from src.common.usb import USB
 from src.common.image_template import *
 from src.modules.capture import capture
+from src.routine.commands import Keybindings
 import threading
 
 
@@ -134,10 +135,8 @@ class ActionSimulator:
 
     @staticmethod
     def _change_channel(num: int = 0, enable=True) -> None:
-        key_settings = config.global_keys
-        change_key = key_settings['Change channel']
 
-        ActionSimulator.click_key(change_key)
+        ActionSimulator.click_key(Keybindings.Change_Channel)
 
         if num > 0:
             item_width = 50

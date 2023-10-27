@@ -22,6 +22,8 @@ class CommandBook(Configurable, Subject):
         self.DEFAULT_CONFIG = {}
         self.dict = None
         self.module = None
+        
+        self._observers = []
         super().__init__(self.name, directory=CB_KEYBINDING_DIR)
         
     def load_commands(self, file):

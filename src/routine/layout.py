@@ -298,4 +298,4 @@ def get_layouts_dir():
     return os.path.join(config.RESOURCES_DIR, 'layouts', config.class_name)
 
 
-layout = Layout()
+layout = Layout('')

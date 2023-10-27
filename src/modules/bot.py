@@ -27,7 +27,6 @@ class Bot(Observer, Subject):
         """Loads a user-defined routine on start up and initializes this Bot's main thread."""
 
         super().__init__()
-        config.global_keys = self.config
         notifier.attach(self)
 
         self.submodules = []

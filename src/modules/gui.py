@@ -44,8 +44,8 @@ class GUI(Observer):
 
         self.navigation = ttk.Notebook(self.root)
 
-        self.view = View(self.navigation)
-        self.edit = Edit(self.navigation)
+        self.view = View(self.navigation, routine_var=self.routine_var)
+        self.edit = Edit(self.navigation, routine_var=self.routine_var, curr_cb=self.view.status.curr_cb)
         self.settings = Settings(self.navigation)
         self.macro = Macros(self.navigation)
 
@@ -141,8 +141,6 @@ class GUI(Observer):
                 case 'record':
                     self.edit.record.add_entry(args[2], args[1])
 
-            
-gui = GUI()
 
 if __name__ == '__main__':
     gui = GUI()

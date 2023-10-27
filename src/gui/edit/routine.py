@@ -7,7 +7,7 @@ from src.gui.interfaces import LabelFrame, Frame
 
 class Routine(LabelFrame):
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, 'Routine', **kwargs)
+        super().__init__(parent, 'Routine')
 
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
@@ -16,7 +16,7 @@ class Routine(LabelFrame):
         self.list_frame.grid(row=0, column=0, sticky=tk.NSEW)
         self.list_frame.rowconfigure(0, weight=1)
 
-        self.components = Components(self.list_frame)
+        self.components = Components(self.list_frame, routine_var=kwargs['routine_var'])
         self.components.grid(row=0, column=0, sticky=tk.NSEW)
 
         self.commands_var = tk.StringVar()
