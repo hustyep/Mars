@@ -16,9 +16,9 @@ from enum import Enum
 
 from src.common import config, utils
 from src.common.usb import USB
-from src.common.common import Subject, Observer
+from src.common.interfaces import Subject, Observer
 from src.common.image_template import *
-from src.common.bot_notification import *
+from src.common.constants import *
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
 from src.modules.listener import listener

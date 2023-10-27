@@ -2,21 +2,23 @@
 
 # import aircv as ac
 import time
-from PIL import ImageChops, Image
 import math
 import queue
-import cv2
-import threading
-import numpy as np
-from random import random
-from mss import mss
 import os
+import threading
+from datetime import datetime, timedelta
+from random import random
+
+import cv2
+import numpy as np
 import pytesseract as tess
 import win32gui
 import win32ui
 import win32con
 import win32api
-from datetime import datetime, timedelta
+from PIL import ImageChops, Image
+from mss import mss
+
 from src.common import config, settings
 
 def run_if_enabled(function):

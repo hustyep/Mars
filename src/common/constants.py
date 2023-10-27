@@ -1,5 +1,8 @@
 from enum import Enum, auto
 
+################################
+#       Bot Notification       #
+################################
 class BotFatal(Enum):
     WHITE_ROOM = 'White Room'
     CRASH = 'Crash'
@@ -34,3 +37,12 @@ class BotDebug(Enum):
     SCREENSHOT_FAILED = 'Screenshot Failed'
     CALIBRATED = auto()
     PLAYER_LOCATION_UPDATE = auto()
+
+#############################
+#       Mineral Type        #
+#############################
+class MineralType(Enum):
+    HEART = 'heart mineral'
+    CRYSTAL = 'crystal mineral'
+    HERB_YELLOW = 'yellow herb'
+    HERB_PURPLE = 'purple herb'

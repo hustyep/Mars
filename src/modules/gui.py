@@ -4,12 +4,17 @@ import time
 import threading
 import tkinter as tk
 from tkinter import ttk
-from src.common import settings
+from os.path import basename
 from src.gui import Menu, View, Edit, Settings, Macros
+from src.common import settings
+from src.common.interfaces import Observer, Subject
 from src.routine.layout import layout
+from src.routine.routine import routine
+from src.modules.bot import bot
+from src.modules.listener import listener
+from src.command_book.command_book import command_book
 
-
-class GUI:
+class GUI(Observer):
     DISPLAY_FRAME_RATE = 30
     RESOLUTIONS = {
         'DEFAULT': '800x800',
@@ -17,6 +22,12 @@ class GUI:
     }
 
     def __init__(self):
+        super().__init__()
+        bot.attach(self)
+        command_book.attach(self)
+        routine.attach(self)
+        listener.attach(self)
+        
         self.root = tk.Tk()
         self.root.title('Mars')
         icon = tk.PhotoImage(file='assets/icon.png')
@@ -98,7 +109,39 @@ class GUI:
             if layout is not None and settings.record_layout:
                 layout.save()
             time.sleep(5)
+            
+    def update(self, subject: Subject, *args, **kwargs) -> None:
+        if subject == bot:
+            type = args[0]
+            if type == 'notify_level':
+                self.settings.notification.notice_level.set(args[1])
+                self.settings.notification.notification_settings.save_config()
+            else:
+                index = args[1]
+                self.view.routine.select(index)
+                self.view.details.display_info(index)
+        elif subject == command_book:
+            self.settings.update_class_bindings()
+            self.menu.file.enable_routine_state()
+            self.view.status.set_cb(command_book.name)
+        elif subject == routine:
+            match (args[0]):
+                case 'clear':
+                    self.clear_routine_info()
+                case 'update':
+                    self.set_routine(routine.display)
+                    self.view.details.update_details()
+                case 'load':
+                    self.view.status.set_routine(basename(routine.path))
+                    self.edit.minimap.draw_default()
+        elif subject == listener:
+            match (args[0]):
+                case 'recalibrated':
+                    self.edit.minimap.redraw()
+                case 'record':
+                    self.edit.record.add_entry(args[2], args[1])
 
+            
 gui = GUI()
 
 if __name__ == '__main__':

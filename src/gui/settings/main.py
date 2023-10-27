@@ -8,13 +8,14 @@ from src.gui.settings.buffs import Buffs
 from src.gui.settings.auto import Auto
 from src.gui.settings.notification import Notification
 from src.gui.interfaces import Tab, Frame
-from src.modules.bot import bot
 from src.modules.listener import listener
 from src.command_book.command_book import command_book
+from src.common import config
 
 class Settings(Tab):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, 'Settings', **kwargs)
+        config.gui_settings = self
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(3, weight=1)
@@ -39,8 +40,8 @@ class Settings(Tab):
         self.controls.pack(side=tk.TOP, fill='x', expand=True)
         self.class_bindings = KeyBindings(self.column2, f'No Command Book Selected', None)
         self.class_bindings.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
-        self.common_bindings = KeyBindings(self.column2, 'In-game Keybindings', bot)
-        self.common_bindings.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
+        # self.common_bindings = KeyBindings(self.column2, 'In-game Keybindings', bot)
+        # self.common_bindings.pack(side=tk.TOP, fill='x', expand=True, pady=(10, 0))
         
     def update_class_bindings(self):
         self.class_bindings.destroy()

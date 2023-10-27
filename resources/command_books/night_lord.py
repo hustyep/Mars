@@ -1,15 +1,13 @@
 """A collection of all commands that Night Lord can use to interact with the game. 	"""
 
-from src.common import config, settings, utils
 import time
 
-from src.common.vkeys import press, key_down, key_up, releaseAll, press_acc
+from src.common import config, settings, utils
+from src.common.vkeys import *
 from src.routine.commands import *
-from src.routine.components import *
-from src.modules.gui import gui
 
 # List of key mappings
-class Key:
+class Keybindings:
     # Movement
     JUMP = 's'
     FLASH_JUMP = ';'
@@ -75,7 +73,7 @@ def step(direction, target):
         if d_y > settings.move_tolerance:
             print(f"step_down: {d_y}")
             key_down('down')
-            press_acc(Key.JUMP, 1, down_time=0.2, up_time=0.08)
+            press_acc(Keybindings.JUMP, 1, down_time=0.2, up_time=0.08)
             key_up('down')
             time.sleep(0.6)
         return
@@ -118,12 +116,12 @@ class HitAndRun(Command):
                         break
                     time.sleep(0.1)
                 key_down(self.direction)                
-            press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
-            press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
+            press(Keybindings.JUMP, 1, down_time=0.04, up_time=0.05)
+            press(Keybindings.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
             ShowDown().execute()
         else:
-            press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
-            press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
+            press(Keybindings.JUMP, 1, down_time=0.04, up_time=0.05)
+            press(Keybindings.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
             ShowDown().execute()
 
 #########################
@@ -137,7 +135,7 @@ class MoveUp(Command):
 
     def main(self):
         if self.dy <= 6:
-            press(Key.JUMP)
+            press(Keybindings.JUMP)
         if self.dy <= 18:
             ShadowLeap(True if self.dy > 15 else False).execute()
         else:
@@ -151,7 +149,7 @@ class MoveDown(Command):
 
     def main(self):
         key_down('down')
-        press(Key.JUMP, 2, down_time=0.1, up_time=0.1)
+        press(Keybindings.JUMP, 2, down_time=0.1, up_time=0.1)
         key_up('down')
         time.sleep(1 if self.dy >= 15 else 0.7)
 
@@ -168,15 +166,15 @@ class FlashJump(Command):
     def main(self):
         key_down(self.direction)
         time.sleep(0.1)
-        press(Key.JUMP, 1, down_time=0.04, up_time=0.05)
-        press(Key.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
+        press(Keybindings.JUMP, 1, down_time=0.04, up_time=0.05)
+        press(Keybindings.FLASH_JUMP, 1, down_time=0.04, up_time=0.05)
         key_up(self.direction)
         time.sleep(0.5)
 
 
 # 上跳
 class ShadowLeap(Command):
-    key = Key.SHADOW_LEAP
+    key = Keybindings.SHADOW_LEAP
     precast = 0.5
     backswing = 0.9
 
@@ -187,14 +185,14 @@ class ShadowLeap(Command):
     def main(self):
         time.sleep(self.__class__.precast)
         if self.jump:
-            press_acc(Key.JUMP, down_time=0.05, up_time=0.06)
+            press_acc(Keybindings.JUMP, down_time=0.05, up_time=0.06)
 
         press_acc(self.__class__.key, up_time=self.__class__.backswing)
 
 
 # 水平位移
 class ShadowSurge(Command):
-    key = Key.SHADOW_SURGE
+    key = Keybindings.SHADOW_SURGE
     cooldown = 5
     precast = 0
     backswing = 0.2
@@ -202,7 +200,7 @@ class ShadowSurge(Command):
 
 # 绳索
 class RopeLift(Command):
-    key = Key.ROPE_LIFT
+    key = Keybindings.ROPE_LIFT
     cooldown = 3
 
     def __init__(self, dy: int = 20):
@@ -211,9 +209,9 @@ class RopeLift(Command):
 
     def main(self):
         if self.dy >= 45:
-            press(Key.JUMP, up_time=0.2)
+            press(Keybindings.JUMP, up_time=0.2)
         elif self.dy >= 32:
-            press(Key.JUMP, up_time=0.1)
+            press(Keybindings.JUMP, up_time=0.1)
         press_acc(self.__class__.key, up_time=self.dy * 0.07)
         if self.dy >= 32:
             time.sleep((self.dy - 32) * 0.05)
@@ -247,7 +245,7 @@ class DarkFlare(Command):
                 press('left', 1, down_time=0.1, up_time=0.05)
             else:
                 press('right', 1, down_time=0.1, up_time=0.05)
-        press(Key.DARK_FLARE, 2, up_time=self.__class__.backswing)
+        press(Keybindings.DARK_FLARE, 2, up_time=self.__class__.backswing)
 
 
 class ErdaShower(Command):
@@ -269,7 +267,7 @@ class ErdaShower(Command):
         if self.direction:
             press(self.direction, 1, down_time=0.05, up_time=0.05)
         key_down('down')
-        press(Key.ERDA_SHOWER, 1, up_time=self.__class__.backswing)
+        press(Keybindings.ERDA_SHOWER, 1, up_time=self.__class__.backswing)
         key_up('down')
 
 
@@ -279,7 +277,7 @@ class ErdaShower(Command):
 
 
 class ShowDown(Command):
-    key = Key.SHOW_DOWN
+    key = Keybindings.SHOW_DOWN
     backswing = 0.57
 
     def main(self):
@@ -289,25 +287,25 @@ class ShowDown(Command):
 
 
 class SuddenRaid(Command):
-    key = Key.SUDDEN_RAID
+    key = Keybindings.SUDDEN_RAID
     cooldown = 30
     backswing = 0.7
 
 
 class Omen(Command):
-    key = Key.OMEN
+    key = Keybindings.OMEN
     cooldown = 60
     backswing = 0.8
 
 
 class Arachnid(Command):
-    key = Key.ARACHNID
+    key = Keybindings.ARACHNID
     cooldown = 250
     backswing = 0.9
 
 
 class SHURIKEN(Command):
-    key = Key.SHURIKEN
+    key = Keybindings.SHURIKEN
     cooldown = 20
     backswing = 0.8
 
@@ -354,54 +352,54 @@ class Buff(Command):
 
 
 class GODDESS_BLESSING(Command):
-    key = Key.GODDESS_BLESSING
+    key = Keybindings.GODDESS_BLESSING
     cooldown = 180
     backswing = 0.75
 
 
 class LAST_RESORT(Command):
-    key = Key.LAST_RESORT
+    key = Keybindings.LAST_RESORT
     cooldown = 75
     backswing = 0.75
 
 
 class EPIC_ADVENTURE(Command):
-    key = Key.EPIC_ADVENTURE
+    key = Keybindings.EPIC_ADVENTURE
     cooldown = 120
     backswing = 0.75
 
 
 class MEMORIES(Command):
-    key = Key.MEMORIES
+    key = Keybindings.MEMORIES
     cooldown = 150
     backswing = 1
 
 
 class MAPLE_WARRIOR(Command):
-    key = Key.MAPLE_WARRIOR
+    key = Keybindings.MAPLE_WARRIOR
     cooldown = 900
     backswing = 0.75
 
 
 class SHADOW_WALKER(Command):
-    key = Key.SHADOW_WALKER
+    key = Keybindings.SHADOW_WALKER
     cooldown = 190
     backswing = 0.8
 
 
 class THROW_BLASTING(Command):
-    key = Key.THROW_BLASTING
+    key = Keybindings.THROW_BLASTING
     cooldown = 180
     backswing = 0.8
 
 
 class FOR_THE_GUILD(Command):
-    key = Key.FOR_THE_GUILD
+    key = Keybindings.FOR_THE_GUILD
     cooldown = 3610
     backswing = 0.1
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Guild Buff')
+        enabled = config.gui_settings.buffs.buff_settings.get('Guild Buff')
         if not enabled:
             return False
 
@@ -412,12 +410,12 @@ class FOR_THE_GUILD(Command):
 
 
 class HARD_HITTER(Command):
-    key = Key.HARD_HITTER
+    key = Keybindings.HARD_HITTER
     cooldown = 3610
     backswing = 0.1
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Guild Buff')
+        enabled = config.gui_settings.buffs.buff_settings.get('Guild Buff')
         if not enabled:
             return False
 
@@ -456,84 +454,84 @@ class Potion(Command):
 
 
 class EXP_POTION(Command):
-    key = Key.EXP_POTION
+    key = Keybindings.EXP_POTION
     cooldown = 7250
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Exp Potion')
+        enabled = config.gui_settings.buffs.buff_settings.get('Exp Potion')
         if not enabled:
             return False
         return super().canUse(next_t)
 
 
 class WEALTH_POTION(Command):
-    key = Key.WEALTH_POTION
+    key = Keybindings.WEALTH_POTION
     cooldown = 7250
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Wealthy Potion')
+        enabled = config.gui_settings.buffs.buff_settings.get('Wealthy Potion')
         if not enabled:
             return False
         return super().canUse(next_t)
 
 
 class GOLD_POTION(Command):
-    key = Key.GOLD_POTION
+    key = Keybindings.GOLD_POTION
     cooldown = 1800
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Gold Potion')
+        enabled = config.gui_settings.buffs.buff_settings.get('Gold Potion')
         if not enabled:
             return False
         return super().canUse(next_t)
 
 
 class GUILD_POTION(Command):
-    key = Key.GUILD_POTION
+    key = Keybindings.GUILD_POTION
     cooldown = 1800
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Guild Potion')
+        enabled = config.gui_settings.buffs.buff_settings.get('Guild Potion')
         if not enabled:
             return False
         return super().canUse(next_t)
 
 
 class CANDIED_APPLE(Command):
-    key = Key.CANDIED_APPLE
+    key = Keybindings.CANDIED_APPLE
     cooldown = 1800
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Candied Apple')
+        enabled = config.gui_settings.buffs.buff_settings.get('Candied Apple')
         if not enabled:
             return False
         return super().canUse(next_t)
 
 
 class LEGION_WEALTHY(Command):
-    key = Key.LEGION_WEALTHY
+    key = Keybindings.LEGION_WEALTHY
     cooldown = 1800
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Legion Wealthy')
+        enabled = config.gui_settings.buffs.buff_settings.get('Legion Wealthy')
         if not enabled:
             return False
         return super().canUse(next_t)
 
 
 class EXP_COUPON(Command):
-    key = Key.EXP_COUPON
+    key = Keybindings.EXP_COUPON
     cooldown = 1800
     backswing = 0
 
     def canUse(self, next_t: float = 0) -> bool:
-        enabled = gui.settings.buffs.buff_settings.get('Exp Coupon')
+        enabled = config.gui_settings.buffs.buff_settings.get('Exp Coupon')
         if not enabled:
             return False
         return super().canUse(next_t)

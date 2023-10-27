@@ -3,23 +3,15 @@
 import time
 import threading
 import numpy as np
-from enum import Enum
 
 from src.routine.components import Point
-from src.common import config, utils
 from src.routine.routine import routine
+from src.common import config, utils, settings
 from src.common.usb import USB
 from src.common.image_template import *
-from src.common.bot_notification import *
+from src.common.constants import *
 from src.modules.capture import capture
 from src.modules.notifier import notifier
-
-
-class MineralType(Enum):
-    HEART = 'heart mineral'
-    CRYSTAL = 'crystal mineral'
-    HERB_YELLOW = 'yellow herb'
-    HERB_PURPLE = 'purple herb'
 
 
 class Detector():
@@ -93,7 +85,7 @@ class Detector():
             mineral_type = MineralType.CRYSTAL
         if len(matches) > 0:
             notifier._notify(BotInfo.MINE_ACTIVE, info=mineral_type.value)
-            player_template = routine.role_template
+            player_template = settings.role_template
             player = utils.multi_match(
                 frame, player_template, threshold=0.9)
             if len(player) > 0:
@@ -125,7 +117,7 @@ class Detector():
                 config.minal_active = True
 
     def check_skull(self, frame):
-        player_template = routine.role_template
+        player_template = settings.role_template
         player = utils.multi_match(
             frame, player_template, threshold=0.9)
         if len(player) == 0:

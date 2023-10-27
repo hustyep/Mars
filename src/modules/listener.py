@@ -3,15 +3,15 @@
 import time
 import threading
 import winsound
-import keyboard as kb
-from src.common.interfaces import Configurable
-from src.common import config, utils
 from datetime import datetime
+import keyboard as kb
+from src.common.interfaces import Configurable, Subject
+from src.common import config, utils
 from src.modules.capture import capture
-# from src.modules.notifier import notifier
-from src.modules.gui import gui
+from src.modules.notifier import notifier
+from src.routine.routine import routine
 
-class Listener(Configurable):
+class Listener(Configurable, Subject):
     DEFAULT_CONFIG = {
         'Start/stop': 'tab',
         'Reload routine': 'page up',
@@ -50,9 +50,9 @@ class Listener(Configurable):
                 if len(self.config['Start/stop']) > 0 and kb.is_pressed(self.config['Start/stop']):
                     Listener.toggle_enabled()
                 elif len(self.config['Reload routine']) > 0 and kb.is_pressed(self.config['Reload routine']):
-                    Listener.reload_routine()
+                    self.reload_routine()
                 elif self.restricted_pressed('Record position'):
-                    Listener.record_position()
+                    self.record_position()
             time.sleep(0.01)
 
     def restricted_pressed(self, action):
@@ -72,7 +72,7 @@ class Listener(Configurable):
         """Resumes or pauses the current routine. Plays a sound to notify the user."""
 
         config.rune_pos = None
-        # notifier.notice_time_record.clear()
+        notifier.notice_time_record.clear()
 
         if not config.enabled:
             Listener.recalibrate_minimap()      # Recalibrate only when being enabled.
@@ -89,9 +89,8 @@ class Listener(Configurable):
         #     winsound.Beep(523, 333)     # C5
         time.sleep(0.267)
 
-    @staticmethod
-    def reload_routine():
-        Listener.recalibrate_minimap()
+    def reload_routine(self):
+        self.recalibrate_minimap()
 
         routine.load(routine.path)
 
@@ -99,18 +98,16 @@ class Listener(Configurable):
         winsound.Beep(659, 200)     # E5
         winsound.Beep(784, 200)     # G5
 
-    @staticmethod
-    def recalibrate_minimap():
+    def recalibrate_minimap(self):
         capture.calibrated = False
-        # while not capture.calibrated:
-        #     time.sleep(0.01)
-        # gui.edit.minimap.redraw()
+        while not capture.calibrated:
+            time.sleep(0.01)
+        self.notify('recalibrated')
 
-    @staticmethod
-    def record_position():
+    def record_position(self):
         pos = config.player_pos
         now = datetime.now().strftime('%I:%M:%S %p')
-        gui.edit.record.add_entry(now, pos)
+        self.notify('recored', pos, now)
         print(f'\n[~] Recorded position ({pos[0]}, {pos[1]}) at {now}')
         time.sleep(0.6)
 

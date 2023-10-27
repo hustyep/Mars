@@ -3,16 +3,14 @@ import inspect
 import importlib
 import traceback
 from os.path import basename, splitext
-from src.common import utils
-from src.common.interfaces import Configurable
-# from src.routine.routine import routine
+from src.common import config, utils
+from src.common.interfaces import Configurable, Subject
 from src.routine import commands
-from src.modules.gui import gui
 
 CB_KEYBINDING_DIR = os.path.join('resources', 'keybindings')
 
 
-class CommandBook(Configurable):
+class CommandBook(Configurable, Subject):
     def __init__(self):
         self.name = ''
         self.buff = commands.Buff()
@@ -28,10 +26,12 @@ class CommandBook(Configurable):
         
     def load_commands(self, file):
         self.name = splitext(basename(file))[0]
+        config.class_name = self.name
         result = self._load_commands(file)
         if result is None:
             raise ValueError(f"Invalid command book at '{file}'")
         self.dict, self.module = result
+        self.notify()
         
     def _load_commands(self, file):
         """Prompts the user to select a command module to import. Updates config's command book."""
@@ -64,14 +64,14 @@ class CommandBook(Configurable):
             return
 
         # Load key map
-        if hasattr(module, 'Key'):
+        if hasattr(module, 'Keybindings'):
             default_config = {}
-            for key, value in module.Key.__dict__.items():
+            for key, value in module.Keybindings.__dict__.items():
                 if not key.startswith('__') and not key.endswith('__'):
                     default_config[key] = value
             self.DEFAULT_CONFIG = default_config
         else:
-            print(f" !  Error loading command book '{self.name}', keymap class 'Key' is missing")
+            print(f" !  Error loading command book '{self.name}', keymap class 'Keybindings' is missing")
             return
 
         # Check if the 'step' function has been implemented
@@ -115,8 +115,6 @@ class CommandBook(Configurable):
             commands.step = new_step
             commands.MoveUp = new_cb['moveup']
             commands.MoveDown = new_cb['movedown']
-            gui.menu.file.enable_routine_state()
-            gui.view.status.set_cb(basename(file))
             # routine.clear()
             print(f" ~  Successfully loaded command book '{self.name}'")
             return new_cb, module

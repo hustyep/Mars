@@ -9,7 +9,6 @@ from src.common.interfaces import Configurable
 from src.gui.interfaces import MenuBarItem
 from src.modules.bot import bot
 from src.routine.routine import routine
-from src.command_book.command_book import command_book
 
 
 class File(MenuBarItem):
@@ -185,7 +184,7 @@ def get_routines(command_name) -> list:
 
 def get_routines_dir(command_name=None):
     if command_name is None:
-        command_name = command_book.name
+        command_name = config.class_name
     target = os.path.join(config.RESOURCES_DIR,
                           'routines', command_name)
     if not os.path.exists(target):

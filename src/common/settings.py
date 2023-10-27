@@ -1,3 +1,5 @@
+import cv2
+
 """
 A list of user-defined settings that can be changed by routines. Also contains a collection
 of validator functions that can be used to enforce parameter types.
@@ -90,12 +92,49 @@ def reset():
     """Resets all settings to their default values."""
 
     global move_tolerance, adjust_tolerance, record_layout, buff_cooldown, mob_name, role_name
+    global role_template, mob_template, elite_template, boss_template, guard_point_l, guard_point_r
+    
     move_tolerance = 13
     adjust_tolerance = 3
     record_layout = False
     buff_cooldown = 180
     mob_name = ''
     role_name = ''
+    
+    role_template = None
+    mob_template = []
+    elite_template = []
+    boss_template = []
+    guard_point_l = (100, 0)
+    guard_point_r = (0, 0)
+    
+def setup_template():
+    global role_template, mob_template, elite_template, boss_template
+
+    if len(mob_name) > 0:
+        try:
+            mob_template = cv2.imread(f'assets/mobs/{mob_name}.png', 0)
+            elite_template = cv2.imread(f'assets/mobs/{mob_name}_elite.png', 0)
+            boss_template = cv2.imread(f'assets/mobs/{mob_name}_boss.png', 0)
+        except:
+            pass
+        if mob_template is not None:
+            mob_template = [mob_template, cv2.flip(mob_template, 1)]
+        
+        if elite_template is not None:
+            elite_template = [elite_template, cv2.flip(elite_template, 1)]
+        elif mob_template:
+            elite_template = cv2.resize(mob_template, None, fx=2, fy=2)
+            elite_template = [elite_template, cv2.flip(elite_template, 1)]
+                            
+        if boss_template is not None:
+            boss_template = [boss_template, cv2.flip(boss_template, 1)]
+    
+    if len(role_name) > 0:
+        try:
+            role_template = cv2.imread(f'assets/roles/player_{role_name}_template.png', 0)
+        except:
+            pass
 
 # The allowed error from the destination when moving towards a Point
 move_tolerance = 13
@@ -114,5 +153,12 @@ mob_name = ''
 
 # The name of the role
 role_name = ''
+
+role_template = None
+mob_template = []
+elite_template = []
+boss_template = []
+guard_point_l = (100, 0)
+guard_point_r = (0, 0)
 
 reset()

@@ -22,6 +22,12 @@ stage_fright = False
 # Represents the current shortest path that the bot is taking
 path = []
 
+class_name = ''
+
+map_name = ''
+
+gui_settings = None
+
 ################################
 #       Notifier Config        #
 ################################
@@ -43,7 +49,7 @@ telegram_chat_id = '805381440'
 #       status              #
 #############################
 
-file_setting = None
+file_settings = None
 
 # Rune status
 rune_pos = None

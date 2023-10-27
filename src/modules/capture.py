@@ -9,8 +9,8 @@ import mss.windows
 import operator
 from src.common import config, utils
 from src.common.image_template import *
-from src.common.bot_notification import *
-from src.common.common import Subject
+from src.common.constants import *
+from src.common.interfaces import Subject
 
 user32 = ctypes.windll.user32
 user32.SetProcessDPIAware()

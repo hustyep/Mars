@@ -13,7 +13,7 @@ if __name__ != "__main__":
     from src.modules.capture import capture
     from src.modules.notifier import notifier
     from src.modules.chat_bot import chat_bot
-    from src.common.bot_notification import *
+    from src.common.constants import *
 
 NORMAL_MSG_RANGES = (
     ((0, 0, 150), (180, 30, 255)),

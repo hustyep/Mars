@@ -1,68 +1,13 @@
 """A collection of classes used to execute a Routine."""
 
 import time
-from src.common import config, utils, settings
+from src.routine.commands import Move, Adjust
+from src.common.interfaces import Component
+from src.common import utils, settings
 
 #################################
 #       Routine Components      #
 #################################
-
-
-class Component:
-    id = 'Routine Component'
-    PRIMITIVES = {int, str, bool, float}
-
-    def __init__(self, *args, **kwargs):
-        if len(args) > 1:
-            raise TypeError(
-                'Component superclass __init__ only accepts 1 (optional) argument: LOCALS')
-        if len(kwargs) != 0:
-            raise TypeError(
-                'Component superclass __init__ does not accept any keyword arguments')
-        if len(args) == 0:
-            self.kwargs = {}
-        elif type(args[0]) != dict:
-            raise TypeError(
-                "Component superclass __init__ only accepts arguments of type 'dict'.")
-        else:
-            self.kwargs = args[0].copy()
-            self.kwargs.pop('__class__')
-            self.kwargs.pop('self')
-
-    @utils.run_if_enabled
-    def execute(self):
-        self.main()
-
-    def main(self):
-        self.print_debug_info()
-
-    def update(self, *args, **kwargs):
-        """Updates this Component's constructor arguments with new arguments."""
-
-        # Validate arguments before actually updating values
-        self.__class__(*args, **kwargs)
-        self.__init__(*args, **kwargs)
-
-    def info(self):
-        """Returns a dictionary of useful information about this Component."""
-
-        return {
-            'name': self.__class__.__name__,
-            'vars': self.kwargs.copy()
-        }
-
-    def encode(self):
-        """Encodes an object using its ID and its __init__ arguments."""
-
-        arr = [self.id]
-        for key, value in self.kwargs.items():
-            if key != 'id' and type(self.kwargs[key]) in Component.PRIMITIVES:
-                arr.append(f'{key}={value}')
-        return ', '.join(arr)
-    
-    def print_debug_info(self):
-        if config.notice_level == 5:
-            print(self.info())
 
 
 class Point(Component):
@@ -99,8 +44,11 @@ class Point(Component):
                 self._main()
             self._increment_counter()
             
-            
     def _main(self):
+        Move(*self.location).execute()
+        if self.adjust:
+            Adjust(*self.location).execute()
+                
         for command in self.commands:
             command.execute()
             
@@ -209,6 +157,7 @@ class Setting(Component):
 
     def main(self):
         setattr(settings, self.key, self.value)
+        settings.setup_template()
 
     def __str__(self):
         return f'  $ {self.key} = {self.value}'

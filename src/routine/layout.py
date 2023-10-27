@@ -7,7 +7,6 @@ import pickle
 from os.path import join, isfile, splitext, basename
 from heapq import heappush, heappop
 from src.common import config, settings, utils
-from src.command_book.command_book import command_book
 
 class Node:
     """Represents a vertex on a quadtree."""
@@ -296,7 +295,7 @@ class Layout:
         self.root = None
 
 def get_layouts_dir():
-    return os.path.join(config.RESOURCES_DIR, 'layouts', command_book.name)
+    return os.path.join(config.RESOURCES_DIR, 'layouts', config.class_name)
 
 
 layout = Layout()

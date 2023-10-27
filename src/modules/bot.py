@@ -5,34 +5,28 @@ import time
 import random
 from src.command_book.command_book import command_book
 from src.chat_bot.chat_bot_entity import ChatBotCommand
+from src.routine import commands
 from src.routine.routine import routine
 from src.routine.components import Point
-from src.common import config, utils
+from src.common import config, settings, utils
 from src.common.action_simulator import ActionSimulator
-from src.common.bot_notification import *
-from src.common.vkeys import press, releaseAll
-from src.common.interfaces import Configurable
-from src.common.common import Observer, Subject
+from src.common.constants import *
+from src.common.vkeys import key_up, key_down, releaseAll
+from src.common.interfaces import Observer, Subject
 from src.modules.notifier import notifier
 from src.modules.capture import capture
 from src.modules.chat_bot import chat_bot
 from src.modules.listener import listener
-from src.modules.gui import gui
+from src.detection import rune
 
-class Bot(Configurable, Observer):
+class Bot(Observer, Subject):
     """A class that interprets and executes user-defined routines."""
-
-    DEFAULT_CONFIG = {
-        'Interact': 'space',
-        'Feed pet': 'L',
-        'Change channel': 'PageDn',
-        'Attack': 'd'
-    }
+    
 
     def __init__(self):
         """Loads a user-defined routine on start up and initializes this Bot's main thread."""
 
-        super().__init__('keybindings')
+        super().__init__()
         config.global_keys = self.config
         notifier.attach(self)
 
@@ -59,50 +53,88 @@ class Bot(Configurable, Observer):
 
         self.ready = True
         listener.enabled = True
-        last_fed = 0
         while True:
             if config.enabled and len(routine) > 0:
                 # current element
                 element = routine[routine.index]
                 
                 # Highlight the current Point
-                gui.view.routine.select(routine.index)
-                gui.view.details.display_info(routine.index)
+                self.notify(element, routine.index)
                 
-                # feed pets
-                pet_settings = gui.settings.pets
-                auto_feed = pet_settings.auto_feed.get()
-                num_pets = pet_settings.num_pets.get()
-                now = time.time()
-                if auto_feed and now - last_fed > 600 / num_pets:
-                    press(self.config['Feed pet'], 1)
-                    last_fed = now
-
-                # Use Buff and Potion then move to the point
                 if isinstance(element, Point):
-                    # print(f"direction:{config.player_direction}, element: {element.location}, guard_point_l:{routine.guard_point_l}, guard_point_r:{routine.guard_point_r}")
+                    # Feed Pet
+                    commands.FeedPet.execute()
+                    
+                    # Use Buff and Potion
                     command_book.potion.execute()
                     command_book.buff.execute()
-                    
-                    command_book.move(*element.location).execute()
-                    if element.adjust:
-                        command_book.adjust(*element.location).execute()
 
                 # Execute next Point in the routine
                 element.execute()
                 
+                if isinstance(element, Point):
+                    self.point_check(target=element.location)
+                    
                 # go next
                 routine.step()
             else:
                 time.sleep(0.01)
                 
-
     def load_commands(self, file):
         try:
             command_book.load_commands(file)
-            gui.settings.update_class_bindings()
-        except ValueError:
-            pass    # TODO: UI warning popup, say check cmd for errors
+        except Exception as e:
+            print(e)
+        else:
+            command_book.move.step_callback = self.point_check
+
+    def point_check(self, direction=None, target=None): 
+        if not config.free:
+            return
+
+        config.free = False
+        if direction in ['left', 'right']:
+            key_up(direction)
+        if config.rune_pos is not None \
+            and (utils.distance(config.rune_pos, config.player_pos) <= settings.move_tolerance * 2 or target == config.rune_closest_pos):
+            result, frame = commands.SolveRune(callback=self.solve_rune_callback).execute()
+            self.solve_rune_callback(result, frame)
+        if config.minal_active \
+            and (utils.distance(config.minal_pos, config.player_pos) <= settings.move_tolerance * 2 or target == config.minal_closest_pos):
+            commands.Mining().execute()
+        if direction in ['left', 'right']:
+            key_down(direction)
+        config.free = True
+        
+    def solve_rune_callback(self, result, frame):
+        if result == 1:
+            self.check_rune_solve_result(frame)
+        elif result == 0:
+            notifier._notify(BotWarnning.RUNE_INTERACT_FAILED)
+        elif result == -1 and frame is not None:
+            self.notify_rune_failed(frame)
+
+    def check_rune_solve_result(self, used_frame):
+        for _ in range(4):
+            rune_type = rune.rune_liberate_result(capture.frame)
+            if rune_type is not None:
+                break
+            time.sleep(0.1)
+        if rune_type is None:
+            self.notify_rune_failed(used_frame)
+        else:
+            notifier.notifyRuneResolved(rune_type)
+            file_path = 'screenshot/rune_solved'
+            utils.save_screenshot(
+                frame=used_frame, file_path=file_path, compress=False)
+
+            if rune_type == 'Rune of Might':
+                ActionSimulator.cancel_rune_buff()
+                
+    def notify_rune_failed(self, used_frame):
+        notifier.notifyRuneResolveFailed()
+        file_path = 'screenshot/rune_failed'
+        utils.save_screenshot(frame=used_frame, file_path=file_path, compress=False)
 
     def toggle(self, enabled: bool, reason: str = ''):
         config.rune_pos = None
@@ -158,8 +190,7 @@ class Bot(Configurable, Observer):
             case ChatBotCommand.LEVEL:
                 level = int(args[0])
                 config.notice_level = level
-                gui.settings.notification.notice_level.set(level)
-                gui.settings.notification.notification_settings.save_config()
+                self.notify('notice_level', level)
                 return "done", None
             case ChatBotCommand.SAY:
                 ActionSimulator.say_to_all(args[0])
