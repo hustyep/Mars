@@ -139,7 +139,7 @@ class CommandBook(Configurable, Subject):
 
     def _set_keybinds(self):
         for k, v in self.config.items():
-            setattr(self.module.Key, k, v)
+            setattr(self.module.Keybindings, k, v)
 
 
 command_book = CommandBook()

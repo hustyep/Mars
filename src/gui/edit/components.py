@@ -41,20 +41,20 @@ class Components(Frame):
         """
 
         def callback(e):
-            routine = self.parent.parent
+            routine_ui = self.parent.parent
             edit = self.parent.parent.parent
 
-            routine.commands.clear_selection()
+            routine_ui.commands.clear_selection()
             selections = e.widget.curselection()
             if len(selections) > 0:
                 index = int(selections[0])
                 obj = routine[index]
 
                 if isinstance(obj, Point):
-                    routine.commands_var.set([c.id for c in obj.commands])
+                    routine_ui.commands_var.set([c.id for c in obj.commands])
                     edit.minimap.draw_point(obj)
                 else:
-                    routine.commands_var.set([])
+                    routine_ui.commands_var.set([])
                     edit.minimap.draw_default()
                 edit.record.clear_selection()
 
