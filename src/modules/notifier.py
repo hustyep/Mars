@@ -128,7 +128,7 @@ class Notifier(Subject, Observer):
         # Check for no movement
         if config.enabled and operator.eq(config.player_pos, self.player_pos):
             interval = int(time.time() - self.player_pos_updated_time)
-            if interval >= 10 and self.player_pos_updated_time:
+            if interval >= 15 and self.player_pos_updated_time:
                 self._notify(BotWarnning.NO_MOVEMENT, arg=interval,
                              info=f'duration:{interval}s')
         else:
