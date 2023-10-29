@@ -33,6 +33,9 @@ class CommandBook(Configurable, Subject):
         if result is None:
             raise ValueError(f"Invalid command book at '{file}'")
         self.dict, self.module = result
+        self.TARGET = self.name
+        self.config = self.DEFAULT_CONFIG.copy()
+        self.load_config()
         self.notify()
         
     def _load_commands(self, file):
