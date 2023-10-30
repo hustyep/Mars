@@ -4,9 +4,8 @@ import win32gui
 import time
 import threading
 import ctypes
-import mss
-import mss.windows
 import operator
+import dxcam
 from src.common import config, utils
 from src.common.image_template import *
 from src.common.constants import *
@@ -25,7 +24,6 @@ class Capture(Subject):
         self.mm_tl = None
         self.mm_br = None
         self.minimap_sample = None
-        self.sct = None
         self.hwnd = None
         self.window = {
             'left': 0,
@@ -34,12 +32,13 @@ class Capture(Subject):
             'height': 768
         }
         self.calibrated = False
+        self.camera = dxcam.create(output_idx=0, output_color="BGR")
 
         self.lost_window_time = 0
         self.lost_minimap_time = 0
         self.lost_player_time = 0
 
-        self.lost_time_threshold = 5
+        self.lost_time_threshold = 3
 
         self.ready = False
         self.thread = threading.Thread(target=self._main)
@@ -47,6 +46,7 @@ class Capture(Subject):
 
     def start(self):
         """Starts this Capture's thread."""
+        self.camera.start(video_mode=True)
 
         print('\n[~] Started video capture')
         self.thread.start()
@@ -54,7 +54,6 @@ class Capture(Subject):
     def _main(self):
         """Constantly monitors the player's position and in-game events."""
 
-        mss.windows.CAPTUREBLT = 0
         # self.start_auto_calibrate()
         while True:
             self.calibrated = self.recalibrate()
@@ -64,16 +63,15 @@ class Capture(Subject):
                 time.sleep(0.1)
                 continue
 
-            with mss.mss() as self.sct:
-                while True:
-                    if not self.calibrated:
-                        break
+            while True:
+                if not self.calibrated:
+                    break
 
-                    self.locatePlayer()
+                self.locatePlayer()
 
-                    if not self.ready:
-                        self.ready = True
-                    time.sleep(0.001)
+                if not self.ready:
+                    self.ready = True
+                # time.sleep(0.001)
 
     def start_auto_calibrate(self):
         # auto recalibrate
@@ -104,12 +102,6 @@ class Capture(Subject):
         self.window['height'] = y2 - y1
 
         # Calibrate by finding the top-left and bottom-right corners of the minimap
-        with mss.mss() as sct:
-            self.frame = self.screenshot(sct=sct)
-        if self.frame is None:
-            self.notify(BotDebug.SCREENSHOT_FAILED)
-            return False
-
         tl = dll_helper.screenSearch(MM_TL_BMP, x1, y1, x2, y2)
         if tl:
             br = dll_helper.screenSearch(MM_BR_BMP,  x1, y1, x2, y2)
@@ -152,9 +144,10 @@ class Capture(Subject):
 
     def locatePlayer(self):
         # Take screenshot
-        self.frame = self.screenshot()
-        if self.frame is None:
+        frame = self.camera.get_latest_frame()
+        if frame is None:
             return
+        self.frame = frame
         # Crop the frame to only show the minimap
         minimap = self.frame[self.mm_tl[1]:self.mm_br[1], self.mm_tl[0]:self.mm_br[0]]
         # cv2.imshow("", minimap)
@@ -192,16 +185,6 @@ class Capture(Subject):
                 self.lost_player_time = now
             if now - self.lost_player_time >= self.lost_time_threshold:
                 self.notify(BotError.LOST_PLAYER, now - self.lost_player_time)
-
-    def screenshot(self, delay=1, sct=None):
-        try:
-            if sct is None:
-                sct = self.sct
-            return np.array(sct.grab(self.window))
-        except mss.exception.ScreenShotError:
-            print(f'\n[!] Error while taking screenshot, retrying in {delay} second'
-                  + ('s' if delay != 1 else ''))
-            time.sleep(delay)
 
 
 capture = Capture()
