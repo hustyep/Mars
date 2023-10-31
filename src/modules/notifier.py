@@ -273,13 +273,13 @@ class Notifier(Subject, Observer):
                 image_path = utils.save_screenshot(frame=capture.frame)
                 self.send_message(text=text, image_path=image_path)
             elif event_type == BotInfo:
-                if event == BotInfo.BOSS_APPEAR:
-                    threading.Timer(5, self.notify_boss_appear).start()
-                
                 if config.notice_level < 4:
                     return
                 text = f'💡[{event.value}] {info}'
                 self.send_message(text=text)
+            elif event_type == BotVerbose:
+                if event == BotVerbose.BOSS_APPEAR:
+                    threading.Timer(5, self.notify_boss_appear).start()
             elif event_type == BotDebug:
                 if config.notice_level < 5:
                     return
