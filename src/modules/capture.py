@@ -9,7 +9,7 @@ import dxcam
 from src.common import config, utils
 from src.common.image_template import *
 from src.common.bot_notification import *
-from src.common.interfaces import Subject
+from src.common.common import Subject
 
 user32 = ctypes.windll.user32
 user32.SetProcessDPIAware()
@@ -93,6 +93,7 @@ class Capture(Subject):
                 self.notify(BotError.LOST_WINDOW, now - self.lost_window_time)
             return False
 
+        self.screenshot()
         self.lost_window_time = 0
         x1, y1, x2, y2 = win32gui.GetWindowRect(self.hwnd)  # 获取当前窗口大小
 
@@ -144,14 +145,8 @@ class Capture(Subject):
 
     def locatePlayer(self):
         # Take screenshot
-        frame = self.camera.get_latest_frame()
-        if frame is None:
-            return
-        top = self.window['top']
-        left = self.window['left']
-        width = self.window['width']
-        height = self.window['height']
-        self.frame = frame[top:top+height, left:left+width]
+        self.screenshot()
+        
         # Crop the frame to only show the minimap
         minimap = self.frame[self.mm_tl[1]:self.mm_br[1], self.mm_tl[0]:self.mm_br[0]]
         # cv2.imshow("", minimap)
@@ -190,5 +185,14 @@ class Capture(Subject):
             if now - self.lost_player_time >= self.lost_time_threshold:
                 self.notify(BotError.LOST_PLAYER, now - self.lost_player_time)
 
+    def screenshot(self):
+        frame = self.camera.get_latest_frame()
+        if frame is None:
+            return
+        top = self.window['top']
+        left = self.window['left']
+        width = self.window['width']
+        height = self.window['height']
+        self.frame = frame[top:top+height, left:left+width]
 
 capture = Capture()
