@@ -91,7 +91,7 @@ SETTING_VALIDATORS = {
 def reset():
     """Resets all settings to their default values."""
 
-    global move_tolerance, adjust_tolerance, record_layout, buff_cooldown, mob_name, role_name
+    global move_tolerance, adjust_tolerance, record_layout, buff_cooldown, mob_name, role_name, map_name, class_name
     global role_template, mob_template, elite_template, boss_template, guard_point_l, guard_point_r
     
     move_tolerance = 13
@@ -100,6 +100,8 @@ def reset():
     buff_cooldown = 180
     mob_name = ''
     role_name = ''
+    map_name = ''
+    class_name = ''
     
     role_template = None
     mob_template = []
@@ -151,8 +153,12 @@ buff_cooldown = 180
 # The image name of the mob template in the map
 mob_name = ''
 
+class_name = ''
+
 # The name of the role
 role_name = ''
+
+map_name = ''
 
 role_template = None
 mob_template = []

@@ -22,10 +22,6 @@ stage_fright = False
 # Represents the current shortest path that the bot is taking
 path = []
 
-class_name = ''
-
-map_name = ''
-
 gui_settings = None
 
 ################################

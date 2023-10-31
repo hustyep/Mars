@@ -4,6 +4,9 @@ import os
 import cv2
 import math
 import pickle
+import xlrd
+import numpy as np
+
 from os.path import join, isfile, splitext, basename
 from heapq import heappush, heappop
 from src.common import config, settings, utils
@@ -73,6 +76,7 @@ class Layout:
 
         self.name = name
         self.root = None
+        self.minimap_data = []
 
     @utils.run_if_enabled
     def add(self, x, y):
@@ -276,6 +280,8 @@ class Layout:
             self.root = None
             self.save()
 
+        self.load_minimap_data()
+
     @utils.run_if_enabled
     def save(self):
         """
@@ -290,12 +296,53 @@ class Layout:
         with open(join(layouts_dir, self.name), 'wb') as file:
             pickle.dump(self, file)
 
+    def load_minimap_data(self):
+        resArray=[]
+        minimap_data_file = f'{get_map_dir(self.name)}.xlsx'
+        try:
+            data = xlrd.open_workbook(minimap_data_file) #读取文件
+        except Exception as e:
+            data = None
+            print(e)
+        if data:
+            table = data.sheet_by_index(0) #按索引获取工作表，0就是工作表1
+            for i in range(1, table.nrows): #table.nrows表示总行数
+                line=table.row_values(i)[1:] #读取每行数据，保存在line里面，line是list
+                resArray.append(line) #将line加入到resArray中，resArray是二维list
+            resArray=np.array(resArray) #将resArray从二维list变成数组
+            self.minimap_data = resArray
+            print(resArray)
+
+
     def clear(self):
         self.name = ''
         self.root = None
+        self.minimap_data = []
 
+
+    def near_rope(self, location):
+        if len(self.minimap_data) > 0:
+            _, width = self.minimap_data.shape
+            cur_x = location[0]
+            cur_y = location[1]
+            for y in range(max(0, cur_y - 10), cur_y):
+                for x in range(max(0, cur_x - 1), max(width - 1, cur_x + 1)):
+                    if self.minimap_data[cur_x][y] == 2:
+                        return True
+        return False
+    
+    def on_the_rope(self, location):
+        if len(self.minimap_data) > 0:
+            if self.minimap_data[location[0]][location[1] + 7] == 1:
+                return False
+            else:
+                return self.minimap_data[location[0]][location[1]] == 2
+        return False
+    
 def get_layouts_dir():
-    return os.path.join(config.RESOURCES_DIR, 'layouts', config.class_name)
+    return os.path.join(config.RESOURCES_DIR, 'layouts', settings.class_name)
 
+def get_map_dir(map_name):
+    return os.path.join(config.RESOURCES_DIR, 'maps', map_name)
 
 layout = Layout('')

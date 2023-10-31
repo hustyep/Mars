@@ -3,7 +3,7 @@ import inspect
 import importlib
 import traceback
 from os.path import basename, splitext
-from src.common import config, utils
+from src.common import settings, utils
 from src.common.interfaces import Configurable, Subject
 from src.routine import commands
 
@@ -28,7 +28,7 @@ class CommandBook(Configurable, Subject):
         
     def load_commands(self, file):
         self.name = splitext(basename(file))[0]
-        config.class_name = self.name
+        settings.class_name = self.name
         result = self._load_commands(file)
         if result is None:
             raise ValueError(f"Invalid command book at '{file}'")
