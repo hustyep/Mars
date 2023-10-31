@@ -52,7 +52,7 @@ class Detector():
         elite_frame = frame[height // 4:3 * height // 4, width // 4:3 * width // 4]
         elite = utils.multi_match(elite_frame, ELITE_TEMPLATE, threshold=0.9)
         if len(elite) > 0:
-            notifier._notify(BotInfo.BOSS_APPEAR)
+            notifier._notify(BotVerbose.BOSS_APPEAR)
 
 
     def check_mineral(self, frame, minimap):
@@ -84,8 +84,8 @@ class Detector():
             matches = utils.multi_match(frame, MINAL_CRYSTAL_TEMPLATE)
             mineral_type = MineralType.CRYSTAL
         if len(matches) > 0:
-            notifier._notify(BotInfo.MINE_ACTIVE, info=mineral_type.value)
-            player_template = settings.role_template
+            notifier._notify(BotVerbose.MINE_ACTIVE, info=mineral_type.value)
+            player_template = config.routine.role_template
             player = utils.multi_match(
                 frame, player_template, threshold=0.9)
             if len(player) > 0:

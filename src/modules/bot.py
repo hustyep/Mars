@@ -228,21 +228,23 @@ class Bot(Observer, Subject):
                 case BotWarnning.NO_MOVEMENT:
                     ActionSimulator.jump_down()
                 case BotWarnning.OTHERS_STAY_OVER_30S:
-                    words = ['cc plz', 'cc plz ', ' cc plz']
+                    words = ['cc pls', 'cc pls ', ' cc pls']
                     random_word = random.choice(words)
                     ActionSimulator.say_to_all(random_word)
                 case BotWarnning.OTHERS_STAY_OVER_60S:
-                    words = ['??', 'hello?', ' cc plz', 'bro?']
+                    words = ['??', 'hello?', ' cc pls', 'bro?']
                     random_word = random.choice(words)
                     ActionSimulator.say_to_all(random_word)
                 case BotWarnning.OTHERS_COMMING:
                     pass
         elif isinstance(event_type, BotInfo):
             match event_type:
-                case BotInfo.BOSS_APPEAR:
-                    threading.Timer(180, ActionSimulator.open_boss_box).start()
                 case BotInfo.RUNE_ACTIVE:
                     pass
+        elif isinstance(event_type, BotVerbose):
+            match event_type:
+                case BotVerbose.BOSS_APPEAR:
+                    threading.Timer(180, ActionSimulator.open_boss_box).start()
         elif isinstance(event_type, BotDebug):
             pass
 

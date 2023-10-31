@@ -29,6 +29,8 @@ class BotInfo(Enum):
     RUNE_ACTIVE = 'Rune Active'
     RUNE_LIBERATED = 'Rune Liberated'
     OTHERS_LEAVED = 'Someone\'s gone'
+    
+class BotVerbose(Enum):
     MINE_ACTIVE = 'Mine Active'
     BOSS_APPEAR = 'Boss Appear'
     BLIND = 'Blind'

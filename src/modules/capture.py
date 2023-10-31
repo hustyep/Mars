@@ -147,7 +147,11 @@ class Capture(Subject):
         frame = self.camera.get_latest_frame()
         if frame is None:
             return
-        self.frame = frame
+        top = self.window['top']
+        left = self.window['left']
+        width = self.window['width']
+        height = self.window['height']
+        self.frame = frame[top:top+height, left:left+width]
         # Crop the frame to only show the minimap
         minimap = self.frame[self.mm_tl[1]:self.mm_br[1], self.mm_tl[0]:self.mm_br[0]]
         # cv2.imshow("", minimap)
