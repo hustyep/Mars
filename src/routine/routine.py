@@ -5,7 +5,7 @@ from os.path import splitext, basename
 
 from src.common import settings, utils
 from src.common.interfaces import Subject
-from src.routine.components import Point, Label, Jump, Setting, SYMBOLS
+from src.routine.components import *
 from src.routine.commands import Command
 from src.routine.layout import layout
 from src.command_book.command_book import command_book
@@ -42,7 +42,7 @@ class Routine(Subject):
         self.path = ''
         self.labels = {}
         self.index = 0
-        self.sequence = []
+        self.sequence: list[Component] = []
         self.display = []       # Updated alongside sequence
 
     @dirty
@@ -53,17 +53,20 @@ class Routine(Subject):
 
     @dirty
     @update
-    def append_component(self, p):
+    def append_component(self, p:Component):
         self.sequence.append(p)
         self.display.append(str(p))
 
     @dirty
     @update
-    def append_command(self, i, c):
+    def append_command(self, i, c:Command):
         """Appends Command object C to the Point at index I in the sequence."""
 
         target = self.sequence[i]
-        target.commands.append(c)
+        if isinstance(target, Point):
+            target.commands.append(c)
+        else:
+            raise ValueError(f"{str(target)} at index {i} is not a Point")
 
     @dirty
     @update
@@ -228,6 +231,7 @@ class Routine(Subject):
 
         self.dirty = False
         self.path = file
+        settings.setup_template()
         layout.load(file)
         self.notify('load')
         
@@ -237,7 +241,8 @@ class Routine(Subject):
         self.labels = {}
         with open(file, newline='') as f:
             csv_reader = csv.reader(f, skipinitialspace=True)
-            curr_point = None
+            curr_point: Point = None
+            curr_sequence: Sequence = None
             line = 1
             for row in csv_reader:
                 result = self._eval(row, line)
@@ -245,16 +250,27 @@ class Routine(Subject):
                     if isinstance(result, Command):
                         if curr_point:
                             curr_point.commands.append(result)
+                    elif isinstance(result, Sequence):
+                        curr_sequence = result
+                        self.append_component(result)
+                    elif isinstance(result, Point):
+                        curr_point = result
+                        if curr_sequence:
+                            curr_sequence.add_component(result)
+                        else:
+                            self.append_component(result)
+                    elif isinstance(result, End):
+                        curr_sequence = None
                     else:
                         self.append_component(result)
-                        if isinstance(result, Point):
-                            curr_point = result
-                            if curr_point.location[0] < settings.guard_point_l[0]:
-                                settings.guard_point_l = curr_point.location
-                            elif curr_point.location[0] > settings.guard_point_r[0]:
-                                settings.guard_point_r = curr_point.location
-                        elif isinstance(result, Setting):
-                            result.main()
+                        # if isinstance(result, Point):
+                        #     curr_point = result
+                        #     if curr_point.location[0] < settings.guard_point_l[0]:
+                        #         settings.guard_point_l = curr_point.location
+                        #     elif curr_point.location[0] > settings.guard_point_r[0]:
+                        #         settings.guard_point_r = curr_point.location
+                        # elif isinstance(result, Setting):
+                        #     result.main()
                 line += 1
 
     def _eval(self, row, i):
