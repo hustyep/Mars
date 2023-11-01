@@ -75,6 +75,69 @@ class Command(Component):
         press_acc(self.__class__.key, up_time=self.__class__.backswing)
         return True
 
+class NewMove(Command):
+    
+    def __init__(self, x, y, tolerance, step=1):
+        super().__init__(locals())
+        self.target = (int(x), int(y))
+        self.tolerance = settings.validate_nonnegative_int(tolerance)
+        self.step = settings.validate_nonnegative_int(step)
+        self.max_steps = 15
+        self.prev_direction = ''
+        
+    def main(self):
+        # self.print_debug_info()
+        if config.notice_level == 5:
+            print(f'[move] from {config.player_pos} to {self.target}, step = {self.step}')
+
+        if self.step > self.max_steps:
+            return
+
+        threshold = self.tolerance / math.sqrt(2)
+        global_error = utils.distance(config.player_pos, self.target)
+
+        while config.enabled and counter > 0 and \
+                local_error > settings.move_tolerance and \
+                global_error > settings.move_tolerance:
+            global_d_x = self.target[0] - config.player_pos[0]
+            d_x = point[0] - config.player_pos[0]
+            if abs(global_d_x) > threshold and \
+                abs(d_x)> threshold:
+                # print(f"counter={counter}, d_x={d_x}")
+                if d_x < 0:
+                    key = 'left'
+                else:
+                    key = 'right'
+                self._new_direction(key)
+                step(key, point)
+                if settings.record_layout:
+                    layout.add(*config.player_pos)
+                if i < len(path) - 1:
+                    time.sleep(0.15)
+                if self.step_callback:
+                    self.step_callback(key)
+                counter -= 1
+            else:
+                global_d_y = self.target[1] - config.player_pos[1]
+                d_y = point[1] - config.player_pos[1]
+                # print(f"counter={counter}, global_d_y={global_d_y}, d_y={d_y}")
+                if abs(global_d_y) > threshold and \
+                        abs(d_y) > threshold:
+                    if d_y < 0:
+                        key = 'up'
+                    else:
+                        key = 'down'
+                    self._new_direction(key)
+                    step(key, point)
+                    if settings.record_layout:
+                        layout.add(*config.player_pos)
+                    if i < len(path) - 1:
+                        time.sleep(0.05)
+                    counter -= 1
+            if threshold > settings.adjust_tolerance:
+                threshold -= 1
+            local_error = utils.distance(config.player_pos, point)
+            global_error = utils.distance(config.player_pos, self.target)
 
 class Move(Command):
     """Moves to a given position using the shortest path based on the current Layout."""
@@ -605,6 +668,17 @@ def sleep_before_y(target_y, tolorance=0):
         if count == 20:
             break
 
+
+def sleep_in_the_air():
+    if not layout.minimap_data:
+        sleep_while_move_y()
+        return
+    count = 0
+    while layout.minimap_data[config.player_pos[0]][config.player_pos[1]+7] != 1:
+        time.sleep(0.02)
+        count += 1
+        if count == 100:
+            break
 
 def direction_changed() -> bool:
     if config.player_direction == 'left':
