@@ -196,14 +196,21 @@ class JumpUp(Command):
         self.print_debug_info()
 
         time.sleep(0.5)
+        
+        evadeRope().execute()
+        
         press(Keybindings.JUMP)
         key_down('up')
         time.sleep(0.06 if self.dy >= 20 else 0.1)
         press(Keybindings.FLASH_JUMP, 1)
         key_up('up')
-        sleep_while_move_y(interval=0.05, n=10)
+        sleep_while_move_y(interval=0.05, n=15)
         # time.sleep(1.5)
-
+        if layout.on_the_rope(config.player_pos):
+            key_down('left')
+            time.sleep(0.05)
+            press(Keybindings.JUMP)
+            key_up('left')
 
 class FlashJump(Command):
     """Performs a flash jump in the given direction."""
@@ -224,7 +231,6 @@ class FlashJump(Command):
         else:
             press(Keybindings.JUMP, 1, down_time=0.03, up_time=0.03)
         press(Keybindings.FLASH_JUMP, self.time, down_time=0.03, up_time=0.03)
-
 
 class ShadowAssault(Command):
     """
@@ -298,6 +304,9 @@ class ShadowAssault(Command):
         elif self.direction.endswith("right"):
             if config.player_direction != 'right':
                 press("right", down_time=0.1)
+        elif self.direction == 'up':
+            evadeRope().execute()
+                
         if self.jump:
             if self.direction.startswith('down'):
                 key_down('down')
@@ -374,6 +383,11 @@ class CruelStab(Command):
         else:
             time.sleep(0.2)
 
+
+class evadeRope(Command):
+    def main(self):
+        if layout.near_rope(config.player_pos):
+            press(config.player_direction, down_time=0.5)
 
 #########################
 #         Skills        #

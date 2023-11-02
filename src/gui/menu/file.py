@@ -4,7 +4,7 @@ import threading
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesno
 
-from src.common import config, utils
+from src.common import config, utils, settings
 from src.common.interfaces import Configurable
 from src.gui.interfaces import MenuBarItem
 from src.modules.bot import bot
@@ -184,7 +184,7 @@ def get_routines(command_name) -> list:
 
 def get_routines_dir(command_name=None):
     if command_name is None:
-        command_name = config.class_name
+        command_name = settings.class_name
     target = os.path.join(config.RESOURCES_DIR,
                           'routines', command_name)
     if not os.path.exists(target):

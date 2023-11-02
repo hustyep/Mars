@@ -9,7 +9,7 @@ import dxcam
 import mss
 # from dll_helper import dll_helper
 # from usb import usb
-from rune import *
+# from rune import *
 
 def image_equal(image, template):
     height, width, channel = image.shape
@@ -99,9 +99,12 @@ def filter_color(img, ranges):
 
 
 def rune_test():
-    frame = cv2.imread(".test/maple_231003174903228.png")
-    rune_interact_result(frame)
-
+    frame = cv2.imread(".test/Maple_231014_163508.png")
+    # rune_interact_result(frame)
+    frame = frame[0:200,]
+    RUNE_BUFF_GRAY_TEMPLATE = cv2.imread('assets/rune/rune_buff_template.jpg', 0)
+    res = multi_match(frame, RUNE_BUFF_GRAY_TEMPLATE, 0.9)
+    print(res)
 
 def mob_detect_test() -> None:
     frame = cv2.imread(".test/maple_231004121116575.png")
@@ -132,7 +135,7 @@ def white_room_test():
     height, width = gray.shape
 
     # Check for white room
-    percent = np.count_nonzero(gray == 255) / height / width
+    percent = np.count_nonzero(gray == 255) / height / width 
     print(percent)
     # start = time.time()
     # TEMPLATE = cv2.imread('assets/white_room_template.png', 0)
