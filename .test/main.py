@@ -5,6 +5,8 @@ import threading
 
 import numpy as np
 import time
+import dxcam
+import mss
 # from dll_helper import dll_helper
 # from usb import usb
 from rune import *
@@ -42,7 +44,7 @@ def image_search(frame, template):
     
     return -1, -1
 
-def multi_match(frame, template, threshold=0.95):
+def multi_match(frame, template, threshold=0.95, isDebug=False):
     """
     Finds all matches in FRAME that are similar to TEMPLATE by at least THRESHOLD.
     :param frame:       The image in which to search.
@@ -68,7 +70,7 @@ def multi_match(frame, template, threshold=0.95):
 
         cv2.rectangle(src_copy, p, (p[0]+template.shape[1],
                       p[1]+template.shape[0]), (0, 0, 225), 2)
-    if len(results) > 0:
+    if len(results) > 0 and isDebug:
         cv2.imshow("result", src_copy)
         cv2.waitKey()
     return results
@@ -101,7 +103,7 @@ def rune_test():
     rune_interact_result(frame)
 
 
-def mob_detect_test():
+def mob_detect_test() -> None:
     frame = cv2.imread(".test/maple_231004121116575.png")
     
     PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/roles/player_sllee_template.png', 0)
@@ -138,6 +140,38 @@ def white_room_test():
     # print(f'{time.time() - start}')
     # print(result)
 
+def screen_shot_test():
+    left, top = 0, 0
+    right, bottom = left + 300, top + 200
+    region = (left, top, right, bottom)
+    camera = dxcam.create(output_color='BGR')
+    camera.start(video_mode=True)
+    for i in range(1000):
+        start = time.time()
+        image = camera.get_latest_frame()  # Will block until new frame available
+        print(f'{time.time() - start}')
+    camera.stop()
+
+def mss_test():
+    window = {
+        'left': 0,
+        'top': 0,
+        'width': 100,
+        'height': 50
+    }
+    for i in range(1000):
+        start = time.time()
+        with mss.mss() as sct:
+            sct.grab(window)
+        print(f'{time.time() - start}')
+
 if __name__ == "__main__":
     # rune_test()
-    mob_detect_test()
+    # mob_detect_test()
+    # mss_test()
+    frame = cv2.imread(".test/maple_231004121116575.png")
+    frame = frame[0:800, 0:1000]
+    PLAYER_SLLEE_TEMPLATE = cv2.imread('assets/roles/player_sllee_template.png', 0)
+    start = time.time()
+    player_match = multi_match(frame, PLAYER_SLLEE_TEMPLATE, threshold=0.9)
+    print(f'{time.time() - start}')
