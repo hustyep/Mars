@@ -580,7 +580,7 @@ class Detect_Mobs(Command):
 #############################
 
 
-def sleep_while_move_y(interval=0.02, n=15):
+def sleep_while_move_y(interval=0.02, n=20):
     player_y = config.player_pos[1]
     count = 0
     while True:

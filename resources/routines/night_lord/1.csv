@@ -1,8 +1,15 @@
 
 @, label=Bottom mobbing
-*, x=10, y=70, frequency=1, interval=0, skip=False, adjust=False
+*, x=5, y=70, frequency=1, interval=0, skip=False, adjust=False
     Arachnid
 *, x=80, y=70, frequency=4, interval=0, skip=False, adjust=False
     Omen
-*, x=130, y=70, frequency=1, interval=0, skip=False, adjust=False
+*, x=140, y=70, frequency=1, interval=0, skip=False, adjust=False
     Arachnid
+
+@, label=Summoning
+*, x=32, y=37, frequency=8, interval=0, skip=False, adjust=True
+    SuddenRaid
+    DarkFlare, direction=left
+*, x=114, y=38, frequency=8, interval=0, skip=False, adjust=True
+    ErdaShower, direction=left

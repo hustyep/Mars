@@ -151,7 +151,7 @@ class HitAndRun(Command):
             FlashJump(dx=abs(d_x)).execute()
             CruelStabRandomDirection().execute()
             # sleep_before_y(target_y=self.target[1], tolorance=1)
-            sleep_while_move_y(interval=0.01, n=8)
+            sleep_while_move_y(interval=0.017, n=5)
             if config.elite_detected:
                 SonicBlow().execute()
                 config.elite_detected = False
@@ -201,8 +201,8 @@ class MoveDown(Command):
             time.sleep(0.2)
             key_down('down')
             press(Key.JUMP, 1, down_time=0.1, up_time=0.5)
-            sleep_while_move_y()
             key_up('down')
+            sleep_while_move_y()
             # time.sleep(0.8 if self.dy >= 15 else 0.7)
 
 
@@ -493,6 +493,8 @@ class SuddenRaid(Command):
 
     def canUse(self, next_t: float = 0) -> bool:
         usable = super().canUse(next_t)
+        if not config.mob_detect:
+            return usable
         if usable:
             mobs = Detect_Mobs(top=500,bottom=500,left=500,right=500,debug=False).execute()
             return mobs is None or len(mobs) > 0
@@ -525,6 +527,8 @@ class TrickBlade(Command):
             
     def canUse(self, next_t: float = 0) -> bool:
         usable = super().canUse(next_t)
+        if not config.mob_detect:
+            return usable
         if usable:
             mobs = Detect_Mobs(top=200,bottom=150,left=400,right=400).execute()
             return mobs is None or len(mobs) > 0

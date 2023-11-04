@@ -1,0 +1,13 @@
+
+@, label=Bottom mobbing
+*, x=35, y=74, frequency=1, interval=0, skip=False, adjust=False
+*, x=108, y=74, frequency=6, interval=0, skip=False, adjust=False
+    Omen
+*, x=192, y=74, frequency=1, interval=0, skip=False, adjust=False
+
+@, label=Summoning
+*, x=158, y=39, frequency=6, interval=0, skip=False, adjust=True
+    SuddenRaid
+    DarkFlare, direction=left
+*, x=106, y=27, frequency=6, interval=0, skip=False, adjust=True
+    ErdaShower, direction=left

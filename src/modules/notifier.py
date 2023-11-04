@@ -115,7 +115,7 @@ class Notifier(Subject, Observer):
                 self._notify(BotFatal.BLACK_SCREEN)
             elif np.count_nonzero(gray == 0) / height / width > 0.7 and not config.lost_minimap:
                 # blind
-                self._notify(BotInfo.BLIND)
+                self._notify(BotVerbose.BLIND)
 
         # Check for white room
         gray_crop = gray[100:-100, 50:-50]
@@ -221,7 +221,7 @@ class Notifier(Subject, Observer):
             return
 
         filtered = utils.filter_color(minimap, RUNE_RANGES)
-        matches = utils.multi_match(filtered, RUNE_TEMPLATE, threshold=0.9)
+        matches = utils.multi_match(filtered, RUNE_TEMPLATE, threshold=0.8)
         if len(matches) == 0:
             return
               
@@ -329,7 +329,7 @@ class Notifier(Subject, Observer):
 
     def notifyRuneError(self, time):
         text_notice = f"{int(time)}s"
-        self._notify(BotError.RUNE_ERROR, arg=time, info=text_notice)
+        self._notify(BotWarnning.RUNE_ERROR, arg=time, info=text_notice)
 
     def send_message(self, text=None, image=None, image_path=None):
         print(text)

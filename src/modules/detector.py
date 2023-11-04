@@ -109,7 +109,7 @@ class Detector():
                         minal_full_pos[0] - 10, minal_full_pos[1] - 50)
                 elif mineral_type == MineralType.HEART:
                     minal_full_pos = (
-                        minal_full_pos[0] - 10, minal_full_pos[1] - 60)
+                        minal_full_pos[0] - 15, minal_full_pos[1] - 60)
 
                 player_full_pos = player[0]
                 dx_full = minal_full_pos[0] - player_full_pos[0]

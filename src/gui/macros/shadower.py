@@ -46,22 +46,23 @@ class Shadower(LabelFrame):
         target = None
         match (type):
             case 'Meso Explosion':
-                hotkey = 'f'
+                hotkey = ['f', 'v']
                 target = self.meso_explosion
             case 'Trickblade':
-                hotkey = 'a'
+                hotkey = ['a']
                 target = self.trickblade
 
         if hotkey:
             if value:
-                keyboard.on_press_key(hotkey, target)
+                for key in hotkey:
+                    keyboard.on_press_key(key, target)
                 # keyboard.add_hotkey(hotkey, target)
             else:
                 # keyboard.remove_hotkey(hotkey)
                 keyboard.unhook_key(hotkey)
 
-    def meso_explosion(self):
-        threading.Timer(0.2, sim.click_key, ('d', )).start()
+    def meso_explosion(self, event):
+        threading.Timer(0.3, sim.click_key, ('d', )).start()
 
     @utils.run_if_disabled
     def trickblade(self) -> None:
