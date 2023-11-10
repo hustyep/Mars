@@ -365,12 +365,12 @@ class Bot(Configurable, Observer):
             chat_bot.voice_call()
 
         elif isinstance(event_type, BotError):
-            chat_bot.voice_call()
             match (event_type):
                 case BotError.OTHERS_STAY_OVER_120S:
                     ActionSimulator.go_home()
                 case (_):
                     self.toggle(False, event_type.value)
+            # chat_bot.voice_call()
             # end match
         elif isinstance(event_type, BotWarnning):
             match event_type:

@@ -175,7 +175,7 @@ class MoveUp(Command):
         print(f"moveup dy={self.dy}")
         self.print_debug_info()
 
-        if self.dy <= 6:
+        if self.dy <= 7:
             press(Key.JUMP)
             sleep_while_move_y()
         elif self.dy <= 24:
