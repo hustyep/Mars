@@ -187,7 +187,10 @@ class WechatBot:
     def send_image(self, image=None, imagePath=None):
         if not USB():
             return
-        
+        if image is None and imagePath is None:
+            return
+        if imagePath:
+            image = cv2.imread(imagePath)
         image = utils.cvt2Plt(image)
         output = BytesIO()
         image.convert("RGB").save(output, "BMP")
@@ -211,7 +214,9 @@ class WechatBot:
             self.send_text(text)
             
         if image is not None:
-            self.send_image(image)
+            self.send_image(image=image)
+        elif imagePath is not None:
+            self.send_image(imagePath=imagePath)
             
     def voice_call(self):
         # self.click(480, 530)

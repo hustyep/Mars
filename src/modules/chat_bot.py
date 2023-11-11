@@ -34,6 +34,7 @@ class ChatBot():
 
     def send_message(self, text=None, image=None, image_path=None):
         self.telegram_bot.send_message(text=text, image_path=image_path)
+        self.wechat_bot.send_message(text=text, imagePath=image_path)
 
     def voice_call(self):
         self.wechat_bot.voice_call()
